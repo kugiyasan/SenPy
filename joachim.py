@@ -1,12 +1,17 @@
 # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html
 # https://github.com/nobodyme/reddit-fetch.git
 # https://github.com/runarsf/rufus
+# https://praw.readthedocs.io/en/latest/getting_started/quick_start.html
 import discord
 from discord.ext import commands
 import requests
 import random
 from fake_useragent import UserAgent
 import io
+try:
+    from myToken import token
+except:
+    from yourToken import token
 
 # 'https://www.reddit.com/r/ChurchOfSenko/'
 # https://www.reddit.com/r/ChurchOfSenko/top/.json?sort=top&t=all&limit=10
@@ -71,9 +76,9 @@ async def stalk(ctx):
 
 ua = UserAgent(fallback='Mozilla/5.0 (X11; CrOS i686 2268.111.0) AppleWebKit/536.11 (KHTML, like Gecko) Chrome/20.0.1132.57 Safari/536.11')
 @bot.command(name='mofumofu')
-async def sendPic(ctx):
+async def sendPic(ctx, limit : int = 50):
     """Send blessing to the server!"""
-    url = 'https://www.reddit.com/r/ChurchOfSenko/new/.json?limit=20'
+    url = 'https://www.reddit.com/r/ChurchOfSenko/new/.json?limit=' + str(limit)
     response = requests.get(url, headers={'User-agent': ua.random})
 
     if not response.ok:
@@ -81,6 +86,7 @@ async def sendPic(ctx):
         return
 
     data = response.json()['data']['children']
+    print('number of post received', len(data))
     for i in range(len(data)):
         image_url = random.choice(data)['data']['url']
         if 'imgur' in image_url:
@@ -137,5 +143,5 @@ async def stop(ctx):
     print('\nlogging out...')
     await bot.logout()
 
-# this is the token DO NOT LEAK THIS PUBLICLY
-bot.run('NjcxNzIyMzM4ODQ4MzQyMDM2.Xjjb1g.IsRgLulJ-Y9nyi2GUa32zw0u0G8')
+
+bot.run(token)
