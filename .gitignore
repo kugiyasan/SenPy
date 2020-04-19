@@ -1,1 +1,5 @@
 myToken.py
+reddit.json
+botCommands/template.py
+__pycache__
+botCommands/__pycache__
