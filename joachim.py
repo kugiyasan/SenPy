@@ -3,6 +3,8 @@
 # https://github.com/runarsf/rufus
 # https://praw.readthedocs.io/en/latest/getting_started/quick_start.html
 
+# if you use stub e.g. f(member: discord.Member), autocomplete is going to work
+
 import discord
 from discord.ext import commands
 
@@ -17,8 +19,8 @@ bot = commands.Bot(command_prefix='XD ', description=description, activity=occup
 
 extensions = ['botCommands.basics',
             'botCommands.dev',
-            'botCommands.reddit',
-            'botCommands.welcome']
+            'botCommands.events',
+            'botCommands.reddit']
 
 @bot.event
 async def on_ready():
@@ -27,18 +29,20 @@ async def on_ready():
         print(g.name + ' member_count: ' + str(g.member_count))
     print()
 
-@bot.command()
+@bot.command(hidden=True)
 @commands.is_owner()
-async def reloadExt(ctx):
+async def reloadExt(ctx: commands.Context):
     """reload the extensions"""
+    await ctx.message.delete()
     for ext in extensions:
         bot.reload_extension(ext)
     print('Reloading successfully finished!')
 
-@bot.command()
+@bot.command(hidden=True)
 @commands.is_owner()
-async def stop(ctx):
+async def stop(ctx: commands.Context):
     """DON'T"""
+    await ctx.message.delete()
     print('\nlogging out...')
     await bot.logout()
 
