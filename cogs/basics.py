@@ -1,13 +1,9 @@
 import discord
 from discord.ext import commands
 
-class Dev(commands.Cog):
+class Basics(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command()
-    async def fasterImg(self, ctx):
-        pass
 
     # @commands.command(name='spam', hidden=True)
     # async def _spam(self, ctx, times: int = 1, *, msg: str = 'spam'):
@@ -17,16 +13,19 @@ class Dev(commands.Cog):
     #         await ctx.send(msg)
 
     @commands.command()
-    async def beautifulMessage(self, ctx):
-        # image = discord.File(open('../senko-san.jpg', 'rb'))
-        await ctx.send(embed=discord.Embed(
-            title='Hello World',
-            description='test test',
-            url='https://i.redd.it/lr3cj0w4f3x31.jpg',
-            set_footer='mofu mofu!',
-            set_image='https://i.redd.it/lr3cj0w4f3x31.jpg',
-            set_thumbnail='https://i.redd.it/lr3cj0w4f3x31.jpg',
-            color=discord.Colour.gold()))
+    async def ban(self, ctx, *members: discord.Member):
+        """wait the bot has ban permission?!?"""
+        output = ', '.join(m.name for m in members)
+        await ctx.send(f'`{output} has been banned from the server... just kidding I can\'t do that`')
+
+    @commands.command()
+    async def delete(self, ctx: commands.Context):
+        """delete the last message of the bot"""
+        await ctx.message.delete()
+        async for message in ctx.history():
+            if message.author.bot:
+                await message.delete()
+                break
 
     # @commands.command(name='kick')
     # @commands.is_owner()
@@ -40,4 +39,4 @@ class Dev(commands.Cog):
     #         await ctx.send(f'```{member} was kicked from the server.```')
 
 def setup(bot):
-    bot.add_cog(Dev(bot))
+    bot.add_cog(Basics(bot))

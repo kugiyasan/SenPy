@@ -2,10 +2,8 @@ import discord
 from discord.ext import commands
 
 from fake_useragent import UserAgent
-import io
 import random
 import requests
-# import praw
 
 class RedditAPI(commands.Cog, name='reddit'):
     def __init__(self, bot):
@@ -16,24 +14,18 @@ class RedditAPI(commands.Cog, name='reddit'):
         # TODO should save URLs locally and maybe even images
         # self.refillURLs()
 
-    @commands.command(name='mofumofu')
+    @commands.command(name='mofumofu', aliases=['mofu'])
     async def sendPic(self, ctx: commands.Context):
         """Send blessing to the server!"""
-        await ctx.message.delete()
-        async with ctx.typing():
-            self.refillURLs()
+        # if self.bot.
+        # await ctx.message.delete()
+        self.refillURLs()
 
-            print('requesting an image to reddit')
-            image = requests.get(self.URLdata.pop(), allow_redirects=False)
-            if(image.status_code == 200):
-                try:
-                    discordImage = discord.File(io.BytesIO(image.content), filename='praiseTheLord.png')
-                    await ctx.send(file=discordImage)
-                    return
-                except:
-                    print('Error image not sent')
-            else:
-                print('Error not the good status code 200 !=', image.status_code)
+        e = discord.Embed(
+            type='image',
+            color=discord.Colour.gold())
+        e.set_image(url=self.URLdata.pop())
+        await ctx.send(embed=e)
 
     def refillURLs(self):
         while len(self.URLdata) < 50:
@@ -41,7 +33,7 @@ class RedditAPI(commands.Cog, name='reddit'):
         random.shuffle(self.URLdata)
 
     def getUrls(self, subreddit):
-        url = f'https://www.reddit.com/r/{subreddit}/new/.json?after={self.after}'
+        url = f'https://www.reddit.com/r/{subreddit}/new/.json?limit=100&after={self.after}'
         print('requesting json file to reddit')
         response = requests.get(url, headers={'User-agent': self.ua.random})
 
@@ -49,10 +41,11 @@ class RedditAPI(commands.Cog, name='reddit'):
             print("Error check the name of the subreddit", response.status_code)
             return
 
-        data = response.json()['data']['children']
-        self.after = response.json()['data']['after']
-        for child in data:
+        data = response.json()['data']
+        self.after = data['after']
+        for child in data['children']:
             image_url = child['data']['url']
+            print(image_url)
             if 'imgur' in image_url:
                 image_url += '.jpeg'
             if '.png' in image_url or '.jpg' in image_url or '.jpeg' in image_url:
