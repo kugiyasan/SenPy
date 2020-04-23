@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import datetime
+import random
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -14,19 +15,19 @@ class Events(commands.Cog):
     #         await channel.send("I see that you are a slow typer, my friend")
     
     @commands.Cog.listener()
-    async def on_message(self, message):
-        # if message.author == self.bot:
-        #     return
-        if len(message.content) > 100:
-            await message.channel.send(f'{message.content[:20]}... too looooooonnnggg')
-
-    @commands.Cog.listener()
-    async def on_message_delete(self, message: discord.Message):
-        if message.author.bot:
+    async def on_message(self, message: discord.Message):
+        # message.delete() # rampage mode
+        if message.author.bot: #or self.bot.owner_id == message.author:
             return
-        if message.content.startswith(self.bot.command_prefix):
-            return
-        await message.channel.send(f'Deleting your message... smh "{message.content}"')
+        if message.guild != None:
+            print(message.guild.name, f'#{message.channel}')
+        print(message.created_at, message.author.name, '\033[32m', message.content, u'\033[0m')
+        if '<0/' in message.content or 'dab' in message.content:
+            dabs = ['<0/', '**<0/**', r'\0>', '<0/   <0/   <0/']
+            await message.channel.send(random.choice(dabs))
+        # #! the long message troll wasn't removed like asked gottem
+        # if len(message.content) > 1000:
+        #     await message.channel.send(f'{message.content[:20]}... too looooooonnnggg')
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
@@ -57,11 +58,11 @@ class Events(commands.Cog):
             try:
                 raise Exception
             except Exception as err:
+                await channel.send(err)
                 await channel.send("""Traceback (most recent call last):
                     File "events.py", line 49, in on_member_unban
                     Error: Felix never unban someone""")
-                # await channel.send(err)
-
+                
     @commands.Cog.listener()
     async def on_guild_emojis_update(self, guild, before, after):
         diff = set(after).difference(set(before))

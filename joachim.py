@@ -3,7 +3,9 @@
 # https://github.com/runarsf/rufus
 # https://praw.readthedocs.io/en/latest/getting_started/quick_start.html
 
-# if you use stub e.g. f(member: discord.Member), autocomplete is going to work
+#* if you use stub e.g. f(member: discord.Member), autocomplete is going to work
+
+import itertools
 
 import discord
 from discord.ext import commands
@@ -13,14 +15,16 @@ try:
 except:
     from yourToken import token
 
+prefixes = ['XD ', 'Xd ', 'xD ', 'xd ', 'XD', 'Xd', 'xD', 'xd']
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
 occupation = discord.Activity(type=discord.ActivityType.playing, name='with Fox Goddess')
-bot = commands.Bot(command_prefix='XD ', description=description, activity=occupation)
+bot = commands.Bot(command_prefix=prefixes, description=description, activity=occupation)
 
-extensions = ['botCommands.basics',
-            'botCommands.dev',
-            'botCommands.events',
-            'botCommands.reddit']
+extensions = ['cogs.basics',
+            'cogs.dev',
+            'cogs.events',
+            'cogs.reddit',
+            'cogs.cancer']
 
 @bot.event
 async def on_ready():
@@ -28,20 +32,17 @@ async def on_ready():
     for g in bot.guilds:
         print(g.name + ' member_count: ' + str(g.member_count))
     print()
-
 @bot.command(hidden=True)
 @commands.is_owner()
 async def reloadExt(ctx: commands.Context):
-    """reload the extensions"""
     await ctx.message.delete()
     for ext in extensions:
         bot.reload_extension(ext)
-    print('Reloading successfully finished!')
+    print('\033[94mReloading successfully finished!\033[0m\n')
 
 @bot.command(hidden=True)
 @commands.is_owner()
 async def stop(ctx: commands.Context):
-    """DON'T"""
     await ctx.message.delete()
     print('\nlogging out...')
     await bot.logout()

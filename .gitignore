@@ -1,8 +1,13 @@
 __pycache__
-botCommands/__pycache__
+cogs/__pycache__
+.vscode
 myToken.py
 reddit.json
-botCommands/template.py
 senko-san.jpg
+audio.mp3
+goodAudio.mp3
+opening.mp4
+cogs/memes.py
+cogs/quarantine.py
+cogs/template.py
 tests
-botCommands/memes.py
