@@ -16,7 +16,8 @@ class Basics(commands.Cog):
     async def ban(self, ctx, *members: discord.Member):
         """wait the bot has ban permission?!?"""
         output = ', '.join(m.name for m in members)
-        await ctx.send(f'`{output} has been banned from the server... just kidding I can\'t do that`')
+        await ctx.send(f'''`{output} has been banned from the server...
+                        just kidding I can\'t do that`''')
 
     @commands.command()
     async def delete(self, ctx: commands.Context):

@@ -3,7 +3,7 @@
 # https://github.com/runarsf/rufus
 # https://praw.readthedocs.io/en/latest/getting_started/quick_start.html
 
-#* if you use stub e.g. f(member: discord.Member), autocomplete is going to work
+#* Stubs (e.g. member: discord.Member) helps autocomplete
 
 import itertools
 
@@ -17,8 +17,11 @@ except:
 
 prefixes = ['XD ', 'Xd ', 'xD ', 'xd ', 'XD', 'Xd', 'xD', 'xd']
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
-occupation = discord.Activity(type=discord.ActivityType.playing, name='with Fox Goddess')
-bot = commands.Bot(command_prefix=prefixes, description=description, activity=occupation)
+occupation = discord.Activity(type=discord.ActivityType.playing,
+                                name='with Fox Goddess')
+bot = commands.Bot(command_prefix=prefixes,
+                    description=description,
+                    activity=occupation)
 
 extensions = ['cogs.basics',
             'cogs.cancer',
@@ -29,7 +32,7 @@ extensions = ['cogs.basics',
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers - id: {bot.user.id}')
+    print(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers')
     for g in bot.guilds:
         print(g.name + ' member_count: ' + str(g.member_count))
     print()

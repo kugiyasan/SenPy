@@ -13,7 +13,8 @@ class Cancer(commands.Cog):
     @commands.command()
     async def insult(self, ctx, *, member: discord.Member = None):
         """random compliment directly from the web"""
-        webpage = requests.get('http://www.robietherobot.com/insult-generator.htm')
+        url = 'http://www.robietherobot.com/insult-generator.htm'
+        webpage = requests.get(url)
         if(webpage.status_code == 200):
             tree = html.fromstring(webpage.content)
             insultText = tree.xpath('//h1')[1].text.strip()
@@ -30,17 +31,24 @@ class Cancer(commands.Cog):
         '''Type XD neko help to see all category'''
         # .format(self.bot.command_prefix[0])
         style = style.lower()
-        possibilities = ['feet', 'yuri', 'trap', 'futanari', 'hololewd', 'lewdkemo', 'solog', 'feetg', 'cum', 'erokemo', 'les',
-            'wallpaper', 'lewdk', 'ngif', 'tickle', 'lewd', 'feed', 'gecg', 'eroyuri', 'eron', 'cum_jpg', 'bj', 'nsfw_neko_gif',
-            'solo', 'kemonomimi', 'nsfw_avatar', 'gasm', 'poke', 'anal', 'slap', 'hentai', 'avatar', 'erofeet', 'holo', 'keta',
-            'blowjob', 'pussy', 'tits', 'holoero', 'lizard', 'pussy_jpg', 'pwankg', 'classic', 'kuni', 'waifu', 'pat', '8ball',
-            'kiss', 'femdom', 'neko', 'spank', 'cuddle', 'erok', 'fox_girl', 'boobs', 'random_hentai_gif', 'smallboobs', 'hug',
-            'ero', 'smug', 'goose', 'baka', 'woof']
+        possibilities = ['feet', 'yuri', 'trap', 'futanari', 'hololewd',
+                        'lewdkemo', 'solog', 'feetg', 'cum', 'erokemo', 'les',
+                        'wallpaper', 'lewdk', 'ngif', 'tickle', 'lewd', 'feed',
+                        'gecg', 'eroyuri', 'eron', 'cum_jpg', 'bj',
+                        'nsfw_neko_gif', 'solo', 'kemonomimi', 'nsfw_avatar',
+                        'gasm', 'poke', 'anal', 'slap', 'hentai', 'avatar',
+                        'erofeet', 'holo', 'keta', 'blowjob', 'pussy', 'tits',
+                        'holoero', 'lizard', 'pussy_jpg', 'pwankg', 'classic',
+                        'kuni', 'waifu', 'pat', '8ball', 'kiss', 'femdom',
+                        'neko', 'spank', 'cuddle', 'erok', 'fox_girl', 'boobs',
+                        'random_hentai_gif', 'smallboobs', 'hug', 'ero',
+                        'smug', 'goose', 'baka', 'woof']
         if style == 'help':
             await ctx.send(f'Available arguments:\n```{" ".join(possibilities)}```')
             return
         if not style or style not in possibilities:
-            await ctx.send(f'Choose an valid argument! Available arguments:\n```{" ".join(possibilities)}```')
+            await ctx.send(f'''Choose an valid argument! Available arguments:
+                            ```{" ".join(possibilities)}```''')
             return
         e = discord.Embed(
             type='image',
@@ -65,7 +73,8 @@ class Cancer(commands.Cog):
             verb = verb[verb.index('.')+1:]
             if verb == 'custom':
                 verb = 'saying'
-            output.append(f'{member.name} is {verb} {member.activities[0].name}')
+            action = member.activities[0].name
+            output.append(f'{member.name} is {verb} {action}')
         await ctx.send('\n'.join(output))
 
 def setup(bot):
