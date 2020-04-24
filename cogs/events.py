@@ -21,10 +21,15 @@ class Events(commands.Cog):
             return
         if message.guild != None:
             print(message.guild.name, f'#{message.channel}')
-        print(message.created_at, message.author.name, '\033[32m', message.content, u'\033[0m')
-        if '<0/' in message.content or 'dab' in message.content:
-            dabs = ['<0/', '**<0/**', r'\0>', '<0/   <0/   <0/']
-            await message.channel.send(random.choice(dabs))
+        print(message.created_at, message.author.name, '\033[32m', message.content, ' \033[0m')
+        dabs = ['dab', 'DAB', '<0/', '<0/', r'\0>', '<0/   <0/   <0/']
+        for dab in dabs:
+            if dab in message.content:
+                if random.randint(0, 1):
+                    await message.channel.send(random.choice(dabs))
+                else:
+                    await message.channel.send('**{}**'.format(random.choice(dabs)))
+
         # #! the long message troll wasn't removed like asked gottem
         # if len(message.content) > 1000:
         #     await message.channel.send(f'{message.content[:20]}... too looooooonnnggg')

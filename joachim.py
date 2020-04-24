@@ -21,10 +21,11 @@ occupation = discord.Activity(type=discord.ActivityType.playing, name='with Fox 
 bot = commands.Bot(command_prefix=prefixes, description=description, activity=occupation)
 
 extensions = ['cogs.basics',
+            'cogs.cancer',
             'cogs.dev',
             'cogs.events',
             'cogs.reddit',
-            'cogs.cancer']
+            'cogs.voice']
 
 @bot.event
 async def on_ready():
@@ -42,7 +43,7 @@ async def reloadExt(ctx: commands.Context):
 
 @bot.command(hidden=True)
 @commands.is_owner()
-async def stop(ctx: commands.Context):
+async def logout(ctx: commands.Context):
     await ctx.message.delete()
     print('\nlogging out...')
     await bot.logout()
