@@ -27,7 +27,8 @@ class Cancer(commands.Cog):
     @commands.command()
     @commands.is_nsfw()
     async def neko(self, ctx, style='neko'):
-        """Type {}neko help to see all category""".format(self.bot.command_prefix[0])
+        '''Type XD neko help to see all category'''
+        # .format(self.bot.command_prefix[0])
         style = style.lower()
         possibilities = ['feet', 'yuri', 'trap', 'futanari', 'hololewd', 'lewdkemo', 'solog', 'feetg', 'cum', 'erokemo', 'les',
             'wallpaper', 'lewdk', 'ngif', 'tickle', 'lewd', 'feed', 'gecg', 'eroyuri', 'eron', 'cum_jpg', 'bj', 'nsfw_neko_gif',

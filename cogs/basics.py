@@ -38,5 +38,10 @@ class Basics(commands.Cog):
     #         await ctx.message.guild.kick(member)
     #         await ctx.send(f'```{member} was kicked from the server.```')
 
+    @commands.command()
+    async def ping(self, ctx):
+        ping =  round(self.bot.latency * 1000)
+        await ctx.send(f"Pong! My ping is {ping}ms")
+
 def setup(bot):
     bot.add_cog(Basics(bot))
