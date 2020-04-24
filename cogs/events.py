@@ -7,7 +7,6 @@ import random
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
-        self._last_member = None
 
     # @commands.Cog.listener()
     # async def on_typing(self, channel, user, when):
@@ -21,18 +20,20 @@ class Events(commands.Cog):
             return
         if message.guild != None:
             print(message.guild.name, f'#{message.channel}')
-        print(message.created_at, message.author.name, '\033[32m', message.content, ' \033[0m')
+        timename = str(message.created_at) + message.author.name
+        print(timename, '\033[32m', message.content, ' \033[0m')
         dabs = ['dab', 'DAB', '<0/', '<0/', r'\0>', '<0/   <0/   <0/']
         for dab in dabs:
             if dab in message.content:
+                wrapper = '{}'
                 if random.randint(0, 1):
-                    await message.channel.send(random.choice(dabs))
-                else:
-                    await message.channel.send('**{}**'.format(random.choice(dabs)))
+                    wrapper = '**{}**'
+                await message.channel.send(wrapper.format(random.choice(dabs)))
 
         # #! the long message troll wasn't removed like asked gottem
-        # if len(message.content) > 1000:
-        #     await message.channel.send(f'{message.content[:20]}... too looooooonnnggg')
+        # m = message.content
+        # if len(m) > 1000:
+        #     await message.channel.send(f'{m[:20]}... too looooooonnnnnngggg')
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction, user):
@@ -75,18 +76,9 @@ class Events(commands.Cog):
             channels = guild.channels
             for channel in channels:
                 if channel.name == 'general':
-                    await channel.send('**NEW EMOJIS**' + ' '.join(map(lambda x:x.name, diff)))
+                    newemojis = ' '.join(map(lambda x:x.name, diff))
+                    await channel.send('**NEW EMOJIS**' + newemojis)
                     break
-
-    @commands.command()
-    async def hello(self, ctx, *, member: discord.Member = None):
-        """Says hello"""
-        member = member or ctx.author
-        if self._last_member is None or self._last_member.id != member.id:
-            await ctx.send('Hello {0.name}~'.format(member))
-        else:
-            await ctx.send('Hello {0.name}... This feels familiar.'.format(member))
-        self._last_member = member
 
 def setup(bot):
     bot.add_cog(Events(bot))

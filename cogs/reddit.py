@@ -11,7 +11,7 @@ class RedditAPI(commands.Cog, name='reddit'):
         self.ua = UserAgent()
         self.after = 'null'
         self.URLdata = []
-        # TODO should save URLs locally and maybe even images
+        # TODO should save URLs locally
         # self.refillURLs()
 
     @commands.command(name='mofumofu', aliases=['mofu'])
@@ -38,18 +38,20 @@ class RedditAPI(commands.Cog, name='reddit'):
         response = requests.get(url, headers={'User-agent': self.ua.random})
 
         if not response.ok:
-            print("Error check the name of the subreddit", response.status_code)
+            print(f"Error {url} responded", response.status_code)
             return
 
         data = response.json()['data']
         self.after = data['after']
         for child in data['children']:
             image_url = child['data']['url']
-            print(image_url)
+            # print(image_url)
             if 'imgur' in image_url:
                 image_url += '.jpeg'
-            if '.png' in image_url or '.jpg' in image_url or '.jpeg' in image_url:
-                self.URLdata.append(image_url)
+            exts = ['.png', '.jpg', '.jpeg']
+            for ext in exts:
+                if image_url.endswith(ext):
+                    self.URLdata.append(image_url)
         print(f'{len(self.URLdata)} urls in the list')
 
 def setup(bot):
