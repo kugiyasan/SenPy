@@ -3,6 +3,7 @@ cogs/__pycache__
 .vscode
 myToken.py
 reddit.json
+logs
 senko-san.jpg
 audio.mp3
 goodAudio.mp3
@@ -12,3 +13,4 @@ cogs/memes.py
 cogs/quarantine.py
 cogs/template.py
 tests
+example.db

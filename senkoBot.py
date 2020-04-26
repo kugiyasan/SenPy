@@ -1,11 +1,10 @@
 # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html
 # https://github.com/nobodyme/reddit-fetch.git
 # https://github.com/runarsf/rufus
-# https://praw.readthedocs.io/en/latest/getting_started/quick_start.html
 
 #* Stubs (e.g. member: discord.Member) helps autocomplete
 
-import itertools
+import logging
 
 import discord
 from discord.ext import commands
@@ -23,19 +22,21 @@ bot = commands.Bot(command_prefix=prefixes,
                     description=description,
                     activity=occupation)
 
-extensions = ['cogs.basics',
+extensions = ('cogs.admin',
             'cogs.cancer',
             'cogs.dev',
             'cogs.events',
             'cogs.reddit',
-            'cogs.voice']
+            'cogs.voice')
+            
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers')
+    logging.info(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers')
     for g in bot.guilds:
-        print(g.name + ' member_count: ' + str(g.member_count))
+        logging.info(g.name + ' member_count: ' + str(g.member_count))
     print()
+
 @bot.command(hidden=True)
 @commands.is_owner()
 async def reloadExt(ctx: commands.Context):
@@ -48,10 +49,11 @@ async def reloadExt(ctx: commands.Context):
 @commands.is_owner()
 async def logout(ctx: commands.Context):
     await ctx.message.delete()
-    print('\nlogging out...')
+    logging.info('\nlogging out...')
     await bot.logout()
 
 if __name__ == "__main__":
+    logging.basicConfig(filename='logs/example1.log', level=logging.INFO)
     for ext in extensions:
         bot.load_extension(ext)
 
