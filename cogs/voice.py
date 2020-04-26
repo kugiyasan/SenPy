@@ -23,12 +23,20 @@ class Voice(commands.Cog):
 
     @commands.command()
     async def cursed(self, ctx):
-        vc = self.bot.voice_clients
-        if len(vc):
-            vc[0].play(discord.PCMAudio(open('audio.wav', 'rb')))
+        voice_client: discord.VoiceClient = self.getvc(ctx)
+        audio_source = discord.PCMAudio(open('audio.wav', 'rb'))
+        if not voice_client.is_playing():
+            voice_client.play(audio_source)
 
     @commands.command(aliases=['paly', 'queue', 'que'])
     async def play(self, ctx):
+        voice_client: discord.VoiceClient = self.getvc(ctx)
+        audio_source = discord.FFmpegPCMAudio('audio.mp3')
+        if not voice_client.is_playing():
+            voice_client.play(audio_source)
+
+    @commands.command()
+    async def loop(self, ctx):
         voice_client: discord.VoiceClient = self.getvc(ctx)
         audio_source = discord.FFmpegPCMAudio('audio.mp3')
         if not voice_client.is_playing():
@@ -43,7 +51,7 @@ class Voice(commands.Cog):
     @commands.command()
     async def resume(self, ctx, *args):
         voice_client: discord.VoiceClient = self.getvc(ctx)
-        if not voice_client.is_playing():
+        if voice_client.is_paused():
             voice_client.resume()
 
     @commands.command()

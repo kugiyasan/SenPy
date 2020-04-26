@@ -2,33 +2,40 @@ import discord
 from discord.ext import commands
 
 import datetime
+import logging
 import random
+import re
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    # @commands.Cog.listener()
-    # async def on_typing(self, channel, user, when):
-    #     if datetime.datetime.utcnow() - when > datetime.timedelta(seconds=10):
-    #         await channel.send("I see that you are a slow typer, my friend")
-    
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         # message.delete() # rampage mode
         if message.author.bot: #or self.bot.owner_id == message.author:
             return
+        guildChannel = ' '
         if message.guild != None:
-            print(message.guild.name, f'#{message.channel}')
-        timename = str(message.created_at) + message.author.name
-        print(timename, '\033[32m', message.content, ' \033[0m')
-        dabs = ['dab', 'DAB', '<0/', '<0/', r'\0>', '<0/   <0/   <0/']
+            guildChannel = ' ' + message.guild.name + ' #' + str(message.channel) + ' '
+        timename = str(message.created_at)[:-3] + ' ' + message.author.name
+        logging.info(timename + guildChannel + message.content)
+        
+        ctx = message.channel
+        
+        codingChannel = 'coding-for-the-morons'
+        if '```' in message.content and message.guild.name == 'Banana Squad' and message.channel.name != codingChannel:
+            await ctx.send(f'Coding goes into #{message.channel}')
+
+        dabs = ['dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/']
         for dab in dabs:
-            if dab in message.content:
+            # if dab in message.content:
+            #? not working
+            if re.search(f'[^A-Za-z]{dab}[^A-Za-z]', message.content):
                 wrapper = '{}'
                 if random.randint(0, 1):
                     wrapper = '**{}**'
-                await message.channel.send(wrapper.format(random.choice(dabs)))
+                await ctx.send(wrapper.format(random.choice(dabs)))
 
         # #! the long message troll wasn't removed like asked gottem
         # m = message.content
@@ -49,13 +56,13 @@ class Events(commands.Cog):
     async def on_member_remove(self, member):
         channel = member.guild.system_channel
         if channel is not None:
-            await channel.send(f'See you later aligator {member.mention}.')
+            await channel.send(f'See you later alligator {member.mention}.')
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
         channel = guild.system_channel
         if channel is not None:
-            await channel.send("Félix used Banhammer!\nIt's super effective!") 
+            await channel.send("Buramie used Banhammer!\nIt's super effective!") 
             
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
@@ -67,7 +74,7 @@ class Events(commands.Cog):
                 await channel.send(err)
                 await channel.send("""Traceback (most recent call last):
                     File "events.py", line 49, in on_member_unban
-                    Error: Felix never unban someone""")
+                    Error: Buramie never unban someone""")
                 
     @commands.Cog.listener()
     async def on_guild_emojis_update(self, guild, before, after):

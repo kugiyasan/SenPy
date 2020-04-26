@@ -1,7 +1,8 @@
 import discord
 from discord.ext import commands
 
-import inspect
+from cogs.utils.sendEmbed import sendEmbed
+
 import nekos
 import requests
 from lxml import html
@@ -26,10 +27,12 @@ class Cancer(commands.Cog):
             print('Error not the good status code 200 !=', webpage.status_code)
 
     @commands.command()
-    @commands.is_nsfw()
-    async def neko(self, ctx, style='neko'):
+    async def neko(self, ctx: commands.Context, style='neko'):
         '''Type XD neko help to see all category'''
         # .format(self.bot.command_prefix[0])
+        if not ctx.channel.is_nsfw() and ctx.guild.name == 'Banana Squad':
+            await ctx.send('Please try again in a nsfw channel')
+            return
         style = style.lower()
         possibilities = ['feet', 'yuri', 'trap', 'futanari', 'hololewd',
                         'lewdkemo', 'solog', 'feetg', 'cum', 'erokemo', 'les',
@@ -43,39 +46,18 @@ class Cancer(commands.Cog):
                         'neko', 'spank', 'cuddle', 'erok', 'fox_girl', 'boobs',
                         'random_hentai_gif', 'smallboobs', 'hug', 'ero',
                         'smug', 'goose', 'baka', 'woof']
+
         if style == 'help':
             await ctx.send(f'Available arguments:\n```{" ".join(possibilities)}```')
             return
+
         if not style or style not in possibilities:
             await ctx.send(f'''Choose an valid argument! Available arguments:
                             ```{" ".join(possibilities)}```''')
             return
-        e = discord.Embed(
-            type='image',
-            color=discord.Colour.gold())
-        e.set_image(url=nekos.img(style))
-        await ctx.send(embed=e)
         
-
-    @commands.command()
-    async def stalk(self, ctx):
-        """get status of all online members"""
-        members = ctx.guild.members
-        output = []
-        for member in members:
-            if member.bot:
-                continue
-            if not member.activities:
-                if member.status != discord.Status.offline:
-                    output.append(f'{member.name} is {member.status}')
-                continue
-            verb = str(member.activities[0].type)
-            verb = verb[verb.index('.')+1:]
-            if verb == 'custom':
-                verb = 'saying'
-            action = member.activities[0].name
-            output.append(f'{member.name} is {verb} {action}')
-        await ctx.send('\n'.join(output))
+        await sendEmbed(ctx, nekos.img(style))
+        
 
 def setup(bot):
     bot.add_cog(Cancer(bot))
