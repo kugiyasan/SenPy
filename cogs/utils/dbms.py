@@ -18,3 +18,7 @@ class DB():
     def create_connection(self, db_file):
         return sqlite3.connect(db_file)
 
+    # def ask(self, query, ):
+    #     c.execute(query)
+    #     output = c.fetchone()
+    #     return output

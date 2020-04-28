@@ -16,7 +16,9 @@ class Admin(commands.Cog):
     async def delete(self, ctx: commands.Context):
         """delete the last message of the bot"""
         await ctx.message.delete()
+
         async for message in ctx.history():
+            #TODO should only delete his own messsage
             if message.author.bot:
                 await message.delete()
                 break

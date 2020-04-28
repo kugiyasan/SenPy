@@ -19,7 +19,7 @@ class Events(commands.Cog):
         if message.guild != None:
             guildChannel = ' ' + message.guild.name + ' #' + str(message.channel) + ' '
         timename = str(message.created_at)[:-3] + ' ' + message.author.name
-        logging.info(timename + guildChannel + message.content)
+        logging.info(timename + guildChannel + message.content.encode('ascii', 'ignore').decode('ascii'))
         
         ctx = message.channel
         
