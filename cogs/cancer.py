@@ -1,12 +1,12 @@
 import discord
 from discord.ext import commands
 
-from cogs.utils.sendEmbed import sendEmbed
-from cogs.utils.deleteMessage import deleteMessage
-
 import nekos
 import requests
 from lxml import html
+
+from cogs.utils.sendEmbed import sendEmbed
+from cogs.utils.deleteMessage import deleteMessage
 
 class Cancer(commands.Cog):
     def __init__(self, bot):
@@ -29,8 +29,7 @@ class Cancer(commands.Cog):
 
     @commands.command()
     async def neko(self, ctx: commands.Context, style='neko'):
-        '''Type XD neko help to see all category'''
-        # .format(self.bot.command_prefix[0])
+        '''Send some cute nekos on your server!'''
         await deleteMessage(ctx)
 
         if not ctx.channel.is_nsfw() and ctx.guild.name == 'Banana Squad':
@@ -50,38 +49,12 @@ class Cancer(commands.Cog):
                         'random_hentai_gif', 'smallboobs', 'hug', 'ero',
                         'smug', 'goose', 'baka', 'woof']
 
-        if style == 'help':
-            await ctx.send(f'Available arguments:\n```{" ".join(possibilities)}```')
-            return
-
         if not style or style not in possibilities:
-            await ctx.send(f'''Choose an valid argument! Available arguments:
-                            ```{" ".join(possibilities)}```''')
+            await ctx.send(f'''Available arguments:\n```{" ".join(possibilities)}```''')
             return
-        
+
         await sendEmbed(ctx, nekos.img(style))
-        
 
-    @commands.command(aliases=['loli'])
-    async def legalize(self, ctx, age):
-        try:
-            age = int(age)
-            if age < 1:
-                raise ValueError
-        except:
-            await ctx.send("Give me a valid age, or else the FBI will come to your house!")
-            return
-
-        if age < 4:
-            await ctx.send("Rip dude, I can't legalize your loli, get ready to get caught!")
-            return 
-        if age < 6:
-            await ctx.send(f"{age}? That's just 10{age%2}, in base 2!")
-            return 
-
-        await ctx.send(f"{age}? That's {20+age%2}, in base {age//2}!")
-        if age > 20:
-            await ctx.send("But what's the purpose of legalizing already legal lolis??")
 
 def setup(bot):
     bot.add_cog(Cancer(bot))

@@ -27,6 +27,7 @@ extensions = ('cogs.admin',
             'cogs.cancer',
             'cogs.dev',
             'cogs.events',
+            'cogs.memes',
             'cogs.reddit',
             'cogs.voice')
             
@@ -57,7 +58,11 @@ async def logout(ctx: commands.Context):
     await bot.logout()
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='logs/example1.log', level=logging.INFO)
+    root_logger= logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    handler = logging.FileHandler('logs/example2.log', 'w', 'utf-8')
+    handler.setFormatter(logging.Formatter('%(name)s %(message)s'))
+    root_logger.addHandler(handler)
     
     for ext in extensions:
         bot.load_extension(ext)
