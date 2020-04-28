@@ -2,15 +2,6 @@ __pycache__
 cogs/__pycache__
 .vscode
 myToken.py
-reddit.json
 logs
-senko-san.jpg
-audio.mp3
-goodAudio.mp3
-audio.wav
-opening.mp4
-cogs/memes.py
-cogs/quarantine.py
-cogs/template.py
+media
 tests
-example.db

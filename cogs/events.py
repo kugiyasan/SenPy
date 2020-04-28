@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 
-import datetime
 import logging
 import random
 import re
@@ -13,13 +12,13 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         # message.delete() # rampage mode
-        if message.author.bot: #or self.bot.owner_id == message.author:
+        if message.author.bot:
             return
         guildChannel = ' '
         if message.guild != None:
             guildChannel = ' ' + message.guild.name + ' #' + str(message.channel) + ' '
         timename = str(message.created_at)[:-3] + ' ' + message.author.name
-        logging.info(timename + guildChannel + message.content.encode('ascii', 'ignore').decode('ascii'))
+        logging.info(timename + guildChannel + message.content)
         
         ctx = message.channel
         
@@ -29,12 +28,10 @@ class Events(commands.Cog):
 
         dabs = ['dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/']
         for dab in dabs:
-            # if dab in message.content:
             #? not working
             if re.search(f'[^A-Za-z]{dab}[^A-Za-z]', message.content):
-                wrapper = '{}'
-                if random.randint(0, 1):
-                    wrapper = '**{}**'
+                style = random.randint(0, 3)
+                wrapper = '*'*style + '{}' + '*'*style
                 await ctx.send(wrapper.format(random.choice(dabs)))
 
         # #! the long message troll wasn't removed like asked gottem
