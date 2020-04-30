@@ -27,6 +27,7 @@ extensions = ('cogs.admin',
             'cogs.cancer',
             'cogs.dev',
             'cogs.events',
+            'cogs.mastermind',
             'cogs.memes',
             'cogs.reddit',
             'cogs.voice')
@@ -44,7 +45,10 @@ async def on_ready():
 @commands.is_owner()
 async def reloadExt(ctx: commands.Context):
     '''Reloads the bot extensions without rebooting the entire program'''
-    await ctx.message.delete()
+    try:
+        await ctx.message.delete()
+    except:
+        pass
     for ext in extensions:
         bot.reload_extension(ext)
 
@@ -53,14 +57,17 @@ async def reloadExt(ctx: commands.Context):
 @bot.command(hidden=True)
 @commands.is_owner()
 async def logout(ctx: commands.Context):
-    await ctx.message.delete()
+    try:
+        await ctx.message.delete()
+    except:
+        pass
     logging.info('\nlogging out...')
     await bot.logout()
 
 if __name__ == "__main__":
     root_logger= logging.getLogger()
     root_logger.setLevel(logging.INFO)
-    handler = logging.FileHandler('logs/example2.log', 'w', 'utf-8')
+    handler = logging.FileHandler('logs/latest.log', 'a', 'utf-8')
     handler.setFormatter(logging.Formatter('%(name)s %(message)s'))
     root_logger.addHandler(handler)
     

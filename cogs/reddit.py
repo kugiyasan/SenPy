@@ -14,7 +14,8 @@ class RedditAPI(commands.Cog, name='reddit'):
         self.URLdata = {}
 
     @commands.command()
-    async def search(self, ctx,  *searchkws):
+    async def search(self, ctx, *searchkws):
+        '''Search a subreddit name, can help if you get an error with r/'''
         print('requesting search to reddit')
         requestURL = 'https://www.reddit.com/subreddits/search.json?q={}&include_over_18=on'.format('%20'.join(searchkws))
 
