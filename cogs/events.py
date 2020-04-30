@@ -3,7 +3,6 @@ from discord.ext import commands
 
 import logging
 import random
-import re
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -22,14 +21,13 @@ class Events(commands.Cog):
         
         ctx = message.channel
         
-        codingChannel = 'coding-for-the-morons'
-        if '```' in message.content and message.guild.name == 'Banana Squad' and message.channel.name != codingChannel:
-            await ctx.send(f'Coding goes into #{message.channel}')
+        codingChannel = 693920225846100049
+        if '```' in message.content and message.guild.name == 'Banana Squad' and message.channel.id != codingChannel:
+            await ctx.send(f'Coding goes into #{codingChannel}')
 
         dabs = ['dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/']
         for dab in dabs:
-            #? not working
-            if re.search(f'[^A-Za-z]{dab}[^A-Za-z]', message.content):
+            if dab in message.content.split():
                 style = random.randint(0, 3)
                 wrapper = '*'*style + '{}' + '*'*style
                 await ctx.send(wrapper.format(random.choice(dabs)))
@@ -47,7 +45,7 @@ class Events(commands.Cog):
     async def on_member_join(self, member):
         channel = member.guild.system_channel
         if channel is not None:
-            await channel.send(f'Welcome {member.mention}.')
+            await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):

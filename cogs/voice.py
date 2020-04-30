@@ -23,22 +23,23 @@ class Voice(commands.Cog):
 
     @commands.command()
     async def cursed(self, ctx):
+        '''Please Buramie let me delete this shit'''
         voice_client: discord.VoiceClient = self.getvc(ctx)
-        audio_source = discord.PCMAudio(open('audio.wav', 'rb'))
+        audio_source = discord.PCMAudio(open('media/audio.wav', 'rb'))
+        if not voice_client:
+            await self.join(ctx)
+            voice_client: discord.VoiceClient = self.getvc(ctx)
         if not voice_client.is_playing():
             voice_client.play(audio_source)
 
-    @commands.command(aliases=['paly', 'queue', 'que'])
+    @commands.command(aliases=['paly', 'queue', 'que', 'p'])
     async def play(self, ctx):
+        '''Play the senko-san opening!'''
         voice_client: discord.VoiceClient = self.getvc(ctx)
-        audio_source = discord.FFmpegPCMAudio('audio.mp3')
-        if not voice_client.is_playing():
-            voice_client.play(audio_source)
-
-    @commands.command()
-    async def loop(self, ctx):
-        voice_client: discord.VoiceClient = self.getvc(ctx)
-        audio_source = discord.FFmpegPCMAudio('audio.mp3')
+        audio_source = discord.FFmpegPCMAudio('media/audio.mp3')
+        if not voice_client:
+            await self.join(ctx)
+            voice_client: discord.VoiceClient = self.getvc(ctx)
         if not voice_client.is_playing():
             voice_client.play(audio_source)
 
@@ -54,17 +55,11 @@ class Voice(commands.Cog):
         if voice_client.is_paused():
             voice_client.resume()
 
-    @commands.command()
+    @commands.command(aliases=['bye'])
     async def disconnect(self, ctx, *args):
         voice_client: discord.VoiceClient = self.getvc(ctx)
         if voice_client:
             await voice_client.disconnect()
-
-    @commands.command()
-    async def stop(self, ctx, *args):
-        voice_client: discord.VoiceClient = self.getvc(ctx)
-        if voice_client.is_playing():
-            voice_client.stop()
 
 def setup(bot):
     bot.add_cog(Voice(bot))

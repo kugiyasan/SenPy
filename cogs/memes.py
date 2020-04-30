@@ -26,5 +26,9 @@ class Memes(commands.Cog):
         if age > 20:
             await ctx.send("But what's the purpose of legalizing already legal lolis??")
 
+    @commands.command()
+    async def ping(self, ctx):
+        await ctx.send(f'Pong! The latency is about {int(self.bot.latency*1000)} ms')
+
 def setup(bot):
     bot.add_cog(Memes(bot))
