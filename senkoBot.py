@@ -24,11 +24,11 @@ bot = commands.Bot(command_prefix=prefixes,
                     activity=occupation)
 
 extensions = ('cogs.admin',
-            'cogs.cancer',
             'cogs.dev',
             'cogs.events',
             'cogs.mastermind',
             'cogs.memes',
+            'cogs.neko',
             'cogs.reddit',
             'cogs.voice')
             

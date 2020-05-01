@@ -1,9 +1,27 @@
 import discord
 from discord.ext import commands
 
+import requests
+from lxml import html
+
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    @commands.command()
+    async def insult(self, ctx, *, member: discord.Member = None):
+        """random compliment from the web"""
+        url = 'http://www.robietherobot.com/insult-generator.htm'
+        webpage = requests.get(url)
+        if(webpage.status_code == 200):
+            tree = html.fromstring(webpage.content)
+            insultText = tree.xpath('//h1')[1].text.strip()
+            if not member:
+                await ctx.send("You're a " + insultText)
+            else:
+                await ctx.send(str(member) + " is a " + insultText)
+        else:
+            print('Error not the good status code 200 !=', webpage.status_code)
 
     @commands.command(aliases=['loli'])
     async def legalize(self, ctx, age):
@@ -26,9 +44,6 @@ class Memes(commands.Cog):
         if age > 20:
             await ctx.send("But what's the purpose of legalizing already legal lolis??")
 
-    @commands.command()
-    async def ping(self, ctx):
-        await ctx.send(f'Pong! The latency is about {int(self.bot.latency*1000)} ms')
 
 def setup(bot):
     bot.add_cog(Memes(bot))

@@ -11,8 +11,7 @@ class Mastermind(commands.Cog):
 
     def judgement(self, guess, answer):
         guess = [int(i) for i in guess]
-        white = 0
-        brown = 0
+        white, brown = 0, 0
 
         for i in range(1, 7):
             brown += min(guess.count(i), answer.count(i))
@@ -26,6 +25,7 @@ class Mastermind(commands.Cog):
     def toEmoji(self, string):
         if type(string) == list:
             string = ''.join(str(i) for i in string)
+
         return (string.replace('1', ':red_circle:')
                     .replace('2', ':orange_circle:')
                     .replace('3', ':yellow_circle:')
@@ -34,11 +34,10 @@ class Mastermind(commands.Cog):
                     .replace('6', ':purple_circle:'))
 
     @commands.command(aliases=['mm'])
-    async def mastermind(self, ctx: commands.Context):
+    async def mastermind(self, ctx: commands.Context, guessLength: int=6):
         '''Play a game of mastermind!'''
         numberOfTries = 10
-        guessLength = 6
-        tryCount = 0
+        
         answer = [random.randint(1, 6) for _ in range(guessLength)]
 
         await ctx.send('1 : red\t2 : orange\t3 : yellow\t4 : green\t5 : blue\t6 : purple')
@@ -51,9 +50,12 @@ class Mastermind(commands.Cog):
             return (m.author == ctx.author
                 and m.channel == ctx.channel)
 
+        tryCount = 0
         while tryCount < numberOfTries:
             try:
-                msg = await self.bot.wait_for('message', timeout=300.0, check=checkresponse)
+                msg = await self.bot.wait_for('message',
+                                            timeout=300.0,
+                                            check=checkresponse)
             except asyncio.TimeoutError:
                 await ctx.send('Stopping mastermind, timeout expired')
                 return
@@ -62,6 +64,7 @@ class Mastermind(commands.Cog):
             if msg.lower() == 'stop':
                 await ctx.send('Stopping the game...', delete_after=10.0)
                 return
+            
             if len(msg) != guessLength or re.search('[^1-6]', msg):
                 await ctx.send('Please enter a valid guess!', delete_after=10.0)
                 continue
@@ -85,6 +88,7 @@ class Mastermind(commands.Cog):
 
                     if judge == ':white_circle:'*guessLength:
                         await ctx.send('Congratulations! You won!')
+                        return
 
                     tryCount += 1
                     break
