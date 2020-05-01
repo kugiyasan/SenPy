@@ -27,8 +27,8 @@ class Admin(commands.Cog):
     @commands.command(hidden=True)
     @commands.is_owner()
     async def gitpull(self, ctx: commands.Context):
-        g = git.cmd.Git(Path(__file__).resolve().parents[2])
-        g.pull(verbose=True)
+        g = git.cmd.Git(Path(__file__).resolve().parent)
+        g.pull()
 
 
 

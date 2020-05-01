@@ -61,7 +61,7 @@ async def logout(ctx: commands.Context):
 
 if __name__ == "__main__":
     root_logger= logging.getLogger()
-    root_logger.setLevel(logging.DEBUG)
+    root_logger.setLevel(logging.INFO)
     handler = logging.FileHandler('logs/latest.log', 'a', 'utf-8')
     handler.setFormatter(logging.Formatter('%(name)s %(message)s'))
     root_logger.addHandler(handler)
