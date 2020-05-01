@@ -38,7 +38,9 @@ class Events(commands.Cog):
         #     await message.channel.send(f'{m[:20]}... too looooooonnnnnngggg')
 
     @commands.Cog.listener()
-    async def on_reaction_add(self, reaction, user):
+    async def on_reaction_add(self, reaction: discord.Reaction, user):
+        if reaction.emoji == u"\U0001F44E" or reaction.emoji == '⬇️':
+            return
         await reaction.message.add_reaction(reaction)
 
     @commands.Cog.listener()

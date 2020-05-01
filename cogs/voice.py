@@ -11,11 +11,11 @@ class Voice(commands.Cog):
     @commands.command()
     async def join(self, ctx: commands.Context):
         vc = ctx.author.voice
-        # print(vc.channel)
         voice_client: discord.VoiceClient = self.getvc(ctx)
+        
         if voice_client and voice_client.is_connected():
             await voice_client.move_to(vc.channel)
-            return
+
         if vc.channel != None:
             await vc.channel.connect()
         else:
@@ -26,9 +26,11 @@ class Voice(commands.Cog):
         '''Please Buramie let me delete this shit'''
         voice_client: discord.VoiceClient = self.getvc(ctx)
         audio_source = discord.PCMAudio(open('media/audio.wav', 'rb'))
+        
         if not voice_client:
             await self.join(ctx)
             voice_client: discord.VoiceClient = self.getvc(ctx)
+
         if not voice_client.is_playing():
             voice_client.play(audio_source)
 
@@ -37,9 +39,11 @@ class Voice(commands.Cog):
         '''Play the senko-san opening!'''
         voice_client: discord.VoiceClient = self.getvc(ctx)
         audio_source = discord.FFmpegPCMAudio('media/audio.mp3')
+
         if not voice_client:
             await self.join(ctx)
             voice_client: discord.VoiceClient = self.getvc(ctx)
+
         if not voice_client.is_playing():
             voice_client.play(audio_source)
 
