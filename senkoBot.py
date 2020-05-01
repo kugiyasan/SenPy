@@ -5,6 +5,7 @@
 #* Stubs (e.g. member: discord.Member) helps autocomplete
 
 import logging
+from cogs.utils.deleteMessage import deleteMessage
 
 import discord
 from discord.ext import commands
@@ -35,20 +36,17 @@ extensions = ('cogs.admin',
 
 @bot.event
 async def on_ready():
+    print(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers\n')
     logging.info(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers')
 
     for g in bot.guilds:
         logging.info(g.name + ' member_count: ' + str(g.member_count))
-    print()
 
 @bot.command(hidden=True)
 @commands.is_owner()
 async def reloadExt(ctx: commands.Context):
     '''Reloads the bot extensions without rebooting the entire program'''
-    try:
-        await ctx.message.delete()
-    except:
-        pass
+    await deleteMessage(ctx)
     for ext in extensions:
         bot.reload_extension(ext)
 
@@ -57,10 +55,7 @@ async def reloadExt(ctx: commands.Context):
 @bot.command(hidden=True)
 @commands.is_owner()
 async def logout(ctx: commands.Context):
-    try:
-        await ctx.message.delete()
-    except:
-        pass
+    await deleteMessage(ctx)
     logging.info('\nlogging out...')
     await bot.logout()
 

@@ -1,5 +1,7 @@
 discord.py
-requests
 fake_useragent
+GitPython
 lxml
-nekos
+nekos.py
+PyNaCl; sys_platform == 'linux'
+requests

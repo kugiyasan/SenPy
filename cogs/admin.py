@@ -1,6 +1,9 @@
 import discord
 from discord.ext import commands
 
+from pathlib import Path
+import git
+
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -20,6 +23,14 @@ class Admin(commands.Cog):
             if message.author == self.bot.user:
                 await message.delete()
                 break
+
+    @commands.command(hidden=True)
+    @commands.is_owner()
+    async def gitpull(self, ctx: commands.Context):
+        g = git.cmd.Git(Path(__file__).resolve().parent)
+        g.pull()
+
+
 
 
 def setup(bot):
