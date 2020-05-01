@@ -3,6 +3,6 @@ cogs/__pycache__
 .vscode
 myToken.py
 config.json
-logs
+logs/**
 media
 tests
