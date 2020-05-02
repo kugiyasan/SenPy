@@ -20,7 +20,8 @@ class RedditAPI(commands.Cog, name='reddit'):
         requestURL = 'https://www.reddit.com/subreddits/search.json?q={}&include_over_18=on'.format('%20'.join(searchkws))
 
         output = []
-        for child in await self.requestReddit(requestURL)[:5]:
+        children = await self.requestReddit(requestURL)
+        for child in children[:5]:
             subredditName = child['data']['url'][3:-1]
             output.append(subredditName)
         await ctx.send('\n'.join(output))
@@ -35,7 +36,7 @@ class RedditAPI(commands.Cog, name='reddit'):
     @commands.command(name='r/', aliases=['bruh'])
     async def sendRedditImage(self, ctx: commands.Context, subreddit):
         '''Enter the name of a subreddit and get a random pic back!'''
-        # await deleteMessage(ctx)
+        await deleteMessage(ctx)
 
         if not self.URLdata.get(subreddit):
             await self.getUrls(subreddit)
@@ -43,7 +44,7 @@ class RedditAPI(commands.Cog, name='reddit'):
         if self.URLdata[subreddit] == []:
             await self.getUrls(subreddit)
             if self.URLdata[subreddit] == []:
-                await ctx.send('No subreddit matches this name!')
+                await ctx.send('No subreddit matches this name or there wasn\'t any image!')
                 return
 
         url = self.URLdata[subreddit].pop()

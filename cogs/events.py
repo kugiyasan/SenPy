@@ -39,7 +39,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user):
-        if reaction.emoji == u"\U0001F44E" or reaction.emoji == '⬇️':
+        if reaction.emoji == "\U0001F44E" or reaction.emoji == '⬇️': #thumbs down
             return
         await reaction.message.add_reaction(reaction)
 
