@@ -24,6 +24,16 @@ class Neko(commands.Cog):
         except nekos.InvalidArgument as err:
             await ctx.send(err)
 
+    @commands.command()
+    async def owo(self, ctx: commands.Context, *, text:str='give me a text to owoify!'):
+        await deleteMessage(ctx)
+        await ctx.send(nekos.owoify(text))
+
+    @commands.command()
+    async def fact(self, ctx: commands.Context):
+        await deleteMessage(ctx)
+        await ctx.send(nekos.fact())
+        
 
 def setup(bot):
     bot.add_cog(Neko(bot))

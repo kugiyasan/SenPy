@@ -15,14 +15,18 @@ class Admin(commands.Cog):
         await ctx.send(f'''`{output} has been banned from the server...\njust kidding I can\'t do that`''')
 
     @commands.command()
-    async def delete(self, ctx: commands.Context):
+    async def delete(self, ctx: commands.Context, count: int=1):
         """delete the last message of the bot"""
         await ctx.message.delete()
+        n = 0
 
         async for message in ctx.history():
             if message.author == self.bot.user:
                 await message.delete()
-                break
+                n += 1
+
+                if n == count:
+                    break
 
     @commands.command(hidden=True)
     @commands.is_owner()
