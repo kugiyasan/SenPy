@@ -32,6 +32,9 @@ class Voice(commands.Cog):
             voice_client: discord.VoiceClient = self.getvc(ctx)
 
         if not voice_client.is_playing():
+            if ctx.author.name == 'Buramie':
+                await ctx.send('Pls don\'t start the song...')
+                return
             voice_client.play(audio_source)
 
     @commands.command(aliases=['paly', 'queue', 'que', 'p'])
@@ -58,6 +61,12 @@ class Voice(commands.Cog):
         voice_client: discord.VoiceClient = self.getvc(ctx)
         if voice_client.is_paused():
             voice_client.resume()
+
+    @commands.command()
+    async def stop(self, ctx, *args):
+        voice_client: discord.VoiceClient = self.getvc(ctx)
+        if voice_client.is_playing():
+            voice_client.stop()
 
     @commands.command(aliases=['bye'])
     async def disconnect(self, ctx, *args):
