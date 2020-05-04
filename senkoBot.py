@@ -4,7 +4,10 @@
 
 #* Stubs (e.g. member: discord.Member) helps autocomplete
 
+import itertools
+import json
 import logging
+import pathlib
 from cogs.utils.deleteMessage import deleteMessage
 
 import discord
@@ -15,7 +18,21 @@ try:
 except:
     from yourToken import token
 
-prefixes = ['XD ', 'Xd ', 'xD ', 'xd ', 'XD', 'Xd', 'xD', 'xd']
+def variations(prefix):
+    caseUnsensitive = itertools.product(*[(c, c.lower()) for c in prefix])
+    output = [''.join(s) for s in caseUnsensitive]
+    withSpace = [''.join(s)+' ' for s in output]
+    return withSpace + output
+
+def prefixes(bot: commands.Bot, message: discord.Message):
+    with open('config.json', 'r') as c:
+        j = json.load(c)
+        for guild in j['guilds']:
+            if guild['name'] == message.guild.name:
+                return variations(guild['command_prefix'])
+        
+    return variations('xd')
+
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
 occupation = discord.Activity(type=discord.ActivityType.playing,
                                 name='with Fox Goddess')
@@ -27,7 +44,7 @@ bot = commands.Bot(command_prefix=prefixes,
 extensions = ('cogs.admin',
             'cogs.dev',
             'cogs.events',
-            'cogs.mastermind',
+            'cogs.Games.mastermind',
             'cogs.memes',
             'cogs.neko',
             'cogs.reddit',
@@ -62,7 +79,8 @@ async def logout(ctx: commands.Context):
 if __name__ == "__main__":
     root_logger= logging.getLogger()
     root_logger.setLevel(logging.INFO)
-    handler = logging.FileHandler('logs/latest.log', 'a', 'utf-8')
+    path = pathlib.Path(__file__).parent.absolute()
+    handler = logging.FileHandler(path / 'logs' / 'latest.log', 'a', 'utf-8')
     handler.setFormatter(logging.Formatter('%(name)s %(message)s'))
     root_logger.addHandler(handler)
     

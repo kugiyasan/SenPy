@@ -11,7 +11,7 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         # message.delete() # rampage mode
-        if message.author.bot:
+        if message.author == self.bot.user:
             return
         guildChannel = ' '
         if message.guild != None:
