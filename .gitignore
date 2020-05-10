@@ -2,6 +2,8 @@ __pycache__
 .vscode
 myToken.py
 config.json
+imgs/**
 logs/**
 media
+pypyDependencies
 tests

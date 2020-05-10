@@ -46,6 +46,7 @@ class Mastermind(commands.Cog):
                     .replace('6', '🟣'))
 
     @commands.command(aliases=['mm'])
+    @commands.bot_has_permissions(manage_messages=True)
     async def mastermind(self, ctx: commands.Context, guessLength: int=6, repeatedColor: bool=True):
         '''Play a game of mastermind!'''
 
@@ -82,7 +83,7 @@ class Mastermind(commands.Cog):
         while tryCount < numberOfTries:
             try:
                 m = await self.bot.wait_for('message',
-                                            timeout=300.0,
+                                            timeout=1200.0,
                                             check=checkresponse)
             except asyncio.TimeoutError:
                 await ctx.send('Stopping mastermind, timeout expired')
@@ -91,7 +92,7 @@ class Mastermind(commands.Cog):
                 return
 
             msg = m.content.replace(' ', '')
-            if msg.lower() == 'stop':
+            if 'stop' in msg.lower():
                 await ctx.send('Stopping the game...', delete_after=10.0)
                 await ctx.send(f'The answer was {self.toEmoji(answer)}')
                 self.playingUsers.discard(ctx.author)

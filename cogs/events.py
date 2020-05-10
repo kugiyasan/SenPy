@@ -23,14 +23,20 @@ class Events(commands.Cog):
         
         codingChannel = 693920225846100049
         if '```' in message.content and message.guild.name == 'Banana Squad' and message.channel.id != codingChannel:
-            await ctx.send(f'Coding goes into #{codingChannel}')
+            await ctx.send(f'Coding goes into <#{codingChannel}>')
 
         dabs = ['dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/']
         for dab in dabs:
-            if dab in message.content.split():
+            if dab in message.content.lower().split():
                 style = random.randint(0, 3)
                 wrapper = '*'*style + '{}' + '*'*style
                 await ctx.send(wrapper.format(random.choice(dabs)))
+
+        dash = message.guild.get_member(399705801717186571)
+        if ('rekt' in message.content.lower()
+            and not message.author.bot
+            and (not dash or dash.status != discord.Status.online)):
+            await ctx.send('Yeah get rekt, son!')
 
         # #! the long message troll wasn't removed like asked gottem
         # m = message.content
