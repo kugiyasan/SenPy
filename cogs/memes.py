@@ -2,7 +2,6 @@ import discord
 from discord.ext import commands
 
 import requests
-from lxml import html
 
 class Memes(commands.Cog):
     def __init__(self, bot):
@@ -14,8 +13,9 @@ class Memes(commands.Cog):
         url = 'http://www.robietherobot.com/insult-generator.htm'
         webpage = requests.get(url)
         if(webpage.status_code == 200):
-            tree = html.fromstring(webpage.content)
-            insultText = tree.xpath('//h1')[1].text.strip()
+            w = str(webpage.content)[5862:]
+            insultText = w[:w.index('<')].strip()
+            
             if not member:
                 await ctx.send("You're a " + insultText)
             else:

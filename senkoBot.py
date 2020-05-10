@@ -19,19 +19,19 @@ except:
     from yourToken import token
 
 def variations(prefix):
-    caseUnsensitive = itertools.product(*[(c, c.lower()) for c in prefix])
+    bothCase = [(c.upper(), c.lower()) for c in prefix]
+    caseUnsensitive = itertools.product(*bothCase)
     output = [''.join(s) for s in caseUnsensitive]
     withSpace = [''.join(s)+' ' for s in output]
     return withSpace + output
 
 def prefixes(bot: commands.Bot, message: discord.Message):
     with open('config.json', 'r') as c:
-        j = json.load(c)
-        for guild in j['guilds']:
-            if guild['name'] == message.guild.name:
-                return variations(guild['command_prefix'])
-        
-    return variations('xd')
+        try:
+            prefix = json.load(c)['guilds'][message.guild.name]['command_prefix']
+            return variations(prefix)
+        except:
+            return variations('xd')
 
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
 occupation = discord.Activity(type=discord.ActivityType.playing,
@@ -41,10 +41,14 @@ bot = commands.Bot(command_prefix=prefixes,
                     description=description,
                     activity=occupation)
 
-extensions = ('cogs.admin',
+extensions = ('cogs.Games.mastermind',
+            'cogs.Games.wordStory',
+            # 'cogs.Maths.dataVisualizer',
+            'cogs.Maths.mathsEquations',
+            'cogs.admin',
             'cogs.dev',
             'cogs.events',
-            'cogs.Games.mastermind',
+            'cogs.info',
             'cogs.memes',
             'cogs.neko',
             'cogs.reddit',

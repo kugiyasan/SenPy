@@ -71,6 +71,7 @@ class RedditAPI(commands.Cog, name='reddit'):
     async def getUrls(self, subreddit):
         requestURL = f'https://www.reddit.com/r/{subreddit}/randomrising/.json?kind=t3'
         response = await self.requestReddit(requestURL)
+        nsfwCount = 0
 
         if not self.URLdata.get(subreddit):
             self.URLdata[subreddit] = []
@@ -80,6 +81,7 @@ class RedditAPI(commands.Cog, name='reddit'):
 
             if child['data']['over_18']:
                 image_url = 'NSFW' + image_url
+                nsfwCount += 1
 
             exts = ['.png', '.jpg', '.jpeg']
             for ext in exts:
@@ -87,7 +89,7 @@ class RedditAPI(commands.Cog, name='reddit'):
                     self.URLdata[subreddit].append(image_url)
                     break
         
-        print(f'{len(self.URLdata[subreddit])} urls in the list for {subreddit}')
+        print(f'{len(self.URLdata[subreddit])} urls in the list for {subreddit} ({nsfwCount} of them are nsfw)')
 
 def setup(bot):
     bot.add_cog(RedditAPI(bot))

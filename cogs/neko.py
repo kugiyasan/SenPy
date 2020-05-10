@@ -26,11 +26,13 @@ class Neko(commands.Cog):
 
     @commands.command()
     async def owo(self, ctx: commands.Context, *, text:str='give me a text to owoify!'):
+        '''yay cute wwitinyg >w<'''
         await deleteMessage(ctx)
         await ctx.send(nekos.owoify(text))
 
     @commands.command()
     async def fact(self, ctx: commands.Context):
+        '''Get yo facts right!'''
         await deleteMessage(ctx)
         await ctx.send(nekos.fact())
         

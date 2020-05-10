@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import asyncio
 
-class Greetings(commands.Cog):
+class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
     
@@ -41,5 +41,9 @@ class Greetings(commands.Cog):
     async def ping(self, ctx):
         await ctx.send(f'Pong! The latency is about {int(self.bot.latency*1000)} ms')
 
+    @commands.command()
+    async def say(self, ctx, *, words):
+        await ctx.send(words)
+
 def setup(bot):
-    bot.add_cog(Greetings(bot))
+    bot.add_cog(Info(bot))
