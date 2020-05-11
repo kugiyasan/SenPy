@@ -10,7 +10,7 @@ class AIGeneratedImg(commands.Cog):
 
     @commands.command(aliases=['anime', 'neet'])
     async def waifu(self, ctx, seed: int=None):
-        """Send AI generated image from thiswaifudoesnotexist.net"""
+        """quality/diversity: ~50000: mq/md, ~75000 hq/ld, ~100000 lq/hd"""
         if not seed:
             seed = random.randint(0, 199999)
 
