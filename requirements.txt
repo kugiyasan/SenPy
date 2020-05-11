@@ -1,9 +1,7 @@
 discord.py
 fake_useragent
-GitPython
-# python3-lxml
-# lxml
+matplotlib
 nekos.py
-# numpy
-PyNaCl #; sys_platform == 'linux'
+numpy
+PyNaCl
 requests

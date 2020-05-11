@@ -15,8 +15,11 @@ class WordStory(commands.Cog):
             return
 
         with open('config.json', 'r') as configFile:
-            guild = json.load(configFile)[message.guild.name]
-            channel_id = guild['word-story']['channel_id']
+            try:
+                guild = json.load(configFile)[message.guild.name]
+                channel_id = guild['word-story']['channel_id']
+            except:
+                return
 
             if channel_id == message.channel.id:
                 msg = message.content

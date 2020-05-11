@@ -18,7 +18,7 @@ class MathsEquations(commands.Cog, name='Maths'):
 
     @commands.command(aliases=['pythagoras2'])
     async def pythagorean_theorem2(self, ctx, cathetus1: float, cathetus2: float):
-        await ctx.send('|\\\n|   \\ <--Hypothesis\n|      \\\n|_____\\')
+        await ctx.send('|\\\n|   \\ <--Hypothesis\n|      \\\n|\\_\\_\\_\\_\\')
         await ctx.send((cathetus1**2 + cathetus2**2) ** 0.5)
 
     @commands.command(aliases=['heron'])

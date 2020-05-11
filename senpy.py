@@ -2,7 +2,7 @@
 # https://github.com/nobodyme/reddit-fetch.git
 # https://github.com/runarsf/rufus
 
-#* Stubs (e.g. member: discord.Member) helps autocomplete
+#* Stubs or type hints (e.g. member: discord.Member) helps autocomplete
 
 import itertools
 import json
@@ -52,6 +52,7 @@ extensions = ('cogs.Games.mastermind',
             'cogs.memes',
             'cogs.neko',
             'cogs.reddit',
+            'cogs.thisDoesNotExist',
             'cogs.voice')
             
 

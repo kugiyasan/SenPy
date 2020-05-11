@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import asyncio
+from cogs.utils.deleteMessage import deleteMessage
 
 class Info(commands.Cog):
     def __init__(self, bot):
@@ -43,6 +44,7 @@ class Info(commands.Cog):
 
     @commands.command()
     async def say(self, ctx, *, words):
+        await deleteMessage(ctx)
         await ctx.send(words)
 
 def setup(bot):
