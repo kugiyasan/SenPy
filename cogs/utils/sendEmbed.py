@@ -8,4 +8,8 @@ async def sendEmbed(ctx, url, **kwargs):
         color=discord.Colour.gold(),
         **kwargs)
     e.set_image(url=url)
-    await ctx.send(embed=e)
+
+    try:
+        await ctx.send(embed=e)
+    except:
+        await ctx.send(url)

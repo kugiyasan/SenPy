@@ -8,8 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 
-from PIL import Image
-import deeppyer
+# from PIL import Image
+# import deeppyer
 
 class MatPlotLib(commands.Cog, name='VisualizeData'):
     def __init__(self, bot):

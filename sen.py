@@ -43,7 +43,7 @@ bot = commands.Bot(command_prefix=prefixes,
 
 extensions = ('cogs.Games.mastermind',
             'cogs.Games.wordStory',
-            # 'cogs.Maths.dataVisualizer',
+            'cogs.Maths.dataVisualizer',
             'cogs.Maths.mathsEquations',
             'cogs.admin',
             'cogs.dev',

@@ -1,10 +1,6 @@
 import discord
 from discord.ext import commands
 
-from pathlib import Path
-import git
-import json
-
 from cogs.utils.configJson import updateValueJson
 
 class Admin(commands.Cog):
@@ -23,19 +19,13 @@ class Admin(commands.Cog):
         await ctx.message.delete()
         n = 0
 
-        async for message in ctx.history():
+        async for message in ctx.history(limit=count*2):
             if message.author == self.bot.user:
                 await message.delete()
                 n += 1
 
                 if n == count:
                     break
-
-    @commands.command(hidden=True)
-    @commands.is_owner()
-    async def gitpull(self, ctx: commands.Context):
-        g = git.cmd.Git(Path(__file__).resolve().parent)
-        g.pull()
 
     @commands.command(aliases=['role', 'getrole'])
     async def addrole(self, ctx: commands.Context, *roles):

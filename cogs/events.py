@@ -80,15 +80,20 @@ class Events(commands.Cog):
                     Error: Buramie never unban someone""")
                 
     @commands.Cog.listener()
-    async def on_guild_emojis_update(self, guild, before, after):
+    async def on_guild_emojis_update(self, guild: discord.Guild, before, after):
         diff = set(after).difference(set(before))
         if diff:
-            channels = guild.channels
-            for channel in channels:
-                if channel.name == 'general':
-                    newemojis = ' '.join(map(lambda x:x.name, diff))
-                    await channel.send('**NEW EMOJIS**' + newemojis)
-                    break
+            channel = guild.system_channel
+            try:
+                await channel.send('**NEW EMOJIS**')
+                newemojis = ' '.join(map(lambda x: str(x), diff))
+                await channel.send(newemojis)
+            except:
+                for channel in guild.channels:
+                    if 'general' in channel.name.replace('é', 'e'):
+                        await channel.send('**NEW EMOJIS**')
+                        newemojis = ' '.join(map(lambda x: str(x), diff))
+                        await channel.send(newemojis)
 
 def setup(bot):
     bot.add_cog(Events(bot))

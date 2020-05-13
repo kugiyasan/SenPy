@@ -6,4 +6,5 @@ imgs/**
 logs/**
 media
 pypyDependencies
+pypyWithSenPY
 tests

@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import asyncio
+import re
 from cogs.utils.deleteMessage import deleteMessage
 
 class Info(commands.Cog):
@@ -45,6 +46,11 @@ class Info(commands.Cog):
     @commands.command()
     async def say(self, ctx, *, words):
         await deleteMessage(ctx)
+
+        if re.search('s[e3]nk[o0]g[o0][o0]d', words.lower().replace(' ', '')):
+            await ctx.send('senko bad')
+            return
+
         await ctx.send(words)
 
 def setup(bot):
