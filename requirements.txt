@@ -5,3 +5,4 @@ nekos.py
 numpy
 PyNaCl
 requests
+scipy

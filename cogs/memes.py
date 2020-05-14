@@ -30,6 +30,7 @@ class Memes(commands.Cog):
 
     @commands.command(aliases=['loli'])
     async def legalize(self, ctx, age):
+        '''All lolis can be legal, if you let me handle it!'''
         try:
             age = int(age)
             if age < 1:

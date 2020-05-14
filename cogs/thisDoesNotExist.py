@@ -29,7 +29,7 @@ class AIGeneratedImg(commands.Cog):
             seed = random.randint(10000, 99999)
 
         if seed < 10000 or seed > 99999:
-            await ctx.send('Give me a valid 5-digits seed!')
+            await ctx.send('Give me a valid 5-digits seed from 10000 to 99999!')
             return
 
         url = f'https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed{seed}.jpg'

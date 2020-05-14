@@ -50,26 +50,7 @@ class Admin(commands.Cog):
 
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
 
-    @commands.command(aliases=['rule'])
-    async def rules(self, ctx: commands.Context):
-        '''Send the server's rules'''
-        if ctx.guild.id == 509558996399816732:
-            await ctx.send("Common rule: Do support t-series or you'll get banned")
-        else:
-            output = []
-            # rules_channel = ctx.guild.rules_channel
-            for channel in ctx.guild.channels:
-                if 'rule' in channel.name.lower():
-                    rules_channel = channel
-                    break
-
-            if not rules_channel:
-                await ctx.send('No rules on this server, FFA bois')
-
-            async for msg in rules_channel.history():
-                output.append(msg.content)
-            await ctx.send('\n'.join(output[::-1]))
-
+    
 
 def setup(bot):
     bot.add_cog(Admin(bot))

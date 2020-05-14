@@ -42,7 +42,6 @@ class Voice(commands.Cog):
     def getvc(self, ctx):
         return discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
-    @commands.command()
     async def join(self, ctx: commands.Context):
         self.lastCommandTime[ctx.guild] = time()
         vc = ctx.author.voice
@@ -114,7 +113,7 @@ class Voice(commands.Cog):
         if not voice_client.is_playing():
             voice_client.play(audio_source)
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def pause(self, ctx, *args):
         self.looping = False
 
@@ -122,13 +121,13 @@ class Voice(commands.Cog):
         if voice_client.is_playing():
             voice_client.pause()
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def resume(self, ctx, *args):
         voice_client: discord.VoiceClient = self.getvc(ctx)
         if voice_client.is_paused():
             voice_client.resume()
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def stop(self, ctx, *args):
         self.looping = False
 
@@ -136,7 +135,7 @@ class Voice(commands.Cog):
         if voice_client.is_playing():
             voice_client.stop()
 
-    @commands.command(aliases=['bye'])
+    @commands.command(aliases=['bye', 'quit', 'reset'], hidden=True)
     async def disconnect(self, ctx, *args):
         await self.stop(ctx)
 
