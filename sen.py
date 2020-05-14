@@ -4,14 +4,15 @@
 
 #* Stubs or type hints (e.g. member: discord.Member) helps autocomplete
 
+import discord
+from discord.ext import commands
+
 import itertools
 import json
 import logging
 import pathlib
 from cogs.utils.deleteMessage import deleteMessage
-
-import discord
-from discord.ext import commands
+from cogs.utils.configJson import getValueJson
 
 try:
     from myToken import token
@@ -25,13 +26,9 @@ def variations(prefix):
     withSpace = [''.join(s)+' ' for s in output]
     return withSpace + output
 
-def prefixes(bot: commands.Bot, message: discord.Message):
-    with open('config.json', 'r') as c:
-        try:
-            prefix = json.load(c)['guilds'][message.guild.name]['command_prefix']
-            return variations(prefix)
-        except:
-            return variations('xd')
+async def prefixes(bot: commands.Bot, message: discord.Message):
+    prefix = await getValueJson('guilds', message.guild.name, 'command_prefix', default='xd')
+    return variations(prefix)
 
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
 occupation = discord.Activity(type=discord.ActivityType.playing,
@@ -43,13 +40,14 @@ bot = commands.Bot(command_prefix=prefixes,
 
 extensions = ('cogs.Games.mastermind',
             'cogs.Games.wordStory',
-            'cogs.Maths.dataVisualizer',
+            # 'cogs.Maths.dataVisualizer', # comment this line if trying to run on pypy
             'cogs.Maths.mathsEquations',
             'cogs.admin',
             'cogs.dev',
             'cogs.events',
             'cogs.info',
             'cogs.memes',
+            'cogs.mofupoints',
             'cogs.neko',
             'cogs.reddit',
             'cogs.thisDoesNotExist',

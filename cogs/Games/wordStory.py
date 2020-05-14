@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import json
 import random
-from cogs.utils.configJson import updateWordStory
+from cogs.utils.configJson import updateWordStory, getValueJson
 
 class WordStory(commands.Cog):
     def __init__(self, bot):
@@ -42,11 +42,20 @@ class WordStory(commands.Cog):
                 await message.add_reaction(self.bot.get_emoji(645461243712503848))
 
                 if guild['word-story']['maxLength'] <= currentLength:
-                    await message.channel.send('The story is finished!')
-                    await message.channel.send(' '.join(guild['word-story']['story'][1:] + [message.content]))
+                    await finishStory(message.channel, message.content)
+    
+    @commands.command(aliases=['finishstory'])
+    @commands.has_permissions(administrator=True)
+    async def finishStory(self, ctx, lastMessage=None):
+        story = await getValueJson('guilds', ctx.guild.name, 'word-story', 'story')
+        story = story[1:]
+        if lastMessage:
+            story.append(lastMessage)
 
-                    await updateWordStory([], message.guild.name, 'story')
-                    
+        await ctx.send('The story is finished!')
+        await ctx.send(' '.join(story))
+
+        await updateWordStory([], ctx.guild.name, 'story')
 
     @commands.command(aliases=['newstory'])
     @commands.has_permissions(administrator=True)

@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from cogs.mofupoints import giveMofuPoints
 from cogs.utils.deleteMessage import deleteMessage
 
 import asyncio
@@ -13,8 +14,8 @@ class Mastermind(commands.Cog):
         self.bot = bot
         self.playingUsers = set()
 
-    @commands.command()
-    async def players(self, ctx):
+    @commands.command(hidden=True)
+    async def gamers(self, ctx):
         if not self.playingUsers:
             await ctx.send('Nobody is playing mastermind')
             return
@@ -50,7 +51,14 @@ class Mastermind(commands.Cog):
     async def mastermind(self, ctx: commands.Context, guessLength: int=6, repeatedColor: bool=True):
         '''Play a game of mastermind!'''
 
-        numberOfTries = 10
+        if ctx.author in self.playingUsers:
+            await ctx.send("You've already started a game, please stop it first!")
+            return
+        self.playingUsers.add(ctx.author)
+
+        # INIT
+        NUMBER_OF_TRIES = 10
+
         if repeatedColor:
             answer = [random.randint(1, 6) for _ in range(guessLength)]
         else:
@@ -61,11 +69,6 @@ class Mastermind(commands.Cog):
             answer = list(range(1, 7))
             random.shuffle(answer)
             answer = answer[:guessLength]
-
-        if ctx.author in self.playingUsers:
-            await ctx.send("You've already started a game, please stop it first!")
-            return
-        self.playingUsers.add(ctx.author)
         
         logging.info(answer)
 
@@ -73,14 +76,15 @@ class Mastermind(commands.Cog):
         await ctx.send(f'Make your first guess! ({guessLength} digits) (Type stop to stop the game)')
         
         emptyLine = '⚫'*guessLength + '\t|'
-        await ctx.send((emptyLine + '\n') * numberOfTries)
+        await ctx.send((emptyLine + '\n') * NUMBER_OF_TRIES)
 
         def checkresponse(m):
             return (m.author == ctx.author
                 and m.channel == ctx.channel)
 
+        # MAIN LOOP
         tryCount = 0
-        while tryCount < numberOfTries:
+        while tryCount < NUMBER_OF_TRIES:
             try:
                 m = await self.bot.wait_for('message',
                                             timeout=1200.0,
@@ -117,7 +121,9 @@ class Mastermind(commands.Cog):
 
                     if judge == '⚪'*guessLength:
                         await ctx.send('Congratulations! You won!')
+                        await ctx.send(f'{guessLength**2} points will be added to your account!')
                         self.playingUsers.discard(ctx.author)
+                        await giveMofuPoints(ctx.author, guessLength**2)
                         return
 
                     tryCount += 1
