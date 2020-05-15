@@ -10,6 +10,15 @@ class Info(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def chika(self, ctx, expression=None):
+        await deleteMessage(ctx)
+        # guild = await self.bot.fetch_guild(700719623917666336)
+        # emojisList = await guild.fetch_emojis()
+        # await ctx.send(''.join(str(e) for e in emojisList))
+
+        await ctx.send('<:thinking1:710563810582200350><:thinking2:710563810804498452>\n<:thinking3:710563823819554816><:thinking4:710563824079732756>')
+
+    @commands.command()
     async def emoji(self, ctx: commands.Context):
         '''List all available emojis on this server + some random from other server'''
         emojisList = await ctx.guild.fetch_emojis()

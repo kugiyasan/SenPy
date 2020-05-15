@@ -9,18 +9,19 @@ import logging
 import random
 import re
 
+playingUsers = set()
+
 class Mastermind(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.playingUsers = set()
 
     @commands.command(hidden=True)
     async def gamers(self, ctx):
-        if not self.playingUsers:
+        if not playingUsers:
             await ctx.send('Nobody is playing mastermind')
             return
             
-        await ctx.send('Here are the players currently playing mastermind: ' + ', '.join(self.playingUsers))
+        await ctx.send('Here is/are the player(s) currently playing mastermind: ' + ', '.join(p.name for p in playingUsers))
 
     def judgement(self, guess, answer):
         guess = [int(i) for i in guess]
@@ -51,13 +52,14 @@ class Mastermind(commands.Cog):
     async def mastermind(self, ctx: commands.Context, guessLength: int=6, repeatedColor: bool=True):
         '''Play a game of mastermind!'''
 
-        if ctx.author in self.playingUsers:
-            await ctx.send("You've already started a game, please stop it first!")
-            return
-        self.playingUsers.add(ctx.author)
-
         # INIT
         NUMBER_OF_TRIES = 10
+        if guessLength < 2:
+            await ctx.send("Choose a harder difficulty!")
+            return
+        if guessLength > 10:
+            await ctx.send("Choose a easier difficulty!")
+            return
 
         if repeatedColor:
             answer = [random.randint(1, 6) for _ in range(guessLength)]
@@ -70,12 +72,18 @@ class Mastermind(commands.Cog):
             random.shuffle(answer)
             answer = answer[:guessLength]
         
-        logging.info(answer)
+        logging.info(f"answer to {ctx.author}'s mastermind: {answer}")
 
-        await ctx.send('1 :🔴\t2 : 🟠\t3 : 🟡\t4 : 🟢\t5 : 🔵\t6 : 🟣')
-        await ctx.send(f'Make your first guess! ({guessLength} digits) (Type stop to stop the game)')
+        if ctx.author in playingUsers:
+            await ctx.send("You've already started a game, please stop it first!")
+            return
+        playingUsers.add(ctx.author)
+
+        text = ('1 :🔴\t2 : 🟠\t3 : 🟡\t4 : 🟢\t5 : 🔵\t6 : 🟣\n'
+            + f'Make your first guess! ({guessLength} digits) (Type "stop" to stop the game)')
+        await ctx.send(text)
         
-        emptyLine = '⚫'*guessLength + '\t|'
+        emptyLine = u'⚫'*guessLength + '\t|'
         await ctx.send((emptyLine + '\n') * NUMBER_OF_TRIES)
 
         def checkresponse(m):
@@ -92,20 +100,22 @@ class Mastermind(commands.Cog):
             except asyncio.TimeoutError:
                 await ctx.send('Stopping mastermind, timeout expired')
                 await ctx.send(f'The answer was {self.toEmoji(answer)}')
-                self.playingUsers.discard(ctx.author)
+                playingUsers.discard(ctx.author)
                 return
 
             msg = m.content.replace(' ', '')
             if 'stop' in msg.lower():
                 await ctx.send('Stopping the game...', delete_after=10.0)
                 await ctx.send(f'The answer was {self.toEmoji(answer)}')
-                self.playingUsers.discard(ctx.author)
+                playingUsers.discard(ctx.author)
                 return
             
-            if len(msg) != guessLength or re.search('[^1-6]', msg):
+            if re.search('[^1-6]', msg):
+                continue
+            if len(msg) != guessLength:
                 await ctx.send('Please enter a valid guess!', delete_after=10.0)
                 continue
-            
+
             await deleteMessage(m)
             
             judge = self.judgement(msg, answer)
@@ -122,7 +132,7 @@ class Mastermind(commands.Cog):
                     if judge == '⚪'*guessLength:
                         await ctx.send('Congratulations! You won!')
                         await ctx.send(f'{guessLength**2} points will be added to your account!')
-                        self.playingUsers.discard(ctx.author)
+                        playingUsers.discard(ctx.author)
                         await giveMofuPoints(ctx.author, guessLength**2)
                         return
 
@@ -130,7 +140,7 @@ class Mastermind(commands.Cog):
                     break
 
         await ctx.send('You lose! The answer was ' + self.toEmoji(answer))
-        self.playingUsers.discard(ctx.author)
+        playingUsers.discard(ctx.author)
 
 def setup(bot):
     bot.add_cog(Mastermind(bot))

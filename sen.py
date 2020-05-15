@@ -11,6 +11,7 @@ import itertools
 import json
 import logging
 import pathlib
+
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.configJson import getValueJson
 
