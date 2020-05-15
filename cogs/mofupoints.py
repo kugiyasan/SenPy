@@ -31,7 +31,7 @@ class MofuPoints(commands.Cog):
         users = [user for user in users if self.bot.get_user(int(user[1])) in ctx.guild.members]
 
         emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣']
-        output = []
+        output = ['***MOFUPOINTS LEADERBOARD***']
         for i in range(min(len(emojis), len(users))):
             name = self.bot.get_user(int(users[i][1])).name
             output.append(emojis[i] + f' {name}: {users[i][0]} points')

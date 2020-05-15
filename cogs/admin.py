@@ -19,7 +19,7 @@ class Admin(commands.Cog):
         await ctx.message.delete()
         n = 0
 
-        async for message in ctx.history(limit=count*2):
+        async for message in ctx.history(limit=100):
             if message.author == self.bot.user:
                 await message.delete()
                 n += 1

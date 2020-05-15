@@ -4,5 +4,7 @@ matplotlib
 nekos.py
 numpy
 PyNaCl
+python-dateutil
 requests
 scipy
+wheel

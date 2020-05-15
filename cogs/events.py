@@ -1,8 +1,25 @@
 import discord
 from discord.ext import commands
 
+from datetime import datetime
+from dateutil import tz
+
 import logging
 import random
+import re
+
+async def utc2localTime(utc):
+    from_zone = tz.tzutc()
+    to_zone = tz.tzlocal()
+
+    # Tell the datetime object that it's in UTC time zone since 
+    # datetime objects are 'naive' by default
+    utc = utc.replace(tzinfo=from_zone)
+
+    # Convert time zone
+    central = utc.astimezone(to_zone)
+    
+    return str(central)[:-9]
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -13,16 +30,19 @@ class Events(commands.Cog):
         # message.delete() # rampage mode
         if message.author == self.bot.user:
             return
-        guildChannel = ' '
+
+        guildChannel = ''
         if message.guild != None:
-            guildChannel = ' ' + message.guild.name + ' #' + str(message.channel) + ' '
-        timename = str(message.created_at)[:-3] + ' ' + message.author.name
-        logging.info(timename + guildChannel + message.content)
-        
+            guildChannel = message.guild.name + ' #' + str(message.channel)
+        time = await utc2localTime(message.created_at)
+        logging.info(' '.join((time, message.author.name, guildChannel, message.content)))
+
         ctx = message.channel
         
         codingChannel = 693920225846100049
-        if '```' in message.content and message.guild.name == 'Banana Squad' and message.channel.id != codingChannel:
+        if ('```' in message.content 
+            and message.guild.name == 'Banana Squad' 
+            and message.channel.id != codingChannel):
             await ctx.send(f'Coding goes into <#{codingChannel}>')
 
         dabs = ['dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/']
@@ -37,6 +57,10 @@ class Events(commands.Cog):
             and not message.author.bot
             and (not dash or dash.status != discord.Status.online)):
             await ctx.send('Yeah get rekt, son!')
+
+        msg1, msg2 = await ctx.history(limit=2).flatten()
+        if msg1.content == msg2.content and msg1.author != msg2.author:
+            await ctx.send(msg1.content)
 
         # #! the long message troll wasn't removed like asked gottem
         # m = message.content
@@ -90,7 +114,7 @@ class Events(commands.Cog):
                 await channel.send(newemojis)
             except:
                 for channel in guild.channels:
-                    if 'general' in channel.name.replace('é', 'e'):
+                    if re.search('g[eé]n[eé]ral', channel.name):
                         await channel.send('**NEW EMOJIS**')
                         newemojis = ' '.join(map(lambda x: str(x), diff))
                         await channel.send(newemojis)
