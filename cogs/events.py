@@ -58,8 +58,11 @@ class Events(commands.Cog):
             and (not dash or dash.status != discord.Status.online)):
             await ctx.send('Yeah get rekt, son!')
 
+        #* Be sure that the first message isn't from the bot
         msg1, msg2 = await ctx.history(limit=2).flatten()
-        if msg1.content == msg2.content and msg1.author != msg2.author:
+        if (msg1.content == msg2.content
+            and msg1.author != msg2.author):
+            # and not msg1.author.bot):
             await ctx.send(msg1.content)
 
         # #! the long message troll wasn't removed like asked gottem

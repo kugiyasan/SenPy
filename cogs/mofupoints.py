@@ -4,6 +4,7 @@ from discord.ext import commands
 import json
 from cogs.utils.configJson import getValueJson, updateValueJson
 from cogs.utils.deleteMessage import deleteMessage
+from cogs.utils.prettyList import prettyList
 
 async def giveMofuPoints(user, points):
     path = 'users', str(user.id), 'mofuPoints'
@@ -23,20 +24,32 @@ class MofuPoints(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    async def getUsersLeaderboard(self, ctx, category):
+        data = await getValueJson('users')
+        users = []
+
+        for k, v in data.items():
+            user = self.bot.get_user(int(k))
+            if user in ctx.guild.members:
+                users.append((v[category], user.name))
+        
+        return sorted(users, reverse=True)
+
     @commands.command(aliases=['top'])
     async def leaderboard(self, ctx):
         """Show the leaderboard for the top fluffer"""
-        data = await getValueJson('users')
-        users = sorted([(v['mofuPoints'], k) for k, v in data.items()], reverse=True)
-        users = [user for user in users if self.bot.get_user(int(user[1])) in ctx.guild.members]
+        users = await self.getUsersLeaderboard(ctx, 'mofuPoints')
 
-        emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣']
-        output = ['***MOFUPOINTS LEADERBOARD***']
-        for i in range(min(len(emojis), len(users))):
-            name = self.bot.get_user(int(users[i][1])).name
-            output.append(emojis[i] + f' {name}: {users[i][0]} points')
+        title = '***MOFUPOINTS LEADERBOARD***'
+        await prettyList(ctx, title, users, 'points')
 
-        await ctx.send('\n'.join(output))
+    @commands.command(aliases=['imagetop'])
+    async def nolife(self, ctx):
+        """Show the leaderboard for who has requested the most images"""
+        users = await self.getUsersLeaderboard(ctx, 'numberOfEmbedRequested')
+
+        title = '***NO LIFE LEADERBOARD***'
+        await prettyList(ctx, title, users, 'requests')
 
     @commands.command(hidden=True, aliases=['senkobad', 'rmt', 'marubestgirl', 'meguminbestgirl', 'hifumibestgirl'])
     async def chikabestgirl(self, ctx):

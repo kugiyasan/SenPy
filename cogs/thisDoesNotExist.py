@@ -3,6 +3,8 @@ from discord.ext import commands
 
 import pathlib
 import random
+
+from cogs.mofupoints import incrementEmbedCounter
 from cogs.utils.sendEmbed import sendEmbed
 
 class AIGeneratedImg(commands.Cog):
@@ -51,6 +53,8 @@ class AIGeneratedImg(commands.Cog):
         # await sendEmbed(ctx, None, description=f'seed: {seed}')
         await ctx.send(file=discord.File(img))
         await ctx.send(f'seed: {seed}')
+        
+        incrementEmbedCounter(ctx.author)
 
 
 def setup(bot):
