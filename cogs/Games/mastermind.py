@@ -84,7 +84,7 @@ class Mastermind(commands.Cog):
         await ctx.send(text)
         
         emptyLine = u'⚫'*guessLength + '\t|'
-        await ctx.send((emptyLine + '\n') * NUMBER_OF_TRIES)
+        boardMessage = await ctx.send((emptyLine + '\n') * NUMBER_OF_TRIES)
 
         def checkresponse(m):
             return (m.author == ctx.author
@@ -121,23 +121,17 @@ class Mastermind(commands.Cog):
             judge = self.judgement(msg, answer)
             msg = self.toEmoji(msg)
 
-            async for message in ctx.history():
-                if message.author == self.bot.user:
-                    if message.content[-1] != '|':
-                        continue
+            board = boardMessage.content.replace(emptyLine, msg+'\t|\t'+judge, 1)
+            await boardMessage.edit(content=board)
 
-                    board = message.content.replace(emptyLine, msg+'\t|\t'+judge, 1)
-                    await message.edit(content=board)
+            if judge == '⚪'*guessLength:
+                await ctx.send('Congratulations! You won!')
+                await ctx.send(f'{guessLength**2} points will be added to your account!')
+                playingUsers.discard(ctx.author)
+                await giveMofuPoints(ctx.author, guessLength**2)
+                return
 
-                    if judge == '⚪'*guessLength:
-                        await ctx.send('Congratulations! You won!')
-                        await ctx.send(f'{guessLength**2} points will be added to your account!')
-                        playingUsers.discard(ctx.author)
-                        await giveMofuPoints(ctx.author, guessLength**2)
-                        return
-
-                    tryCount += 1
-                    break
+            tryCount += 1
 
         await ctx.send('You lose! The answer was ' + self.toEmoji(answer))
         playingUsers.discard(ctx.author)

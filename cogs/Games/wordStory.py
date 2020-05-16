@@ -42,7 +42,7 @@ class WordStory(commands.Cog):
                 await message.add_reaction(self.bot.get_emoji(645461243712503848))
 
                 if guild['word-story']['maxLength'] <= currentLength:
-                    await finishStory(message.channel, message.content)
+                    await self.finishStory(message.channel, message.content)
     
     @commands.command(aliases=['finishstory'])
     @commands.has_permissions(administrator=True)
