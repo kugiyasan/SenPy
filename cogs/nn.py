@@ -50,10 +50,10 @@ class NN(commands.Cog):
         self.device = torch.device("cpu")
 
         self.model = BasicCNN().to(self.device)
-        self.model.load_state_dict(torch.load("tests/data/MNISTdigitreader.pt"))
+        self.model.load_state_dict(torch.load("tests/data/MNISTdigitreader2.pt"))
         self.model.eval()
 
-    @commands.command()
+    @commands.command(aliases=['digits'])
     async def digit(self, ctx: commands.Context):
         """Guess the digit in the image"""
         images = ctx.message.attachments
@@ -72,13 +72,15 @@ class NN(commands.Cog):
         pix /= 255.0
         pix.shape = (1, 1, 28, 28)
 
-        # fig, ax = plt.subplots()
         plt.subplots()
         plt.axis('off')
-        plt.imshow(pix[0, 0])
+        heatmap = plt.imshow(pix[0, 0])
+        plt.colorbar(heatmap)
 
         filePath = pathlib.Path(__file__).parents[1] / 'media' / f'{ctx.author.name}graph.png'
         plt.savefig(filePath, dpi=72, bbox_inches='tight')
+        plt.close('all')
+
         await ctx.send(file=discord.File(filePath))
         filePath.unlink()
 

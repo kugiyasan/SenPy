@@ -42,7 +42,6 @@ bot = commands.Bot(command_prefix=prefixes,
 #! cogs.Maths.dataVisualizer and cogs.nn won't run on pypy
 extensions = ('cogs.Games.mastermind',
             'cogs.Games.wordStory',
-            'cogs.Maths.dataVisualizer',
             'cogs.Maths.mathsEquations',
             'cogs.admin',
             'cogs.dev',
@@ -51,10 +50,13 @@ extensions = ('cogs.Games.mastermind',
             'cogs.memes',
             'cogs.mofupoints',
             'cogs.neko',
-            'cogs.nn',
             'cogs.reddit',
             'cogs.thisDoesNotExist',
             'cogs.voice')
+
+pythonExclusiveExtensions = (
+    'cogs.Maths.dataVisualizer',
+    'cogs.nn')
             
 
 @bot.event
@@ -70,11 +72,19 @@ async def on_ready():
 async def reloadExt(ctx: commands.Context):
     '''Reloads the bot extensions without rebooting the entire program'''
     await deleteMessage(ctx)
-    for ext in extensions:
-        try:
+
+    try:
+        for ext in extensions:
             bot.reload_extension(ext)
-        except:
-            print(f"{ext} wasn't reloaded because a error occured")
+
+        for ext in pythonExclusiveExtensions:
+            try:
+                bot.reload_extension(ext)
+            except:
+                print(f"{ext} wasn't reloaded because a error occured")
+    except:
+        await ctx.send('Reloading failed')
+        raise
 
     print('\033[94mReloading successfully finished!\033[0m\n')
 
@@ -85,18 +95,27 @@ async def logout(ctx: commands.Context):
     logging.info('\nlogging out...')
     await bot.logout()
 
+class NoParsingFilter(logging.Filter):
+    def filter(self, record):
+        return 'root' == record.name
+
 if __name__ == "__main__":
-    root_logger= logging.getLogger()
+    root_logger = logging.getLogger()
     root_logger.setLevel(logging.INFO)
     path = pathlib.Path(__file__).parent.absolute()
     handler = logging.FileHandler(path / 'logs' / 'latest.log', 'a', 'utf-8')
     handler.setFormatter(logging.Formatter('%(name)s %(message)s'))
+    handler.addFilter(NoParsingFilter())
     root_logger.addHandler(handler)
     
     for ext in extensions:
+        bot.load_extension(ext)
+
+    for ext in pythonExclusiveExtensions:
         try:
             bot.load_extension(ext)
         except:
             print(f"{ext} wasn't loaded because a error occured")
+            print("If you're running on pypy, this is normal behaviour")
 
     bot.run(token)
