@@ -59,7 +59,7 @@ class Voice(commands.Cog):
 
         voice_client.play(discord.FFmpegOpusAudio('media/welcome.mp3'))
         while voice_client.is_playing():
-            asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
 
     @commands.command()
     async def cursed(self, ctx):
@@ -143,7 +143,7 @@ class Voice(commands.Cog):
         if voice_client:
             voice_client.play(discord.FFmpegOpusAudio('media/seeya.mp3'))
             while voice_client.is_playing():
-                asyncio.sleep(0.1)
+                await asyncio.sleep(0.1)
 
             await voice_client.disconnect()
 
