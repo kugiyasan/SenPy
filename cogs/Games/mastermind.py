@@ -54,7 +54,7 @@ class Mastermind(commands.Cog):
 
         # INIT
         NUMBER_OF_TRIES = 10
-        if guessLength < 2:
+        if guessLength < 4:
             await ctx.send("Choose a harder difficulty!")
             return
         if guessLength > 10:

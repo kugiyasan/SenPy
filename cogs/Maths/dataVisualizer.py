@@ -33,7 +33,7 @@ class MatPlotLib(commands.Cog, name='VisualizeData'):
         # ax.set_yticklabels([])
         ax.set_title('Prediction of the distribution of the grades')
 
-        filePath = pathlib.Path(__file__).parents[2] / 'imgs' / f'{ctx.author.name}graph.png'
+        filePath = pathlib.Path(__file__).parents[2] / 'media' / f'{ctx.author.name}graph.png'
         plt.savefig(filePath, dpi=72, bbox_inches='tight')
         await ctx.send(file=discord.File(filePath))
         filePath.unlink()

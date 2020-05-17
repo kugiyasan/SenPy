@@ -6,35 +6,52 @@ from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 
 from fake_useragent import UserAgent
+import random
 import requests
 
-class RedditAPI(commands.Cog, name='reddit'):
+class RedditAPI(commands.Cog, name='Reddit'):
     def __init__(self, bot):
         self.bot = bot
         self.ua = UserAgent()
         self.URLdata = {}
 
-    @commands.command()
+    @commands.command(aliases=['reddit'])
     async def search(self, ctx, *searchkws):
-        '''Search a subreddit name, can help if you get an error with xd bruh'''
+        '''Search a subreddit name'''
         print('requesting search to reddit')
         requestURL = 'https://www.reddit.com/subreddits/search.json?q={}&include_over_18=on'.format('%20'.join(searchkws))
+        NUMBER_OF_SUGGESTIONS = 5
 
-        output = []
+        suggestions = []
         children = await self.requestReddit(requestURL)
-        for child in children[:5]:
+        for child in children[:NUMBER_OF_SUGGESTIONS]:
             subredditName = child['data']['url'][3:-1]
-            output.append(subredditName)
+            suggestions.append(subredditName)
 
-        title = '**Top 5 subreddits based on your search keyword:**'
-        await prettyList(ctx, title, output)
+        title = f'**Top {NUMBER_OF_SUGGESTIONS} subreddits based on your search keyword (Select with 1-{NUMBER_OF_SUGGESTIONS}):**'
+        await prettyList(ctx, title, suggestions)
+
+        def checkresponse(m):
+            return (m.author == ctx.author
+                and m.channel == ctx.channel
+                and m.content.isdecimal()
+                and int(m.content) > 0
+                and int(m.content) <= NUMBER_OF_SUGGESTIONS)
+
+        m = await self.bot.wait_for('message',
+                                    timeout=60.0,
+                                    check=checkresponse)
+
+        await self.sendRedditImage(ctx, children[int(m.content)-1]['data']['url'][3:-1])
 
     @commands.command(aliases=['mofu'])
     async def mofumofu(self, ctx: commands.Context, dayNumber: int = 0):
         """Send blessing to the server!"""
         if dayNumber:
             await ctx.send(f'DAY {dayNumber} OF THE OWNER NOT REMOVING THIS CHANNEL')
-        await self.sendRedditImage(ctx, 'ChurchOfSenko')
+
+        subreddits = ['senko', 'SewayakiKitsune', 'ChurchOfSenko', 'fluffthetail']
+        await self.sendRedditImage(ctx, random.choice(subreddits))
 
     @commands.command(name='r/', aliases=['bruh'])
     async def sendRedditImage(self, ctx: commands.Context, subreddit):

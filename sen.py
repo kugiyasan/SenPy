@@ -39,9 +39,10 @@ bot = commands.Bot(command_prefix=prefixes,
                     description=description,
                     activity=occupation)
 
+#! cogs.Maths.dataVisualizer and cogs.nn won't run on pypy
 extensions = ('cogs.Games.mastermind',
             'cogs.Games.wordStory',
-            # 'cogs.Maths.dataVisualizer', # comment this line if trying to run on pypy
+            'cogs.Maths.dataVisualizer',
             'cogs.Maths.mathsEquations',
             'cogs.admin',
             'cogs.dev',
@@ -50,6 +51,7 @@ extensions = ('cogs.Games.mastermind',
             'cogs.memes',
             'cogs.mofupoints',
             'cogs.neko',
+            'cogs.nn',
             'cogs.reddit',
             'cogs.thisDoesNotExist',
             'cogs.voice')
@@ -69,7 +71,10 @@ async def reloadExt(ctx: commands.Context):
     '''Reloads the bot extensions without rebooting the entire program'''
     await deleteMessage(ctx)
     for ext in extensions:
-        bot.reload_extension(ext)
+        try:
+            bot.reload_extension(ext)
+        except:
+            print(f"{ext} wasn't reloaded because a error occured")
 
     print('\033[94mReloading successfully finished!\033[0m\n')
 
@@ -89,6 +94,9 @@ if __name__ == "__main__":
     root_logger.addHandler(handler)
     
     for ext in extensions:
-        bot.load_extension(ext)
+        try:
+            bot.load_extension(ext)
+        except:
+            print(f"{ext} wasn't loaded because a error occured")
 
     bot.run(token)

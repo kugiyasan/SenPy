@@ -2,11 +2,13 @@ import discord
 from discord.ext import commands
 
 import json
+import logging
 from cogs.utils.configJson import getValueJson, updateValueJson
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 
 async def giveMofuPoints(user, points):
+    logging.info(f'Giving {points} points to {user.name}')
     path = 'users', str(user.id), 'mofuPoints'
     userPoint = await getValueJson(*path, default=0)
     await updateValueJson(userPoint+points, *path)
