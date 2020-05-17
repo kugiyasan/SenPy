@@ -3,6 +3,7 @@ from discord.ext import commands
 
 import asyncio
 import re
+import sys
 from cogs.utils.deleteMessage import deleteMessage
 
 class Info(commands.Cog):
@@ -10,6 +11,10 @@ class Info(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def about(self, ctx):
+        await ctx.send('SenPy is running on:\n' + sys.version + '\n' + sys.platform)
+
+    @commands.command(aliases=['thonk', 'thinking'])
     async def chika(self, ctx, expression=None):
         await deleteMessage(ctx)
         # guild = await self.bot.fetch_guild(700719623917666336)

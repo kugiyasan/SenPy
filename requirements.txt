@@ -1,10 +1,12 @@
 discord.py
 fake_useragent
-matplotlib
+# matplotlib
 nekos.py
 numpy
 PyNaCl
 python-dateutil
 requests
 scipy
+# torch
+# torchvision
 wheel

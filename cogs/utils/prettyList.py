@@ -1,11 +1,10 @@
 import discord
 from discord.ext import commands
 
-# emojis = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '0️⃣']
-
 def int2Emoji(i):
     string = str(i)
-    (string.replace('0', '0️⃣')
+    string = (string
+        .replace('0', '0️⃣')
         .replace('1', '1️⃣')
         .replace('2', '2️⃣')
         .replace('3', '3️⃣')
