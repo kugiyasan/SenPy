@@ -26,6 +26,9 @@ class Voice(commands.Cog):
 
     @commands.Cog.listener()
     async def on_voice_state_update(self, member: discord.Member, before, after: discord.VoiceState):
+        if not self.getvc(member):
+            return
+            
         if not after.channel:
             # someone quit the vc
             for voice_channel in member.guild.voice_channels:
@@ -42,6 +45,7 @@ class Voice(commands.Cog):
     def getvc(self, ctx):
         return discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
+    @commands.command()
     async def join(self, ctx: commands.Context):
         self.lastCommandTime[ctx.guild] = time()
         vc = ctx.author.voice
@@ -50,12 +54,13 @@ class Voice(commands.Cog):
         if voice_client and voice_client.is_connected():
             await voice_client.move_to(vc.channel)
 
+        if not vc:
+            await ctx.send('get into a voice channel so I can join!')
+            return
+
         if vc.channel != None:
             await vc.channel.connect()
             voice_client = self.getvc(ctx)
-        else:
-            await ctx.send('get into a voice channel so I can join!')
-            return
 
         voice_client.play(discord.FFmpegOpusAudio('media/welcome.mp3'))
         while voice_client.is_playing():
@@ -100,7 +105,7 @@ class Voice(commands.Cog):
                     
             await asyncio.sleep(1)
 
-    @commands.command(aliases=['rev'])
+    @commands.command(aliases=['rev', 'yalp'])
     async def reverse(self, ctx):
         '''!gninepo nas-oknes eht yalP'''
         voice_client: discord.VoiceClient = self.getvc(ctx)

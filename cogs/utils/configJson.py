@@ -1,6 +1,4 @@
-import discord
 import json
-
 
 async def updateValueJson(value, *keys, appendList=False):
     with open('config.json', 'r') as configFile:

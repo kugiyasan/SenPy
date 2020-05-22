@@ -33,7 +33,10 @@ class MofuPoints(commands.Cog):
         for k, v in data.items():
             user = self.bot.get_user(int(k))
             if user in ctx.guild.members:
-                users.append((v[category], user.name))
+                try:
+                    users.append((v[category], user.name))
+                except:
+                    pass
         
         return sorted(users, reverse=True)
 

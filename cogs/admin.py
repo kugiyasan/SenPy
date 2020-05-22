@@ -46,6 +46,10 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx: commands.Context, newPrefix):
         '''change the command prefix for this server'''
+        if len(newPrefix) > 4:
+            await ctx.send('The new prefix is a too long, can you make it shorter please?')
+            return
+
         await updateValueJson(newPrefix, ctx.guild.name, 'command_prefix')
 
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')

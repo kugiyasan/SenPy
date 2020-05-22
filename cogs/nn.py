@@ -46,11 +46,11 @@ class NN(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-        # self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.device = torch.device("cpu")
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        # self.device = torch.device("cpu")
 
         self.model = BasicCNN().to(self.device)
-        self.model.load_state_dict(torch.load("tests/data/MNISTdigitreader2.pt"))
+        self.model.load_state_dict(torch.load("tests/notebooks/data/MNISTdigitreader4.pt"))
         self.model.eval()
 
     @commands.command(aliases=['digits'])
@@ -58,7 +58,7 @@ class NN(commands.Cog):
         """Guess the digit in the image"""
         images = ctx.message.attachments
         if (len(images) == 0
-            or not re.search(r'(\.png)|(\.jpg)|(\.jpeg)', images[0].filename.lower())):
+            or not re.search(r'(\.png$)|(\.jpg$)|(\.jpeg$)', images[0].filename.lower())):
             await ctx.send('Please attach an png or jpg image with your message!')
             return
 

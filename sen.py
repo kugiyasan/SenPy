@@ -11,6 +11,7 @@ import itertools
 import json
 import logging
 import pathlib
+import sys
 
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.configJson import getValueJson
@@ -77,11 +78,9 @@ async def reloadExt(ctx: commands.Context):
         for ext in extensions:
             bot.reload_extension(ext)
 
-        for ext in pythonExclusiveExtensions:
-            try:
+        if not 'PyPy' in sys.version:
+            for ext in pythonExclusiveExtensions:
                 bot.reload_extension(ext)
-            except:
-                print(f"{ext} wasn't reloaded because a error occured")
     except:
         await ctx.send('Reloading failed')
         raise
@@ -111,11 +110,10 @@ if __name__ == "__main__":
     for ext in extensions:
         bot.load_extension(ext)
 
-    for ext in pythonExclusiveExtensions:
-        try:
+    if not 'PyPy' in sys.version:
+        for ext in pythonExclusiveExtensions:
             bot.load_extension(ext)
-        except:
-            print(f"{ext} wasn't loaded because a error occured")
-            print("If you're running on pypy, this is normal behaviour")
+    else:
+        print("You're running on PyPy, so some cogs hasn't been laoded to ensure compatibility")
 
     bot.run(token)
