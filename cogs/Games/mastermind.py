@@ -48,7 +48,6 @@ class Mastermind(commands.Cog):
                     .replace('6', '🟣'))
 
     @commands.command(aliases=['mm'])
-    @commands.bot_has_permissions(manage_messages=True)
     async def mastermind(self, ctx: commands.Context, guessLength: int=6, repeatedColor: bool=True):
         '''Play a game of mastermind!'''
 
@@ -109,6 +108,10 @@ class Mastermind(commands.Cog):
                 await ctx.send(f'The answer was {self.toEmoji(answer)}')
                 playingUsers.discard(ctx.author)
                 return
+
+            if 'show' in msg.lower():
+                boardMessage = await ctx.send(boardMessage.content)
+                continue
             
             if re.search('[^1-6]', msg):
                 continue

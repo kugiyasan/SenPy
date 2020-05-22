@@ -39,14 +39,22 @@ class Info(commands.Cog):
         await ctx.send(f'Pong! The latency is about {int(self.bot.latency*1000)} ms')
 
     @commands.command()
-    async def say(self, ctx, *, words):
+    async def say(self, ctx: commands.Context, *, words=''):
         '''Make this little innocent bot speak for you, you pervert'''
-        await deleteMessage(ctx)
 
         if re.search('s[e3]nk[o0]g[o0][o0]d', words.lower().replace(' ', '')):
+            await deleteMessage(ctx)
             await ctx.send('senko bad')
             return
 
+        if ctx.message.attachments:
+            PATH = f'media/say_{ctx.author.name}.png'
+            await ctx.message.attachments[0].save(PATH)
+            await deleteMessage(ctx)
+            await ctx.send(words, file=discord.File(PATH))
+            return
+
+        await deleteMessage(ctx)
         await ctx.send(words)
 
 def setup(bot):

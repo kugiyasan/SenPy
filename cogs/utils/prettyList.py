@@ -1,6 +1,3 @@
-import discord
-from discord.ext import commands
-
 def int2Emoji(i):
     string = str(i)
     string = (string

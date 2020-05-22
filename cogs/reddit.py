@@ -29,7 +29,7 @@ class RedditAPI(commands.Cog, name='Reddit'):
             suggestions.append(subredditName)
 
         title = f'**Top {NUMBER_OF_SUGGESTIONS} subreddits based on your search keyword (Select with 1-{NUMBER_OF_SUGGESTIONS}):**'
-        await prettyList(ctx, title, suggestions)
+        await prettyList(ctx, title, suggestions, maxLength=NUMBER_OF_SUGGESTIONS)
 
         def checkresponse(m):
             return (m.author == ctx.author

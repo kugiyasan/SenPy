@@ -8,6 +8,8 @@ import logging
 import random
 import re
 
+from cogs.utils.getGeneralchannel import getGeneralchannel
+
 async def utc2localTime(utc):
     from_zone = tz.tzutc()
     to_zone = tz.tzlocal()
@@ -59,11 +61,14 @@ class Events(commands.Cog):
             await ctx.send('Yeah get rekt, son!')
 
         #* Be sure that the first message isn't from the bot
-        msg1, msg2 = await ctx.history(limit=2).flatten()
-        if (msg1.content == msg2.content
-            and msg1.author != msg2.author):
-            # and not msg1.author.bot):
-            await ctx.send(msg1.content)
+        try:
+            msg1, msg2 = await ctx.history(limit=2).flatten()
+            if (msg1.content == msg2.content
+                and msg1.author != msg2.author):
+                # and not msg1.author.bot):
+                await ctx.send(msg1.content)
+        except:
+            pass
 
         # #! the long message troll wasn't removed like asked gottem
         # m = message.content
@@ -72,55 +77,72 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user):
+        users = await reaction.users().flatten()
+        if len(users) == 1 and users[0].bot:
+            return
+
         if reaction.emoji == "\U0001F44E" or reaction.emoji == '⬇️': #thumbs down
             return
+
         await reaction.message.add_reaction(reaction)
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        channel = member.guild.system_channel
-        if channel is not None:
-            await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
+        channel = await self.getGeneralchannel(member.guild)
+        await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
-        channel = member.guild.system_channel
-        if channel is not None:
-            await channel.send(f'See you later alligator {member.mention}.')
+        channel = await self.getGeneralchannel(member.guild)
+        await channel.send(f'See you later alligator {member.mention}.')
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
-        channel = guild.system_channel
-        if channel is not None:
-            await channel.send("Buramie used Banhammer!\nIt's super effective!") 
+        channel = await self.getGeneralchannel(guild)
+        await channel.send(f"{guild.owner.name} used Banhammer!\nIt's super effective!") 
             
     @commands.Cog.listener()
     async def on_member_unban(self, guild, user):
-        channel = guild.system_channel
-        if channel is not None:
-            try:
-                raise Exception
-            except Exception as err:
-                await channel.send(err)
-                await channel.send("""Traceback (most recent call last):
-                    File "events.py", line 49, in on_member_unban
-                    Error: Buramie never unban someone""")
+        channel = await self.getGeneralchannel(guild)
+        await channel.send(f"""Traceback (most recent call last):
+            File "events.py", line 110, in on_member_unban
+            Error: {guild.owner.name} never unban someone""")
                 
     @commands.Cog.listener()
     async def on_guild_emojis_update(self, guild: discord.Guild, before, after):
         diff = set(after).difference(set(before))
         if diff:
-            channel = guild.system_channel
-            try:
-                await channel.send('**NEW EMOJIS**')
-                newemojis = ' '.join(map(lambda x: str(x), diff))
-                await channel.send(newemojis)
-            except:
-                for channel in guild.channels:
-                    if re.search('g[eé]n[eé]ral', channel.name):
-                        await channel.send('**NEW EMOJIS**')
-                        newemojis = ' '.join(map(lambda x: str(x), diff))
-                        await channel.send(newemojis)
+            channel = await self.getGeneralchannel(guild)
+
+            await channel.send('**NEW EMOJIS**')
+            newemojis = ' '.join(map(lambda x: str(x), diff))
+            await channel.send(newemojis)
+
+    async def getGeneralchannel(self, guild: discord.Guild):
+        botMember = guild.get_member(self.bot.user.id)
+        async for channel in self.channelGenerator(guild):
+            if (channel != None
+                and channel.permissions_for(botMember).send_messages):
+                return channel
+
+    async def channelGenerator(self, guild):
+        yield guild.system_channel
+
+        for channel in guild.channels:
+            if 'welcome' in channel.name.lower():
+                yield channel
+            elif re.search('g[eé]n[eé]ral', channel.name):
+                yield channel
+        
+        for channel in guild.channels:
+            yield channel
+        
+        raise self.NoWritableChannelError
+
+
+    class NoWritableChannelError(Exception):
+        pass
+
 
 def setup(bot):
     bot.add_cog(Events(bot))
