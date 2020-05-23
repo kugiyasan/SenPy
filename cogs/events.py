@@ -8,8 +8,6 @@ import logging
 import random
 import re
 
-from cogs.utils.getGeneralchannel import getGeneralchannel
-
 async def utc2localTime(utc):
     from_zone = tz.tzutc()
     to_zone = tz.tzlocal()
