@@ -16,10 +16,7 @@ import sys
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.configJson import getValueJson
 
-try:
-    from myToken import token
-except:
-    from yourToken import token
+from discordToken import token
 
 def variations(prefix):
     bothCase = [(c.upper(), c.lower()) for c in prefix]
@@ -29,7 +26,11 @@ def variations(prefix):
     return withSpace + output
 
 async def prefixes(bot: commands.Bot, message: discord.Message):
-    prefix = await getValueJson('guilds', message.guild.name, 'command_prefix', default='xd')
+    try:
+        prefix = await getValueJson('guilds', message.guild.name, 'command_prefix', default='xd')
+    except:
+        prefix = 'xd'
+        
     return variations(prefix)
 
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
@@ -58,7 +59,8 @@ extensions = ('cogs.Games.mastermind',
 pythonExclusiveExtensions = (
     'cogs.Maths.dataVisualizer',
     'cogs.nn')
-            
+loadPythonExclusive = False
+
 
 @bot.event
 async def on_ready():
@@ -78,7 +80,7 @@ async def reloadExt(ctx: commands.Context):
         for ext in extensions:
             bot.reload_extension(ext)
 
-        if not 'PyPy' in sys.version:
+        if not 'PyPy' in sys.version and loadPythonExclusive:
             for ext in pythonExclusiveExtensions:
                 bot.reload_extension(ext)
     except:
@@ -110,10 +112,10 @@ if __name__ == "__main__":
     for ext in extensions:
         bot.load_extension(ext)
 
-    if not 'PyPy' in sys.version:
+    if not 'PyPy' in sys.version and loadPythonExclusive:
         for ext in pythonExclusiveExtensions:
             bot.load_extension(ext)
     else:
-        print("You're running on PyPy, so some cogs hasn't been laoded to ensure compatibility")
+        print("You're running on PyPy, so some cogs hasn't been loaded to ensure compatibility")
 
     bot.run(token)

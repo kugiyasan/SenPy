@@ -15,8 +15,13 @@ def int2Emoji(i):
     return string
 
 async def prettyList(ctx, title, rawList, units='', maxLength=5):
+    repeat = min(maxLength, len(rawList))
+    if repeat < 1:
+        await ctx.send("There is no result!")
+        return
+
     output = [title]
-    for i in range(min(maxLength, len(rawList))):
+    for i in range(repeat):
         if type(rawList[i]) == tuple:
             output.append(int2Emoji(i+1) + f' {rawList[i][1]}: {rawList[i][0]} {units}')
         else:

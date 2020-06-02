@@ -50,7 +50,7 @@ class NN(commands.Cog):
         # self.device = torch.device("cpu")
 
         self.model = BasicCNN().to(self.device)
-        self.model.load_state_dict(torch.load("tests/notebooks/data/MNISTdigitreader4.pt"))
+        self.model.load_state_dict(torch.load("tests/neuralNetworks/MNISTdigitreader4.pt"))
         self.model.eval()
 
     @commands.command(aliases=['digits'])

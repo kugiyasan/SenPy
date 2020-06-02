@@ -1,3 +1,4 @@
+deeppyer
 discord.py
 fake_useragent
 # matplotlib

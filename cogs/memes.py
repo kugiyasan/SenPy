@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 
 # from lxml import html
+from PIL import Image
+import deeppyer
 import requests
 
 class Memes(commands.Cog):
@@ -49,6 +51,20 @@ class Memes(commands.Cog):
         await ctx.send(f"{age}? That's {20+age%2}, in base {age//2}!")
         if age > 20:
             await ctx.send("But what's the purpose of legalizing already legal lolis??")
+
+    @commands.command(aliases=['df'])
+    async def deepfry(self, ctx: commands.Context):
+        '''haha image goes brrrrrrrr'''
+
+        if not ctx.message.attachments:
+            await ctx.send('Please attach an image!')
+            return
+            
+        # PATH = f'media/deepfry_{ctx.author.name}.png'
+        file = await ctx.message.attachments[0].read()
+        img = Image.open(file)
+        img = await deeppyer.deepfry(img, flares=False)
+        await ctx.send(file=discord.File(img))
 
 
 def setup(bot):

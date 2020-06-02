@@ -52,19 +52,26 @@ class Events(commands.Cog):
                 wrapper = '*'*style + '{}' + '*'*style
                 await ctx.send(wrapper.format(random.choice(dabs)))
 
-        dash = message.guild.get_member(399705801717186571)
-        if ('rekt' in message.content.lower()
-            and not message.author.bot
-            and (not dash or dash.status != discord.Status.online)):
-            await ctx.send('Yeah get rekt, son!')
+        if message.guild:
+            dash = message.guild.get_member(399705801717186571)
+            if ('rekt' in message.content.lower()
+                and not message.author.bot
+                and (not dash or dash.status != discord.Status.online)):
+                await ctx.send('Yeah get rekt, son!')
 
-        #* Be sure that the first message isn't from the bot
         try:
-            msg1, msg2 = await ctx.history(limit=2).flatten()
-            if (msg1.content == msg2.content
-                and msg1.author != msg2.author):
-                # and not msg1.author.bot):
-                await ctx.send(msg1.content)
+            msgs = await ctx.history(limit=3).flatten()
+
+            if len(set(msgs)) != len(msgs):
+                # this code is pretty bad, raising generic expression for nothing
+                raise Exception
+            
+            for i in range(len(msgs)):
+                if (msgs[i-1].content != msgs[i].content
+                    or msgs[i].author.bot):
+                    break
+            else:
+                await ctx.send(msgs[0].content)
         except:
             pass
 

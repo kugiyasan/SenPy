@@ -140,7 +140,7 @@ class Voice(commands.Cog):
         if voice_client.is_playing():
             voice_client.stop()
 
-    @commands.command(aliases=['bye', 'quit', 'reset'], hidden=True)
+    @commands.command(aliases=['bye', 'quit', 'reset', 'decalisse'], hidden=True)
     async def disconnect(self, ctx, *args):
         await self.stop(ctx)
 

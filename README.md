@@ -21,8 +21,8 @@ Note: I shut down my Bot instance everyday during the night, so don't expect thi
 * Open the terminal
 * Clone this repository with `git clone https://github.com/kugiyasan/SenPy.git`, then `cd SenPy`
 * Install the required modules for python `pip install -r requirements.txt`
-* Paste your discord token obtained on the Discord Developer Portal in `yourToken.py`
-* Make a `log` and `media` directory. Inside the `media` directory, place a `audio.mp3`, `welcome.mp3` and `seeya.mp3`
+* Paste your discord token obtained on the Discord Developer Portal in `token.py`. It should look like `token = 'ASFxccwaf...'`
+* Make a `log` and `media` directory. Inside the `media` directory, place a `audio.mp3`, `welcome.mp3` and `seeya.mp3` if you want some sounds to come out!
 * Enjoy! `python sen.py`
 
 # DISCLAIMER
