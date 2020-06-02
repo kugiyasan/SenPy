@@ -109,7 +109,7 @@ class Mastermind(commands.Cog):
                 playingUsers.discard(ctx.author)
                 return
 
-            if 'show' in msg.lower():
+            if 'show' in msg.lower() or 'drop' in msg.lower():
                 boardMessage = await ctx.send(boardMessage.content)
                 continue
             

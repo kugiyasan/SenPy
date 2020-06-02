@@ -50,6 +50,11 @@ class RedditAPI(commands.Cog, name='Reddit'):
         if dayNumber:
             await ctx.send(f'DAY {dayNumber} OF THE OWNER NOT REMOVING THIS CHANNEL')
 
+            if random.randint(0, 1):
+                file = discord.File("media/snekSenko.png", filename="snek.png")
+                await sendEmbed(ctx, "attachment://snek.png", localImageFile=file, title='Get cursed my son')
+                return
+
         subreddits = ['senko', 'SewayakiKitsune', 'ChurchOfSenko', 'fluffthetail']
         await self.sendRedditImage(ctx, random.choice(subreddits))
 

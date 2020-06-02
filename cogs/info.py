@@ -55,6 +55,10 @@ class Info(commands.Cog):
             return
 
         await deleteMessage(ctx)
+
+        if words.startswith('/tts'):
+            await ctx.send(words[4:], tts=True)
+
         await ctx.send(words)
 
 def setup(bot):

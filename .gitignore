@@ -1,6 +1,6 @@
 __pycache__
 .vscode
-myToken.py
+discordToken.py
 config.json
 imgs/**
 logs/**
