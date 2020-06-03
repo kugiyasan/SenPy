@@ -34,6 +34,10 @@ class Info(commands.Cog):
         # https://cdn.discordapp.com/emojis/669743618113667091.png
 
     @commands.command()
+    async def help(self, ctx: commands.Context, category=None):
+        await ctx.send('New help command coming soon!')
+
+    @commands.command()
     async def ping(self, ctx):
         '''SenPy has lower ping than Dash!!!'''
         await ctx.send(f'Pong! The latency is about {int(self.bot.latency*1000)} ms')

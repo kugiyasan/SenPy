@@ -1,6 +1,7 @@
 deeppyer
 discord.py
 fake_useragent
+lxml
 # matplotlib
 nekos.py
 numpy

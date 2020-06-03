@@ -1,10 +1,11 @@
 import discord
 from discord.ext import commands
 
-# from lxml import html
+from lxml import html
 from PIL import Image
 import deeppyer
 import requests
+from io import BytesIO
 
 class Memes(commands.Cog):
     def __init__(self, bot):
@@ -16,12 +17,8 @@ class Memes(commands.Cog):
         url = 'http://www.robietherobot.com/insult-generator.htm'
         webpage = requests.get(url)
         if(webpage.status_code == 200):
-            #! this is better, but it requires lxml
-            # tree = html.fromstring(webpage.content)
-            # insultText = tree.xpath('//h1')[1].text.strip()
-
-            webpageString = str(webpage.content)[5862:]
-            insultText = webpageString[:webpageString.index('<')].strip()
+            tree = html.fromstring(webpage.content)
+            insultText = tree.xpath('//h1')[1].text.strip()
             
             if not member:
                 await ctx.send("You're a " + insultText)
@@ -62,9 +59,17 @@ class Memes(commands.Cog):
             
         # PATH = f'media/deepfry_{ctx.author.name}.png'
         file = await ctx.message.attachments[0].read()
-        img = Image.open(file)
-        img = await deeppyer.deepfry(img, flares=False)
-        await ctx.send(file=discord.File(img))
+        # print(file)
+        img = Image.open(BytesIO(file))
+        img = await deeppyer.deepfry(img)# , flares=False)
+
+        # imgBytes = io.BytesIO()
+        # img.save(imgBytes, format='PNG')
+        # imgBytes = imgBytes.getvalue()
+
+        # toSend = discord.File(io.BytesIO(imgBytes), filename=f'deepfry_{ctx.author.name}.png')
+        toSend = discord.File(Image.open(img))
+        await ctx.send(file=toSend)
 
 
 def setup(bot):

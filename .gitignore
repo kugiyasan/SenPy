@@ -5,6 +5,6 @@ config.json
 imgs/**
 logs/**
 media
-pypyDependencies
-pypyWithSenPY
+nohup.out
+output.txt
 tests
