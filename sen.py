@@ -40,11 +40,12 @@ occupation = discord.Activity(type=discord.ActivityType.playing,
 bot = commands.Bot(command_prefix=prefixes,
                     description=description,
                     activity=occupation)
+# bot.remove_command('help')
 
 #! cogs.Maths.dataVisualizer and cogs.nn won't run on pypy
 extensions = ('cogs.Games.mastermind',
-            'cogs.Games.wordStory',
-            'cogs.Maths.mathsEquations',
+            # 'cogs.Games.wordStory',
+            # 'cogs.Maths.mathsEquations',
             'cogs.admin',
             'cogs.dev',
             'cogs.events',
@@ -116,6 +117,6 @@ if __name__ == "__main__":
         for ext in pythonExclusiveExtensions:
             bot.load_extension(ext)
     else:
-        print("You're running on PyPy, so some cogs hasn't been loaded to ensure compatibility")
+        print("Some cogs hasn't been loaded")
 
     bot.run(token)

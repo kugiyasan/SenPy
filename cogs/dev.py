@@ -18,10 +18,7 @@ class Dev(commands.Cog):
         embed = discord.Embed()
         embed.set_image(url="attachment://image.png")
         await ctx.send(file=file, embed=embed)
-
-    @commands.command()
-    async def deepfry(self, ctx: commands.Context):
-        pass
+        
 
 def setup(bot):
     bot.add_cog(Dev(bot))
