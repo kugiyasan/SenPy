@@ -34,7 +34,7 @@ class Info(commands.Cog):
         # https://cdn.discordapp.com/emojis/669743618113667091.png
 
     @commands.command()
-    async def help(self, ctx: commands.Context, category=None):
+    async def newhelp(self, ctx: commands.Context, category=None):
         await ctx.send('New help command coming soon!')
 
     @commands.command()

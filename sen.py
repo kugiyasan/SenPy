@@ -43,7 +43,8 @@ bot = commands.Bot(command_prefix=prefixes,
 # bot.remove_command('help')
 
 #! cogs.Maths.dataVisualizer and cogs.nn won't run on pypy
-extensions = ('cogs.Games.mastermind',
+extensions = ('cogs.Games.chessCog',
+            'cogs.Games.mastermind',
             # 'cogs.Games.wordStory',
             # 'cogs.Maths.mathsEquations',
             'cogs.admin',
