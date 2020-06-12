@@ -2,6 +2,8 @@ import discord
 from discord.ext import commands
 
 from cogs.Games.board import Board, GameError
+from cogs.Games.crappyChess import ChessGame
+from cogs.Games.crappyChess import GameError as OldGameError
 import asyncio
 
 
@@ -20,8 +22,8 @@ class ChessCog(commands.Cog):
         await ctx.send('Here is/are the player(s) currently playing chess: ' + players)
 
     @commands.command()
-    async def chess(self, ctx, adversary: discord.Member):
-        """Play a chess game with someone"""
+    async def chess(self, ctx, adversary: discord.Member, mode='full'):
+        """Play chess with someone mode='full' or 'pawn' or 'old'"""
         if adversary.bot:
             await ctx.send("You can't play versus a bot, at least for now")
             return
@@ -32,7 +34,16 @@ class ChessCog(commands.Cog):
         self.playingUsers.update((ctx.author, adversary))
         
         turn = 0
-        game = Board()
+        if mode == 'full':
+            game = Board()
+        elif mode == 'pawn':
+            game = Board(onlyPawn=True)
+        elif mode == 'old':
+            game = ChessGame()
+        else:
+            await ctx.send('Unknown game mode')
+            return
+
         board = await ctx.send(str(game))
 
         def checkresponse(m):
@@ -57,16 +68,23 @@ class ChessCog(commands.Cog):
 
             if m.content.lower() == 'stop':
                 await self.endGame(ctx, adversary, (turn, str(game)))
+                return
 
             msg = m.content.split()
             if len(msg) != 2:
-                await ctx.send('Too many arguments were given', delete_after=10.0)
+                await ctx.send('There should be 2 arguments!', delete_after=10.0)
                 continue
 
             try:
                 gameState = game.movePiece(*msg)
-            except GameError as error:
-                await ctx.send(str(error), delete_after=10.0)
+            except GameError as errorMsg:
+                await ctx.send(str(errorMsg), delete_after=10.0)
+                continue
+            except OldGameError as errorMsg:
+                await ctx.send(str(errorMsg), delete_after=10.0)
+                continue
+            except:
+                await ctx.send('Unknown error\n' + str(errorMsg))
                 continue
             
             if gameState:
@@ -74,13 +92,16 @@ class ChessCog(commands.Cog):
                 return
 
             await board.delete()
-            board = await ctx.send(str(game))
+            player = (ctx.author, adversary)[turn]
+            board = await ctx.send(str(game) + f"\nit's {player.name}'s turn!")
             turn = (turn + 1) % 2
         
     async def endGame(self, ctx, adversary, gameState):
         winner = (ctx.author.name, adversary)[gameState[0]]
-        await ctx.send(gameState[1] + f'\n{winner} wins!')
+        # await ctx.send(gameState[1] + f'\n{winner} wins!')
+        await ctx.send(f'\n{winner} wins!')
         self.playingUsers -= {ctx.author, adversary}
+
 
 def setup(bot):
     bot.add_cog(ChessCog(bot))

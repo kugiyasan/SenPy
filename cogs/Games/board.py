@@ -1,35 +1,41 @@
 import numpy as np
 import re
 
-from pieces import *
+from .pieces import *
 
 class Board():
-    def __init__(self):
+    def __init__(self, onlyPawn=False):
         self.turn = 0
         self.board = np.full((8, 8), None, dtype=object)
 
-        # self.board[0] = [
-        #     Rook((0, 0), Color.BLACK),
-        #     Knight((0, 1), Color.BLACK),
-        #     Bishop((0, 2), Color.BLACK),
-        #     Queen((0, 3), Color.BLACK),
-        #     King((0, 4), Color.BLACK),
-        #     Bishop((0, 5), Color.BLACK),
-        #     Knight((0, 6), Color.BLACK),
-        #     Rook((0, 7), Color.BLACK)
-        # ]
-        # self.board[7] = [
-        #     Rook((7, 0), Color.WHITE),
-        #     Knight((7, 1), Color.WHITE),
-        #     Bishop((7, 2), Color.WHITE),
-        #     Queen((7, 3), Color.WHITE),
-        #     King((7, 4), Color.WHITE),
-        #     Bishop((7, 5), Color.WHITE),
-        #     Knight((7, 6), Color.WHITE),
-        #     Rook((7, 7), Color.WHITE)
-        # ]
         self.board[1] = [Pawn('B') for i in range(8)]
         self.board[6] = [Pawn('W') for i in range(8)]
+
+        if onlyPawn:
+            self.board[0][3] = King('B')
+            self.board[7][3] = King('W')
+            return
+
+        self.board[0] = [
+            Rook('B'),
+            Knight('B'),
+            Bishop('B'),
+            King('B'),
+            Queen('B'),
+            Bishop('B'),
+            Knight('B'),
+            Rook('B')
+        ]
+        self.board[7] = [
+            Rook('W'),
+            Knight('W'),
+            Bishop('W'),
+            King('W'),
+            Queen('W'),
+            Bishop('W'),
+            Knight('W'),
+            Rook('W')
+        ]
 
     def movePiece(self, initSq, destSq):
         '''The Board object will make general check to see if the move is valid,
@@ -56,30 +62,38 @@ class Board():
 
         self._move(initSq, destSq)
 
-        self.turn = (self.turn + 1) % 2
+        self.turn += 1
 
     def _move(self, initSq, destSq):
-        emptySquaresCoords = self.board[initSq].checkIfValid(initSq, destSq, self.color)
+        emptySquaresCoords = self.board[initSq].checkIfValid(initSq, destSq, self.turn)
+        self.board[initSq].move()
 
         if emptySquaresCoords:
             print(emptySquaresCoords)
             for coord in emptySquaresCoords:
                 if self.board[coord] != None:
                     raise GameError('There is a piece in the way!')
-
-        else:
-            print(type(self.board[initSq]))
-
-            # exception: pawn moving in diagonal need a opponent at destSq
-            if type(self.board[initSq]) == Pawn and self.board[destSq] == None:
-                raise GameError("Pawn moving in diagonal doesn't have a Piece to kill at destSq")
+            
+            # pawn promotion, default to Queen
+            #? maybe offer to promote to Knight
+            print(destSq[0])
+            if destSq[0] == 0 or destSq[0] == 7:
+                print('here')
+                self.board[initSq] = Queen(self.board[initSq].COLOR)
+        
+        elif type(self.board[initSq]) == Pawn:
+            # exception: pawn moving in diagonal need a Piece to kill at destSq
+            if self.board[destSq] == None:
+                # double exception: en passant capture
+                EnPassantPawn = self.board[initSq[0], destSq[1]]
+                if type(EnPassantPawn) == Pawn and EnPassantPawn.doubleStartTurn+1 == self.turn:
+                    self.board[initSq[0], destSq[1]] = None
+                    
+                else:
+                    raise GameError("Pawn moving in diagonal doesn't have a Piece to kill at destSq")
 
         self.board[destSq] = self.board[initSq]
         self.board[initSq] = None
-
-    @property
-    def color(self):
-        return ('W', 'B')[self.turn]
 
     def __repr__(self):
         board = np.copy(self.board)
@@ -106,7 +120,8 @@ class Board():
                     .replace('WQ', '<:WQ:717894296967315517>')
                     .replace('WR', '<:WR:717894296807931984>'))
 
-        number = (':eight:', ':seven:', ':six:', ':five:', ':four:', ':three:', ':two:', ':one:')
+        number = (':eight:', ':seven:', ':six:', ':five:',
+                  ':four:', ':three:', ':two:', ':one:')
         header = ('⬛:regional_indicator_a:'
                 + ':regional_indicator_b:'
                 + ':regional_indicator_c:'
@@ -116,26 +131,39 @@ class Board():
                 + ':regional_indicator_g:'
                 + ':regional_indicator_h:\n')
         return header + '\n'.join(number[i]+''.join(row) for i, row in enumerate(board))
-        # return '\n'.join(''.join(row) for row in board)
+    
+    @property
+    def terminalBoard(self):
+        board = np.copy(self.board)
+
+        for x in range(8):
+            for y in range(8):
+                if board[x][y] == None:
+                    board[x][y] = ('⬛', '⬜')[(x + y) % 2]
+                    continue
+                
+                board[x, y] = str(board[x, y])
+        return '\n'.join(''.join(row) for row in board)
         
 
 if __name__ == "__main__":
-    game = Board()
+    mode = input('only pawn? (default no): ').lower()
+    yesWords = {'y', 'yes', 'true', '1'}
+    if mode in yesWords:
+        game = Board(onlyPawn=True)
+    else:
+        game = Board()
 
     while 1:
-        print(game)
+        print(game.terminalBoard)
 
-        initSq = input('initSq: ')
-        destSq = input('destSq: ')
+        try:
+            initSq, destSq = input('Coordinates: ').split()
+        except ValueError:
+            print('Enter valid coordinates')
+            continue
 
         try:
             game.movePiece(initSq, destSq)
         except GameError as errorMessage:
             print(errorMessage)
-
-    # def playerMove(self, color, initSq, destSq, pawnPromotion='Q', doNotUpdateTurn=False):
-    #     if self.turn != color:
-    #         raise GameError("Not this player's turn")
-
-    #     if self.fordiddenMoves(self.board[initSq], initSq, destSq):
-    #         raise GameError('Illegal move for this pawn')
