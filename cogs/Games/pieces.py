@@ -76,13 +76,12 @@ class King(Piece):
         dx = destSq[1] - initSq[1]
         dy = destSq[0] - initSq[0]
 
-        #TODO move the Rook
-        # Roque
-        # if dy == 0 and not self.hasMoved:
-        #     if dx == 2:
-        #         return (destSq, (destSq[0], destSq[1]-1))
-        #     if dx == -2:
-        #         return ((destSq[0], destSq[1]-1), destSq, (destSq[0], destSq[1]+1))
+        # Castling first check, continues in board.py
+        if dy == 0 and not self.hasMoved:
+            if dx == 2:
+                return (destSq, (destSq[0], destSq[1]-1))
+            if dx == -2:
+                return ((destSq[0], destSq[1]-1), destSq, (destSq[0], destSq[1]+1))
 
         if abs(dx) < 2 and abs(dy) < 2:
             return
@@ -119,7 +118,9 @@ class Rook(Piece):
 
     def checkIfValid(self, initSq, destSq, turn):
         super().checkIfValid(initSq, destSq, turn)
+        return self._checkIfValid(initSq, destSq, turn)
 
+    def _checkIfValid(self, initSq, destSq, turn):
         dx = destSq[1] - initSq[1]
         dy = destSq[0] - initSq[0]
 
@@ -145,39 +146,31 @@ class Bishop(Piece):
     def checkIfValid(self, initSq, destSq, turn):
         super().checkIfValid(initSq, destSq, turn)
 
+        initSq, destSq = min(initSq, destSq), max(initSq, destSq)
+
         dx = destSq[1] - initSq[1]
         dy = destSq[0] - initSq[0]
 
         if abs(dx) != abs(dy):
             raise GameError("The Bishop can only move on a diagonal line")
         
-        minx = initSq[1]
-        miny = initSq[0]
-        maxx = destSq[1]
-        if dx == dy:
-            return ((miny+x, minx+x) for x in range(miny+1, maxx))
+        mul = 1 if dx > 0 else -1
 
-        elif dx == -dy:
-            return ((miny-x, minx+x) for x in range(miny+1, maxx))
+        return ((initSq[0]+i, initSq[1]+mul*i) for i in range(1, abs(dx)))
 
-class Queen(Bishop):
+class Queen(Bishop, Rook):
+    def __init__(self, color):
+        Bishop.__init__(self, color)
+
     def checkIfValid(self, initSq, destSq, turn):
         try:
-            return super().checkIfValid(initSq, destSq, turn)
-        except:
+            return Bishop.checkIfValid(self, initSq, destSq, turn)
+        except GameError:
             pass
         
-        dx = destSq[1] - initSq[1]
-        dy = destSq[0] - initSq[0]
-
-        if dx == 0:
-            a = min(destSq[0], initSq[0]) + 1
-            b = max(destSq[0], initSq[0])
-            return ((x, initSq[1]) for x in range(a, b))
-
-        elif dy == 0:
-            a = min(destSq[1], initSq[1]) + 1
-            b = max(destSq[1], initSq[1])
-            return ((initSq[0], x) for x in range(a, b))
+        try:
+            return Rook._checkIfValid(self, initSq, destSq, turn)
+        except GameError:
+            pass
 
         raise GameError("The Queen can move on a horizontal, vertical or a diagonal line")
