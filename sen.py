@@ -19,7 +19,7 @@ from cogs.utils.configJson import getValueJson
 from discordToken import token
 
 def variations(prefix):
-    bothCase = [(c.upper(), c.lower()) for c in prefix]
+    bothCase = ((c.upper(), c.lower()) for c in prefix)
     caseUnsensitive = itertools.product(*bothCase)
     output = [''.join(s) for s in caseUnsensitive]
     withSpace = [''.join(s)+' ' for s in output]
@@ -56,6 +56,7 @@ extensions = ('cogs.Games.chessCog',
             'cogs.neko',
             'cogs.reddit',
             'cogs.thisDoesNotExist',
+            'cogs.userEdit',
             'cogs.voice')
 
 pythonExclusiveExtensions = (
