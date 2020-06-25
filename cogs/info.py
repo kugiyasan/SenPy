@@ -12,20 +12,17 @@ class Info(commands.Cog):
 
     @commands.command()
     async def about(self, ctx):
-        await ctx.send('SenPy is running on:\n' + sys.version + '\n' + sys.platform)
+        """gives info on the current setup"""
+        await ctx.send('SenPy is running on Python:\n' + sys.version + '\n' + sys.platform)
 
     @commands.command(aliases=['thonk', 'thinking'])
     async def chika(self, ctx, expression=None):
         await deleteMessage(ctx)
-        # guild = await self.bot.fetch_guild(700719623917666336)
-        # emojisList = await guild.fetch_emojis()
-        # await ctx.send(''.join(str(e) for e in emojisList))
-
         await ctx.send('<:thinking1:710563810582200350><:thinking2:710563810804498452>\n<:thinking3:710563823819554816><:thinking4:710563824079732756>')
 
     @commands.command()
     async def emoji(self, ctx: commands.Context):
-        '''List all available emojis on this server + some random from other server'''
+        """List all available emojis on this server + some random from other server"""
         emojisList = await ctx.guild.fetch_emojis()
         await ctx.send(' '.join(str(e) for e in emojisList))
         await ctx.send('<:choku:645454770378899457>')
@@ -39,14 +36,14 @@ class Info(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        '''SenPy has lower ping than Dash!!!'''
+        """SenPy has lower ping than Dash!!!"""
         await ctx.send(f'Pong! The latency is about {int(self.bot.latency*1000)} ms')
 
     @commands.command()
     async def say(self, ctx: commands.Context, *, words=''):
-        '''Make this little innocent bot speak for you, you pervert'''
+        """Make this little innocent bot speak for you, you pervert"""
 
-        if re.search('s[e3]nk[o0]g[o0][o0]d', words.lower().replace(' ', '')):
+        if re.search('[s5][e3]nk[o0]g[o0][o0]d', words.lower().replace(' ', '')):
             await deleteMessage(ctx)
             await ctx.send('senko bad')
             return

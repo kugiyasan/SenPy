@@ -4,6 +4,7 @@ from discord.ext import commands
 from datetime import datetime
 from dateutil import tz
 
+import asyncio
 import logging
 import random
 import re
@@ -62,16 +63,11 @@ class Events(commands.Cog):
         try:
             msgs = await ctx.history(limit=3).flatten()
 
-            if len(set(msgs)) != len(msgs):
-                # this code is pretty bad, raising generic expression for nothing
-                raise Exception
-            
-            for i in range(len(msgs)):
-                if (msgs[i-1].content != msgs[i].content
-                    or msgs[i].author.bot):
-                    break
-            else:
-                await ctx.send(msgs[0].content)
+            msgSet = set(m.content for m in msgs)
+            authors = set(m.author for m in msgs if not m.author.bot)
+
+            if len(msgSet) == 1 and len(authors) == 3:
+                await ctx.send(msgSet.pop())
         except:
             pass
 

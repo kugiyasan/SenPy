@@ -8,10 +8,9 @@ class Admin(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def ban(self, ctx, *members: discord.Member):
+    async def ban(self, ctx, member: discord.Member):
         """wait the bot has ban permission?!?"""
-        output = ', '.join(m.name for m in members)
-        await ctx.send(f'''`{output} has been banned from the server...\njust kidding I can\'t do that`''')
+        await ctx.send(f'''`{member.name} has been banned from the server...\njust kidding I can\'t do that`''')
 
     @commands.command(aliases=['purge', 'del'])
     async def delete(self, ctx: commands.Context, count: int=1):
@@ -62,7 +61,6 @@ class Admin(commands.Cog):
             await ctx.send('Unknown action. Usage: `xd role add|remove *roles*`')
             return
 
-
     @commands.command()
     async def roles(self, ctx):
         '''Emumerate every role that you can give yourself on this server'''
@@ -112,21 +110,18 @@ class Admin(commands.Cog):
         else:
             await ctx.send('Unknown action. Usage: "xd manageRoles add|remove *roles*"')
 
-
-
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx: commands.Context, newPrefix):
         '''change the command prefix for this server'''
         if len(newPrefix) > 4:
-            await ctx.send('The new prefix is a too long, can you make it shorter please?')
+            await ctx.send('The new prefix is too long, can you make it shorter please?')
             return
 
-        await updateValueJson(newPrefix, ctx.guild.name, 'command_prefix')
+        await updateValueJson(newPrefix, 'guilds', ctx.guild.name, 'command_prefix')
 
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
 
-    
 
 def setup(bot):
     bot.add_cog(Admin(bot))

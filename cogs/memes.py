@@ -57,19 +57,14 @@ class Memes(commands.Cog):
             await ctx.send('Please attach an image!')
             return
             
-        # PATH = f'media/deepfry_{ctx.author.name}.png'
+        PATH = f'media/deepfry_{ctx.author.name}.png'
         file = await ctx.message.attachments[0].read()
-        # print(file)
         img = Image.open(BytesIO(file))
-        img = await deeppyer.deepfry(img)# , flares=False)
+        img = await deeppyer.deepfry(img, flares=False)
 
-        # imgBytes = io.BytesIO()
-        # img.save(imgBytes, format='PNG')
-        # imgBytes = imgBytes.getvalue()
+        img.save(PATH, format='PNG')
 
-        # toSend = discord.File(io.BytesIO(imgBytes), filename=f'deepfry_{ctx.author.name}.png')
-        toSend = discord.File(Image.open(img))
-        await ctx.send(file=toSend)
+        await ctx.send(file=discord.File(PATH))
 
 
 def setup(bot):
