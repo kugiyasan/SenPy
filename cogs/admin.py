@@ -51,10 +51,12 @@ class Admin(commands.Cog):
             await ctx.send('No role updated, be sure to give me the exact role name')
             return
 
+        remove = ('remove', 'del', 'rm', 'delete')
+
         if action == 'add':
             await ctx.author.add_roles(*roleToUpdate, reason='xd addrole')
             await ctx.send(f'Done! You are now in the {string} gang!')
-        elif action == 'remove':
+        elif action in remove:
             await ctx.author.remove_roles(*roleToUpdate, reason='xd rmrole')
             await ctx.send(f'You left the {string} gang')
         else:
@@ -89,7 +91,7 @@ class Admin(commands.Cog):
                 updatedRoles = list(set(confirmedRoles).update(roles))
 
             await updateValueJson(updatedRoles, 'guilds', ctx.guild.name, 'rolesToGive')
-            await ctx.send(f"Role(s) that I can now give: {' '.join(updatedRoles)}")
+            await ctx.send(f"Role(s) that I can now give: {', '.join(updatedRoles)}")
 
         elif action == 'remove':
             roles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive')

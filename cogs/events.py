@@ -70,12 +70,7 @@ class Events(commands.Cog):
                 await ctx.send(msgSet.pop())
         except:
             pass
-
-        # #! the long message troll wasn't removed like asked gottem
-        # m = message.content
-        # if len(m) > 1000:
-        #     await message.channel.send(f'{m[:20]}... too looooooonnnnnngggg')
-
+        
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user):
         users = await reaction.users().flatten()

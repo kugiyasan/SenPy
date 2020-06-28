@@ -2,8 +2,6 @@
 # https://github.com/nobodyme/reddit-fetch.git
 # https://github.com/runarsf/rufus
 
-#* Stubs or type hints (e.g. member: discord.Member) helps autocomplete
-
 import discord
 from discord.ext import commands
 

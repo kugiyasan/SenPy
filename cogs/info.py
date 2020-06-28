@@ -43,7 +43,7 @@ class Info(commands.Cog):
     async def say(self, ctx: commands.Context, *, words=''):
         """Make this little innocent bot speak for you, you pervert"""
 
-        if re.search('[s5][e3]nk[o0]g[o0][o0]d', words.lower().replace(' ', '')):
+        if re.search('[s5][e3]nk[o0](g[o0][o0]d|b[e3][s$][t+])', words.lower().replace(' ', '')):
             await deleteMessage(ctx)
             await ctx.send('senko bad')
             return

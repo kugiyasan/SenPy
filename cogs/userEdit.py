@@ -27,23 +27,6 @@ class UserEdit(commands.Cog):
         image = await ctx.message.attachments[0].read()
         await self.bot.user.edit(avatar=io.BytesIO(image).getvalue())
 
-    @commands.command()
-    async def hypesquad(self, ctx, house):
-        house = house.lower()
-
-        if house == 'bravery':
-            house = discord.HypeSquadHouse.bravery
-        elif house == 'brilliance':
-            house = discord.HypeSquadHouse.brilliance
-        elif house == 'balance':
-            house = discord.HypeSquadHouse.balance
-        elif house == 'none':
-            house = None
-        else:
-            await ctx.send('Unknown hypesquad house')
-            return
-
-        await self.bot.user.edit(house=house)
 
 def setup(bot):
     bot.add_cog(UserEdit(bot))

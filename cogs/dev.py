@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-# import deeppyer
-
 class Dev(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -12,7 +10,7 @@ class Dev(commands.Cog):
         pass
         # print(discord.Permissions.send_messages)
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def test(self, ctx: commands.Context):
         file = discord.File("media/hanamaru.jpg", filename="image.png")
         embed = discord.Embed()
