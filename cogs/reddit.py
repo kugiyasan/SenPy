@@ -108,7 +108,7 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 image_url = 'NSFW' + image_url
                 nsfwCount += 1
 
-            exts = ['.png', '.jpg', '.jpeg']
+            exts = ('.png', '.jpg', '.jpeg')
             for ext in exts:
                 if image_url.endswith(ext):
                     self.URLdata[subreddit].append(image_url)
