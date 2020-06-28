@@ -1,0 +1,3 @@
+[submodule "cogs/Games/chess"]
+	path = cogs/Games/chess
+	url = https://github.com/kugiyasan/chess
