@@ -1,11 +1,8 @@
 import discord
 from discord.ext import commands
 
-from cogs.Games.board import Board, GameError
-from cogs.Games.crappyChess import ChessGame
-from cogs.Games.crappyChess import GameError as OldGameError
+from cogs.Games.chess.board import Board, GameError
 import asyncio
-
 
 class ChessCog(commands.Cog):
     def __init__(self, bot):
@@ -38,8 +35,6 @@ class ChessCog(commands.Cog):
             game = Board()
         elif mode == 'pawn':
             game = Board(onlyPawn=True)
-        elif mode == 'old':
-            game = ChessGame()
         else:
             await ctx.send('Unknown game mode')
             return
@@ -78,9 +73,6 @@ class ChessCog(commands.Cog):
             try:
                 gameState = game.movePiece(*msg)
             except GameError as errorMsg:
-                await ctx.send(str(errorMsg), delete_after=10.0)
-                continue
-            except OldGameError as errorMsg:
                 await ctx.send(str(errorMsg), delete_after=10.0)
                 continue
             except:
