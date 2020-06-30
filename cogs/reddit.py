@@ -58,6 +58,12 @@ class RedditAPI(commands.Cog, name='Reddit'):
         subreddits = ['senko', 'SewayakiKitsune', 'ChurchOfSenko', 'fluffthetail']
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
+    @commands.command()
+    async def araara(self, ctx):
+        """Ara ara you want to have a description of this command?"""
+        # AnimeMILFS
+        # AraAra
+
     @commands.command(name='r/', aliases=['bruh'])
     async def sendRedditImage(self, ctx: commands.Context, subreddit):
         '''Enter the name of a subreddit and get a random pic back!'''
