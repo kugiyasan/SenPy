@@ -4,7 +4,9 @@ from discord.ext import commands
 import asyncio
 import re
 import sys
+
 from cogs.utils.deleteMessage import deleteMessage
+from cogs.utils.sendEmbed import sendEmbed
 
 class Info(commands.Cog):
     def __init__(self, bot):
@@ -13,7 +15,16 @@ class Info(commands.Cog):
     @commands.command()
     async def about(self, ctx):
         """gives info on the current setup"""
-        await ctx.send('SenPy is running on Python:\n' + sys.version + '\n' + sys.platform)
+        # self.bot.application_info()
+        inviteLink = 'https://discord.com/oauth2/authorize?client_id=671722338848342036&scope=bot&permissions=3537984'
+
+        e = discord.Embed(
+            title = 'Click here to invite me on your server!',
+            description = 'SenPy is running on Python:\n' + sys.version + '\n' + sys.platform,
+            url = inviteLink
+        )
+
+        await ctx.send(embed=e)
 
     @commands.command(aliases=['thonk', 'thinking'])
     async def chika(self, ctx, expression=None):
@@ -29,6 +40,10 @@ class Info(commands.Cog):
         await ctx.send('<:gwumpysenko:669743618113667091>')
         print(emojisList[0])
         # https://cdn.discordapp.com/emojis/669743618113667091.png
+
+    @commands.command()
+    async def hug(self, ctx: commands.Context):
+        await sendEmbed(ctx, 'https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237')
 
     @commands.command()
     async def newhelp(self, ctx: commands.Context, category=None):

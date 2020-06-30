@@ -1,5 +1,4 @@
 # https://discordpy.readthedocs.io/en/latest/ext/commands/commands.html
-# https://github.com/nobodyme/reddit-fetch.git
 # https://github.com/runarsf/rufus
 
 import discord
