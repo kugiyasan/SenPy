@@ -9,6 +9,7 @@ from io import BytesIO
 
 from cogs.utils.sendEmbed import sendEmbed
 
+
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -21,7 +22,7 @@ class Memes(commands.Cog):
         if(webpage.status_code == 200):
             tree = html.fromstring(webpage.content)
             insultText = tree.xpath('//h1')[1].text.strip()
-            
+
             if not member:
                 await ctx.send("You're a " + insultText)
             else:
@@ -42,10 +43,10 @@ class Memes(commands.Cog):
 
         if age < 4:
             await ctx.send("Rip dude, I can't legalize your loli, get ready to get caught!")
-            return 
+            return
         if age < 6:
             await ctx.send(f"{age}? That's just 10{age%2}, in base 2!")
-            return 
+            return
 
         await ctx.send(f"{age}? That's {20+age%2}, in base {age//2}!")
         if age > 20:
@@ -58,7 +59,7 @@ class Memes(commands.Cog):
         if not ctx.message.attachments:
             await ctx.send('Please attach an image!')
             return
-            
+
         PATH = f'media/deepfry_{ctx.author.name}.png'
         file = await ctx.message.attachments[0].read()
         img = Image.open(BytesIO(file))

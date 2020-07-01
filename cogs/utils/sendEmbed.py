@@ -1,20 +1,21 @@
 import discord
 
-# from cogs.utils.configJson import 
+# from cogs.utils.configJson import
 from cogs.mofupoints import incrementEmbedCounter
+
 
 async def sendEmbed(ctx, url, localImageFile=None, **kwargs):
     print(url)
 
     await incrementEmbedCounter(ctx.author)
-    
+
     if localImageFile:
         embed = discord.Embed(
             color=discord.Colour.gold(),
             **kwargs)
     else:
         embed = discord.Embed(
-            type='image', 
+            type='image',
             color=discord.Colour.gold(),
             **kwargs)
 
