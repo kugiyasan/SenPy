@@ -8,11 +8,12 @@ import sys
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.sendEmbed import sendEmbed
 
+
 class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    #TODO credit, invite
+    # TODO credit, invite
     @commands.command()
     async def about(self, ctx):
         """gives info on the current setup"""
@@ -20,9 +21,9 @@ class Info(commands.Cog):
         inviteLink = 'https://discord.com/oauth2/authorize?client_id=671722338848342036&scope=bot&permissions=3537984'
 
         e = discord.Embed(
-            title = 'Click here to invite me on your server!',
-            description = 'SenPy is running on Python:\n' + sys.version + '\n' + sys.platform,
-            url = inviteLink
+            title='Click here to invite me on your server!',
+            description='SenPy is running on Python:\n' + sys.version + '\n' + sys.platform,
+            url=inviteLink
         )
 
         await ctx.send(embed=e)
@@ -59,7 +60,7 @@ class Info(commands.Cog):
     async def say(self, ctx: commands.Context, *, words=''):
         """Make this little innocent bot speak for you, you pervert"""
 
-        #TODO don't save the file locally, send it directly
+        # TODO don't save the file locally, send it directly
         if ctx.message.attachments:
             PATH = f'media/say_{ctx.author.name}.png'
             await ctx.message.attachments[0].save(PATH)
@@ -73,6 +74,7 @@ class Info(commands.Cog):
             await ctx.send(words[4:], tts=True)
 
         await ctx.send(words)
+
 
 def setup(bot):
     bot.add_cog(Info(bot))

@@ -9,6 +9,7 @@ from fake_useragent import UserAgent
 import random
 import requests
 
+
 class RedditAPI(commands.Cog, name='Reddit'):
     def __init__(self, bot):
         self.bot = bot
@@ -19,7 +20,8 @@ class RedditAPI(commands.Cog, name='Reddit'):
     async def search(self, ctx, *searchkws):
         '''Search a subreddit name'''
         print('requesting search to reddit')
-        requestURL = 'https://www.reddit.com/subreddits/search.json?q={}&include_over_18=on'.format('%20'.join(searchkws))
+        requestURL = 'https://www.reddit.com/subreddits/search.json?q={}&include_over_18=on'.format(
+            '%20'.join(searchkws))
         NUMBER_OF_SUGGESTIONS = 5
 
         suggestions = []
@@ -33,10 +35,10 @@ class RedditAPI(commands.Cog, name='Reddit'):
 
         def checkresponse(m):
             return (m.author == ctx.author
-                and m.channel == ctx.channel
-                and m.content.isdecimal()
-                and int(m.content) > 0
-                and int(m.content) <= NUMBER_OF_SUGGESTIONS)
+                    and m.channel == ctx.channel
+                    and m.content.isdecimal()
+                    and int(m.content) > 0
+                    and int(m.content) <= NUMBER_OF_SUGGESTIONS)
 
         m = await self.bot.wait_for('message',
                                     timeout=60.0,
@@ -55,7 +57,8 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 await sendEmbed(ctx, "attachment://snek.png", localImageFile=file, title='Get cursed my son')
                 return
 
-        subreddits = ('senko', 'SewayakiKitsune', 'ChurchOfSenko', 'fluffthetail')
+        subreddits = ('senko', 'SewayakiKitsune',
+                      'ChurchOfSenko', 'fluffthetail')
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
     @commands.command(aliases=['ara'])
@@ -69,7 +72,7 @@ class RedditAPI(commands.Cog, name='Reddit'):
         if not random.randint(0, 10):
             await sendEmbed(ctx, random.choice(araara))
             return
-    
+
         subreddits = ('AnimeMILFS', 'AraAra')
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
@@ -95,7 +98,7 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 return
             else:
                 url = url[4:]
-    
+
         await sendEmbed(ctx, url)
 
     async def requestReddit(self, url):
@@ -128,8 +131,10 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 if image_url.endswith(ext):
                     self.URLdata[subreddit].append(image_url)
                     break
-        
-        print(f'{len(self.URLdata[subreddit])} urls in the list for {subreddit} ({nsfwCount} of them are nsfw)')
+
+        print(
+            f'{len(self.URLdata[subreddit])} urls in the list for {subreddit} ({nsfwCount} of them are nsfw)')
+
 
 def setup(bot):
     bot.add_cog(RedditAPI(bot))

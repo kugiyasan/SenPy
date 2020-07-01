@@ -6,6 +6,7 @@ import nekos
 from cogs.utils.sendEmbed import sendEmbed
 from cogs.utils.deleteMessage import deleteMessage
 
+
 class Neko(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -25,7 +26,7 @@ class Neko(commands.Cog):
             await ctx.send(err)
 
     @commands.command()
-    async def owo(self, ctx: commands.Context, *, text:str='give me a text to owoify!'):
+    async def owo(self, ctx: commands.Context, *, text: str = 'give me a text to owoify!'):
         '''yay cute wwitinyg >w<'''
         await deleteMessage(ctx)
         await ctx.send(nekos.owoify(text))
@@ -35,7 +36,7 @@ class Neko(commands.Cog):
         '''Get yo facts right!'''
         await deleteMessage(ctx)
         await ctx.send(nekos.fact())
-        
+
 
 def setup(bot):
     bot.add_cog(Neko(bot))

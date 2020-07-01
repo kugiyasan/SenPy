@@ -6,19 +6,22 @@ from cogs.utils.configJson import getValueJson, updateValueJson
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 
+
 async def giveMofuPoints(user, points):
     path = 'users', str(user.id), 'mofuPoints'
     userPoint = await getValueJson(*path, default=0)
     await updateValueJson(userPoint+points, *path)
+
 
 async def incrementEmbedCounter(user):
     path = 'users', str(user.id), 'numberOfEmbedRequested'
     userPoint = await getValueJson(*path, default=0)
     userPoint += 1
     await updateValueJson(userPoint, *path)
-    
+
     if userPoint % 5 == 0:
         await giveMofuPoints(user, 1)
+
 
 class MofuPoints(commands.Cog):
     def __init__(self, bot):
@@ -35,7 +38,7 @@ class MofuPoints(commands.Cog):
                     users.append((v[category], user.name))
                 except:
                     pass
-        
+
         return sorted(users, reverse=True)
 
     @commands.command(aliases=['top'])
@@ -66,6 +69,7 @@ class MofuPoints(commands.Cog):
 
         await updateValueJson(True, *path)
         await giveMofuPoints(ctx.author, 100)
+
 
 def setup(bot):
     bot.add_cog(MofuPoints(bot))

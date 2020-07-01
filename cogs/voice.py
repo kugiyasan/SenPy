@@ -4,7 +4,7 @@ from discord.ext import commands
 import asyncio
 from time import time
 
-#TODO auto disconnect bot after 5 minutes
+# TODO auto disconnect bot after 5 minutes
 
 # def autoDisconnect(func):
 #     async def inner(self, ctx):
@@ -12,11 +12,12 @@ from time import time
 #         self.lastCommandTime[ctx.guild] = currentTime
 
 #         await func(self, ctx)
-        
+
 #         await asyncio.sleep(10)
 #         if self.lastCommandTime[ctx.guild] == currentTime:
 #             await self.disconnect(ctx)
 #     return inner
+
 
 class Voice(commands.Cog):
     def __init__(self, bot):
@@ -28,7 +29,7 @@ class Voice(commands.Cog):
     async def on_voice_state_update(self, member: discord.Member, before, after: discord.VoiceState):
         if not self.getvc(member):
             return
-            
+
         if not after.channel:
             # someone quit the vc
             for voice_channel in member.guild.voice_channels:
@@ -45,12 +46,12 @@ class Voice(commands.Cog):
     def getvc(self, ctx):
         return discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def join(self, ctx: commands.Context):
         self.lastCommandTime[ctx.guild] = time()
         vc = ctx.author.voice
         voice_client: discord.VoiceClient = self.getvc(ctx)
-        
+
         if voice_client and voice_client.is_connected():
             await voice_client.move_to(vc.channel)
 
@@ -72,7 +73,7 @@ class Voice(commands.Cog):
         '''Please Buramie let me delete this shit'''
         voice_client: discord.VoiceClient = self.getvc(ctx)
         audio_source = discord.PCMAudio(open('media/audio.wav', 'rb'))
-        
+
         if not voice_client:
             await self.join(ctx)
             voice_client: discord.VoiceClient = self.getvc(ctx)
@@ -102,7 +103,7 @@ class Voice(commands.Cog):
         self.looping = True
         while self.looping:
             await self.play(ctx)
-                    
+
             await asyncio.sleep(1)
 
     @commands.command(aliases=['rev', 'yalp'])
@@ -151,6 +152,7 @@ class Voice(commands.Cog):
                 await asyncio.sleep(0.1)
 
             await voice_client.disconnect()
+
 
 def setup(bot):
     bot.add_cog(Voice(bot))

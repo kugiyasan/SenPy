@@ -7,12 +7,13 @@ import random
 from cogs.mofupoints import incrementEmbedCounter
 from cogs.utils.sendEmbed import sendEmbed
 
+
 class AIGeneratedImg(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=['anime', 'neet', 'speedwagon'])
-    async def waifu(self, ctx, seed: int=None):
+    async def waifu(self, ctx, seed: int = None):
         """quality/diversity: ~50000: mq/md, ~75000 hq/ld, ~100000 lq/hd"""
         if not seed:
             seed = random.randint(0, 199999)
@@ -25,7 +26,7 @@ class AIGeneratedImg(commands.Cog):
         await sendEmbed(ctx, url, description=f'seed: {seed}')
 
     @commands.command(aliases=['yiff', 'fursona'])
-    async def furry(self, ctx, seed: int=None):
+    async def furry(self, ctx, seed: int = None):
         """Send AI generated image from thisfursonadoesnotexist.com"""
         if not seed:
             seed = random.randint(10000, 99999)
@@ -36,9 +37,9 @@ class AIGeneratedImg(commands.Cog):
 
         url = f'https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed{seed}.jpg'
         await sendEmbed(ctx, url, description=f'seed: {seed}')
-    
+
     @commands.command()
-    async def husbando(self, ctx, seed: int=None):
+    async def husbando(self, ctx, seed: int = None):
         """AI generated husbandos"""
         if not seed:
             seed = random.randint(0, 1003)
@@ -48,12 +49,13 @@ class AIGeneratedImg(commands.Cog):
             return
 
         number = str(seed).zfill(4)
-        img = open(f'media/2019-05-06-stylegan-malefaces-1ksamples/{number}.jpg', 'rb')
+        img = open(
+            f'media/2019-05-06-stylegan-malefaces-1ksamples/{number}.jpg', 'rb')
 
         # await sendEmbed(ctx, None, description=f'seed: {seed}')
         await ctx.send(file=discord.File(img))
         await ctx.send(f'seed: {seed}')
-        
+
         incrementEmbedCounter(ctx.author)
 
 

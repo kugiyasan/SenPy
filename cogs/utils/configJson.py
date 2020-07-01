@@ -1,5 +1,6 @@
 import json
 
+
 async def updateValueJson(value, *keys, appendList=False):
     with open('config.json', 'r') as configFile:
         data = json.load(configFile)
@@ -11,7 +12,7 @@ async def updateValueJson(value, *keys, appendList=False):
         except:
             cursor[key] = {}
             cursor = cursor[key]
-    
+
     if appendList:
         cursor[keys[-1]].append(value)
     else:
@@ -19,6 +20,7 @@ async def updateValueJson(value, *keys, appendList=False):
 
     with open('config.json', 'w+') as configFile:
         json.dump(data, configFile)
+
 
 async def getValueJson(*keys, default=None):
     with open('config.json', 'r') as configFile:
@@ -29,6 +31,5 @@ async def getValueJson(*keys, default=None):
             data = data[key]
         except:
             return default
-    
-    return data
 
+    return data
