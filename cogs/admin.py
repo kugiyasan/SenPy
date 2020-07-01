@@ -3,17 +3,25 @@ from discord.ext import commands
 
 from cogs.utils.configJson import getValueJson, updateValueJson
 
+
 class Admin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.is_owner()
+    @commands.command(hidden=True)
+    async def activity(self, ctx, *, string):
+        occupation = discord.Activity(
+            type=discord.ActivityType.playing, name=string)
+        await self.bot.change_presence(activity=occupation)
+
     @commands.command()
     async def ban(self, ctx, member: discord.Member):
         """wait the bot has ban permission?!?"""
-        await ctx.send(f'''`{member.name} has been banned from the server...\njust kidding I can\'t do that`''')
+        await ctx.send(f"""`{member.name} has been banned from the server...\njust kidding I can\'t do that`""")
 
     @commands.command(aliases=['purge', 'del'])
-    async def delete(self, ctx: commands.Context, count: int=1):
+    async def delete(self, ctx: commands.Context, count: int = 1):
         """delete the last messages of the bot"""
         await ctx.message.delete()
         n = 0
@@ -28,22 +36,21 @@ class Admin(commands.Cog):
 
     @commands.command(aliases=['getrole'])
     async def addrole(self, ctx: commands.Context, *roles):
-        '''give yourself a certain role in the server'''
+        """give yourself a certain role in the server"""
         await self.role(ctx, action='add', *roles)
 
     @commands.command(aliases=['removerole', 'deleterole', 'rmrole'])
     async def delrole(self, ctx: commands.Context, *roles):
-        '''Remove roles from yourself'''
+        """Remove roles from yourself"""
         await self.role(ctx, action='remove', *roles)
 
-    @commands.command()
     async def role(self, ctx, action='add', *roles):
         roleToUpdate = []
         availableRoles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive')
 
         for role in ctx.guild.roles:
             if (role.name in roles
-                and role.name in availableRoles):
+                    and role.name in availableRoles):
                 roleToUpdate.append(role)
 
         string = ', '.join(role.name for role in roleToUpdate)
@@ -65,7 +72,7 @@ class Admin(commands.Cog):
 
     @commands.command()
     async def roles(self, ctx):
-        '''Emumerate every role that you can give yourself on this server'''
+        """Emumerate every role that you can give yourself on this server"""
         roles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive')
 
         if not roles:
@@ -100,7 +107,7 @@ class Admin(commands.Cog):
                 await ctx.send('No role to remove!')
                 return
             else:
-                updatedRoles = set(roles).difference_update(newroles)
+                updatedRoles = set(roles).difference(newroles)
                 if not updatedRoles:
                     await updateValueJson([], 'guilds', ctx.guild.name, 'rolesToGive')
                     await ctx.send("I can't give roles now!")
@@ -115,7 +122,7 @@ class Admin(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx: commands.Context, newPrefix):
-        '''change the command prefix for this server'''
+        """change the command prefix for this server"""
         if len(newPrefix) > 4:
             await ctx.send('The new prefix is too long, can you make it shorter please?')
             return

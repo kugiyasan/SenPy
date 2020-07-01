@@ -5,9 +5,6 @@ import discord
 from discord.ext import commands
 
 import itertools
-import json
-import logging
-import pathlib
 import sys
 
 from cogs.utils.deleteMessage import deleteMessage
@@ -31,19 +28,13 @@ async def prefixes(bot: commands.Bot, message: discord.Message):
     return variations(prefix)
 
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
-occupation = discord.Activity(type=discord.ActivityType.playing,
-                                name='with Fox Goddess')
 
 bot = commands.Bot(command_prefix=prefixes,
-                    description=description,
-                    activity=occupation)
+                    description=description)
 # bot.remove_command('help')
 
-#! cogs.Maths.dataVisualizer and cogs.nn won't run on pypy
 extensions = ('cogs.Games.chessCog',
             'cogs.Games.mastermind',
-            # 'cogs.Games.wordStory',
-            # 'cogs.Maths.mathsEquations',
             'cogs.admin',
             'cogs.dev',
             'cogs.events',
@@ -53,22 +44,14 @@ extensions = ('cogs.Games.chessCog',
             'cogs.neko',
             'cogs.reddit',
             'cogs.thisDoesNotExist',
-            'cogs.userEdit',
             'cogs.voice')
-
-pythonExclusiveExtensions = (
-    'cogs.Maths.dataVisualizer',
-    'cogs.nn')
-loadPythonExclusive = False
-
 
 @bot.event
 async def on_ready():
     print(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers\n')
-    logging.info(f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers')
 
     for g in bot.guilds:
-        logging.info(g.name + ' member_count: ' + str(g.member_count))
+        print(g.name + ' member_count: ' + str(g.member_count))
 
 @bot.command(hidden=True)
 @commands.is_owner()
@@ -79,10 +62,6 @@ async def reloadExt(ctx: commands.Context):
     try:
         for ext in extensions:
             bot.reload_extension(ext)
-
-        if not 'PyPy' in sys.version and loadPythonExclusive:
-            for ext in pythonExclusiveExtensions:
-                bot.reload_extension(ext)
     except:
         await ctx.send('Reloading failed')
         raise
@@ -93,29 +72,10 @@ async def reloadExt(ctx: commands.Context):
 @commands.is_owner()
 async def logout(ctx: commands.Context):
     await deleteMessage(ctx)
-    logging.info('\nlogging out...')
     await bot.logout()
 
-class NoParsingFilter(logging.Filter):
-    def filter(self, record):
-        return 'root' == record.name
-
 if __name__ == "__main__":
-    root_logger = logging.getLogger()
-    root_logger.setLevel(logging.INFO)
-    path = pathlib.Path(__file__).parent.absolute()
-    handler = logging.FileHandler(path / 'logs' / 'latest.log', 'a', 'utf-8')
-    handler.setFormatter(logging.Formatter('%(name)s %(message)s'))
-    handler.addFilter(NoParsingFilter())
-    root_logger.addHandler(handler)
-    
     for ext in extensions:
         bot.load_extension(ext)
-
-    if not 'PyPy' in sys.version and loadPythonExclusive:
-        for ext in pythonExclusiveExtensions:
-            bot.load_extension(ext)
-    else:
-        print("Some cogs hasn't been loaded")
 
     bot.run(token)
