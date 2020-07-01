@@ -20,7 +20,7 @@ class ChessCog(commands.Cog):
 
     @commands.command()
     async def chess(self, ctx, adversary: discord.Member, mode='full'):
-        """Play chess with someone mode='full' or 'pawn' or 'old'"""
+        """Play chess with someone mode='full' or 'pawn'"""
         if adversary.bot:
             await ctx.send("You can't play versus a bot, at least for now")
             return

@@ -84,6 +84,7 @@ class Admin(commands.Cog):
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def manageRoles(self, ctx, action, *newroles):
+        """Admin command. Let you choose which roles can be given by the bot"""
         if action == 'add':
             roles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive', default=[])
 

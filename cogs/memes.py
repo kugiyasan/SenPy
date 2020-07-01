@@ -4,7 +4,6 @@ from discord.ext import commands
 from lxml import html
 from PIL import Image
 import deeppyer
-import random
 import requests
 from io import BytesIO
 
@@ -13,15 +12,6 @@ from cogs.utils.sendEmbed import sendEmbed
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(aliases=['ara'])
-    async def araara(self, ctx: commands.Context, *, args):
-        """Ara ara you're calling this command?"""
-        araara = (
-            'https://tenor.com/view/akeno-ara-ara-ara-ara-akeno-dxd-gif-15672998',
-            'https://tenor.com/view/ara-anime-eyebrow-up-gif-15721758'
-        )
-        await sendEmbed(ctx, random.choice(araara))
 
     @commands.command()
     async def insult(self, ctx, *, member: discord.Member = None):

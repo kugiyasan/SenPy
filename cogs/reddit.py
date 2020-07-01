@@ -55,14 +55,23 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 await sendEmbed(ctx, "attachment://snek.png", localImageFile=file, title='Get cursed my son')
                 return
 
-        subreddits = ['senko', 'SewayakiKitsune', 'ChurchOfSenko', 'fluffthetail']
+        subreddits = ('senko', 'SewayakiKitsune', 'ChurchOfSenko', 'fluffthetail')
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
-    @commands.command()
-    async def araara(self, ctx):
+    @commands.command(aliases=['ara'])
+    async def araara(self, ctx: commands.Context, *, args):
         """Ara ara you want to have a description of this command?"""
-        # AnimeMILFS
-        # AraAra
+        """Ara ara you're calling this command?"""
+        araara = (
+            'https://tenor.com/view/akeno-ara-ara-ara-ara-akeno-dxd-gif-15672998',
+            'https://tenor.com/view/ara-anime-eyebrow-up-gif-15721758'
+        )
+        if not random.randint(0, 10):
+            await sendEmbed(ctx, random.choice(araara))
+            return
+    
+        subreddits = ('AnimeMILFS', 'AraAra')
+        await self.sendRedditImage(ctx, random.choice(subreddits))
 
     @commands.command(name='r/', aliases=['bruh'])
     async def sendRedditImage(self, ctx: commands.Context, subreddit):
