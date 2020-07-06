@@ -1,26 +1,21 @@
 import discord
 from discord.ext import commands
 
-import json
-from cogs.utils.configJson import getValueJson, updateValueJson
+from cogs.utils.dbms import conn
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 
 
 async def giveMofuPoints(user, points):
-    path = 'users', str(user.id), 'mofuPoints'
-    userPoint = await getValueJson(*path, default=0)
-    await updateValueJson(userPoint+points, *path)
+    with conn:
+        conn.execute("UPDATE users SET mofupoints = mofupoints + ? WHERE id = ?", (points, user.id))
 
 
 async def incrementEmbedCounter(user):
-    path = 'users', str(user.id), 'numberOfEmbedRequested'
-    userPoint = await getValueJson(*path, default=0)
-    userPoint += 1
-    await updateValueJson(userPoint, *path)
-
-    if userPoint % 5 == 0:
-        await giveMofuPoints(user, 1)
+    with conn:
+        conn.execute("""UPDATE users
+                        SET numberOfEmbedRequested = numberOfEmbedRequested + 1
+                        WHERE id = ?""", (user.id,))
 
 
 class MofuPoints(commands.Cog):
@@ -28,23 +23,28 @@ class MofuPoints(commands.Cog):
         self.bot = bot
 
     async def getUsersLeaderboard(self, ctx, category):
-        data = await getValueJson('users')
+        if category == "mofupoints":
+            rows = conn.execute("""SELECT id, mofupoints FROM users
+                                    ORDER BY mofupoints DESC""").fetchall()
+        elif category == "numberOfEmbedRequested":
+            rows = conn.execute("""SELECT id, numberOfEmbedRequested FROM users
+                                    ORDER BY numberOfEmbedRequested DESC""").fetchall()
+        else:
+            raise ValueError("Unknown category. Available arguments: mofupoints, numberOfEmbedRequested")
+
         users = []
 
-        for k, v in data.items():
-            user = self.bot.get_user(int(k))
+        for k, v in rows:
+            user = self.bot.get_user(k)
             if user in ctx.guild.members:
-                try:
-                    users.append((v[category], user.name))
-                except:
-                    pass
-
-        return sorted(users, reverse=True)
+                users.append((v, user.name))
+    
+        return users
 
     @commands.command(aliases=['top'])
     async def leaderboard(self, ctx):
         """Show the leaderboard for the top fluffer"""
-        users = await self.getUsersLeaderboard(ctx, 'mofuPoints')
+        users = await self.getUsersLeaderboard(ctx, 'mofupoints')
 
         title = '***MOFUPOINTS LEADERBOARD***'
         await prettyList(ctx, title, users, 'points')
@@ -62,12 +62,13 @@ class MofuPoints(commands.Cog):
         # This is a secret command, congrats to you if you've found it!
         await deleteMessage(ctx)
 
-        path = 'users', str(ctx.author.id), 'claimedEasterEgg'
-        alreadyClaimed = await getValueJson(*path, default=False)
+        with conn:
+            alreadyClaimed = conn.execute("SELECT claimedEasterEgg FROM users WHERE id = ?", (ctx.author.id)).fetchone()
+            conn.execute("UPDATE users SET claimedEasterEgg = 1 WHERE id = ?", (ctx.author.id))
+
         if alreadyClaimed:
             return
 
-        await updateValueJson(True, *path)
         await giveMofuPoints(ctx.author, 100)
 
 

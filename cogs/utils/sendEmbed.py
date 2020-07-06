@@ -1,6 +1,6 @@
 import discord
 
-# from cogs.utils.configJson import
+# from cogs.utils.dbms import
 from cogs.mofupoints import incrementEmbedCounter
 
 

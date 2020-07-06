@@ -67,8 +67,8 @@ class Voice(commands.Cog):
         while voice_client.is_playing():
             await asyncio.sleep(0.1)
 
-    @commands.command()
-    async def cursed(self, ctx):
+    @commands.command(aliases=['cursed'])
+    async def cursedSong(self, ctx):
         '''ok this command is going to be here for a bit more'''
         '''Please Buramie let me delete this shit'''
         voice_client: discord.VoiceClient = self.getvc(ctx)

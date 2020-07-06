@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from cogs.utils.configJson import getValueJson, updateValueJson
+from cogs.utils.dbms import conn
 
 
 class Admin(commands.Cog):
@@ -34,92 +34,6 @@ class Admin(commands.Cog):
                 if n == count:
                     break
 
-    @commands.command(aliases=['getrole'])
-    async def addrole(self, ctx: commands.Context, *roles):
-        """give yourself a certain role in the server"""
-        await self.role(ctx, action='add', *roles)
-
-    @commands.command(aliases=['removerole', 'deleterole', 'rmrole'])
-    async def delrole(self, ctx: commands.Context, *roles):
-        """Remove roles from yourself"""
-        await self.role(ctx, action='remove', *roles)
-
-    async def role(self, ctx, action='add', *roles):
-        roleToUpdate = []
-        availableRoles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive')
-
-        for role in ctx.guild.roles:
-            if (role.name in roles
-                    and role.name in availableRoles):
-                roleToUpdate.append(role)
-
-        string = ', '.join(role.name for role in roleToUpdate)
-        if not string:
-            await ctx.send('No role updated, be sure to give me the exact role name')
-            return
-
-        remove = ('remove', 'del', 'rm', 'delete')
-
-        if action == 'add':
-            await ctx.author.add_roles(*roleToUpdate, reason='xd addrole')
-            await ctx.send(f'Done! You are now in the {string} gang!')
-        elif action in remove:
-            await ctx.author.remove_roles(*roleToUpdate, reason='xd rmrole')
-            await ctx.send(f'You left the {string} gang')
-        else:
-            await ctx.send('Unknown action. Usage: `xd role add|remove *roles*`')
-            return
-
-    @commands.command()
-    async def roles(self, ctx):
-        """Emumerate every role that you can give yourself on this server"""
-        roles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive')
-
-        if not roles:
-            await ctx.send('There is no role that I can give!')
-            return
-
-        await ctx.send('Available roles: ' + ', '.join(roles))
-
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def manageRoles(self, ctx, action, *newroles):
-        """Admin command. Let you choose which roles can be given by the bot"""
-        if action == 'add':
-            roles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive', default=[])
-
-            confirmedRoles = []
-            for role in ctx.guild.roles:
-                if role.name in newroles:
-                    confirmedRoles.append(role.name)
-
-            if not roles:
-                updatedRoles = list(set(confirmedRoles))
-            else:
-                updatedRoles = list(set(confirmedRoles).update(roles))
-
-            await updateValueJson(updatedRoles, 'guilds', ctx.guild.name, 'rolesToGive')
-            await ctx.send(f"Role(s) that I can now give: {', '.join(updatedRoles)}")
-
-        elif action == 'remove':
-            roles = await getValueJson('guilds', ctx.guild.name, 'rolesToGive')
-
-            if not roles:
-                await ctx.send('No role to remove!')
-                return
-            else:
-                updatedRoles = set(roles).difference(newroles)
-                if not updatedRoles:
-                    await updateValueJson([], 'guilds', ctx.guild.name, 'rolesToGive')
-                    await ctx.send("I can't give roles now!")
-                    return
-
-            await updateValueJson(list(updatedRoles), 'guilds', ctx.guild.name, 'rolesToGive')
-            await ctx.send(f"Role(s) that I can now give: {' '.join(updatedRoles)}")
-
-        else:
-            await ctx.send('Unknown action. Usage: "xd manageRoles add|remove *roles*"')
-
     @commands.command()
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx: commands.Context, newPrefix):
@@ -128,7 +42,8 @@ class Admin(commands.Cog):
             await ctx.send('The new prefix is too long, can you make it shorter please?')
             return
 
-        await updateValueJson(newPrefix, 'guilds', ctx.guild.name, 'command_prefix')
+        with conn:
+            conn.execute("UPDATE guilds SET command_prefix = ? WHERE id = ?", (newPrefix, ctx.guild.id))
 
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
 

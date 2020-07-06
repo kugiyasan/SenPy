@@ -15,8 +15,12 @@ def int2Emoji(i):
     return string
 
 
-async def prettyList(ctx, title, rawList, units='', maxLength=5):
+async def prettyList(ctx, title: str, rawList, units='', maxLength=5):
     repeat = min(maxLength, len(rawList))
+
+    if maxLength == 0:
+        repeat = len(rawList)
+
     if repeat < 1:
         await ctx.send("There is no result!")
         return
