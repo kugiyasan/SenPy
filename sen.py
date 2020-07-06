@@ -4,30 +4,23 @@
 import discord
 from discord.ext import commands
 
-import itertools
 import sys
 
 from cogs.utils.deleteMessage import deleteMessage
-from cogs.utils.configJson import getValueJson
+from cogs.utils.dbms import conn
 
 from discordToken import token
 
 
-def variations(prefix):
-    bothCase = ((c.upper(), c.lower()) for c in prefix)
-    caseUnsensitive = itertools.product(*bothCase)
-    output = [''.join(s) for s in caseUnsensitive]
-    withSpace = [''.join(s)+' ' for s in output]
-    return withSpace + output
-
-
 async def prefixes(bot: commands.Bot, message: discord.Message):
-    try:
-        prefix = await getValueJson('guilds', message.guild.name, 'command_prefix', default='xd')
-    except:
-        prefix = 'xd'
+    prefix = "xd "
+    if message.guild != None:
+        with conn:
+            temp = conn.execute("SELECT command_prefix FROM guilds WHERE id = ?", (message.guild.id,)).fetchone()
+            if temp:
+                prefix = temp[0]
 
-    return variations(prefix)
+    return prefix, f"<@!{bot.user.id}> "
 
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
 
@@ -37,6 +30,7 @@ bot = commands.Bot(command_prefix=prefixes,
 
 extensions = ('cogs.Games.chessCog',
               'cogs.Games.mastermind',
+              'cogs.Games.russianRoulette',
               'cogs.admin',
               'cogs.dev',
               'cogs.events',
@@ -51,8 +45,8 @@ extensions = ('cogs.Games.chessCog',
 
 @bot.event
 async def on_ready():
-    print(
-        f'Logged in as {bot.user.name} running on {len(bot.guilds)} servers\n')
+    print(f'Logged in as {bot.user.name}')
+    print(f'Running on {len(bot.guilds)} servers\n')
 
     for g in bot.guilds:
         print(g.name + ' member_count: ' + str(g.member_count))

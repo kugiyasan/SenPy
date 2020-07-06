@@ -5,7 +5,6 @@ from cogs.mofupoints import giveMofuPoints
 from cogs.utils.deleteMessage import deleteMessage
 
 import asyncio
-import logging
 import random
 import re
 
@@ -70,8 +69,6 @@ class Mastermind(commands.Cog):
             answer = list(range(1, 7))
             random.shuffle(answer)
             answer = answer[:guessLength]
-        
-        logging.info(f"answer to {ctx.author}'s mastermind: {answer}")
 
         if ctx.author in playingUsers:
             await ctx.send("You've already started a game, please stop it first!")
@@ -94,7 +91,7 @@ class Mastermind(commands.Cog):
         while tryCount < NUMBER_OF_TRIES:
             try:
                 m = await self.bot.wait_for('message',
-                                            timeout=1200.0,
+                                            timeout=300.0,
                                             check=checkresponse)
             except asyncio.TimeoutError:
                 await ctx.send('Stopping mastermind, timeout expired')

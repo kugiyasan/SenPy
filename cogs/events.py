@@ -1,11 +1,6 @@
 import discord
 from discord.ext import commands
 
-from datetime import datetime
-from dateutil import tz
-
-import asyncio
-import logging
 import random
 import re
 
@@ -20,12 +15,16 @@ class Events(commands.Cog):
             return
 
         ctx = message.channel
+        
+        # if not ctx.permissions_for(ctx.guild.get_member(self.bot.user.id)).manage_messages:
+        #     await ctx.send("Can't edit messages")
+        #     return
 
         dabs = ['dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/']
         for dab in dabs:
             if dab in message.content.lower().split():
-                style = random.randint(0, 3)
-                wrapper = '*'*style + '{}' + '*'*style
+                style = '*' * random.randint(0, 3)
+                wrapper = style + '{}' + style
                 await ctx.send(wrapper.format(random.choice(dabs)))
 
         if message.guild:
