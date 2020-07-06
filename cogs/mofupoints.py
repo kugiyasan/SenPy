@@ -8,14 +8,18 @@ from cogs.utils.prettyList import prettyList
 
 async def giveMofuPoints(user, points):
     with conn:
-        conn.execute("UPDATE users SET mofupoints = mofupoints + ? WHERE id = ?", (points, user.id))
+        conn.execute("""INSERT INTO users (id, mofupoints)
+                        VALUES(?, ?) 
+                        ON CONFLICT(id) 
+                        DO UPDATE SET mofupoints = mofupoints + ?""", (user.id, points, points))
 
 
 async def incrementEmbedCounter(user):
     with conn:
-        conn.execute("""UPDATE users
-                        SET numberOfEmbedRequests = numberOfEmbedRequests + 1
-                        WHERE id = ?""", (user.id,))
+        conn.execute("""INSERT INTO users (id, numberOfEmbedRequests)
+                        VALUES(?, 1) 
+                        ON CONFLICT(id) 
+                        DO UPDATE SET numberOfEmbedRequests = numberOfEmbedRequests + 1""", (user.id,))
 
 
 class MofuPoints(commands.Cog):
@@ -63,10 +67,13 @@ class MofuPoints(commands.Cog):
         await deleteMessage(ctx)
 
         with conn:
-            alreadyClaimed = conn.execute("SELECT claimedEasterEgg FROM users WHERE id = ?", (ctx.author.id)).fetchone()
-            conn.execute("UPDATE users SET claimedEasterEgg = 1 WHERE id = ?", (ctx.author.id))
+            alreadyClaimed = conn.execute("SELECT easterEggClaimed FROM users WHERE id = ?", (ctx.author.id,)).fetchone()
+            conn.execute("""INSERT INTO users (id, easterEggClaimed)
+                            VALUES(?, 1) 
+                            ON CONFLICT(id) 
+                            DO UPDATE SET easterEggClaimed = 1""", (ctx.author.id,))
 
-        if alreadyClaimed:
+        if alreadyClaimed[0]:
             return
 
         await giveMofuPoints(ctx.author, 100)

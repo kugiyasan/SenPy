@@ -4,7 +4,7 @@ from discord.ext import commands
 from cogs.Games.chess.board import Board, GameError
 import asyncio
 
-class ChessCog(commands.Cog):
+class ChessCog(commands.Cog, name='Chess'):
     def __init__(self, bot):
         self.bot = bot
         self.playingUsers = set()

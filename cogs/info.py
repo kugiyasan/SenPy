@@ -76,13 +76,15 @@ class Info(commands.Cog):
 
     @commands.command(aliases=['suggest', 'comment', 'feedback'])
     async def report(self, ctx, *, text=''):
-        """The principal to communicate with the bot dev"""
-        # use dm to receive feedback and resend to the bot owner
-        await ctx.send("The command isn't ready yet, don't try using it")
+        """Send your thoughts about this bot to the bot dev"""
 
         if text == '':
             await ctx.send('Write your feedback directly with the command e.g. xd feedback blah blah blah')
             return
+
+        channel = await self.bot.get_user(self.bot.owner_id).create_dm()
+        await channel.send(f"***{ctx.author}*** has some feedback!\n{text}")
+        await ctx.send("Your feedback was sent successfully!")
 
 def setup(bot):
     bot.add_cog(Info(bot))
