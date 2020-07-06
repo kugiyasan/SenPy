@@ -13,19 +13,20 @@ from discordToken import token
 
 
 async def prefixes(bot: commands.Bot, message: discord.Message):
-    prefix = "xd "
+    prefix = "xd"
     if message.guild != None:
         with conn:
             temp = conn.execute("SELECT command_prefix FROM guilds WHERE id = ?", (message.guild.id,)).fetchone()
             if temp:
                 prefix = temp[0]
 
-    return prefix, f"<@!{bot.user.id}> "
+    return prefix + " ", prefix, f"<@!{bot.user.id}> "
 
 description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
 
 bot = commands.Bot(command_prefix=prefixes,
-                   description=description)
+                   description=description,
+                   help_command=commands.DefaultHelpCommand())
 # bot.remove_command('help')
 
 extensions = ('cogs.Games.chessCog',
@@ -54,7 +55,7 @@ async def on_ready():
 
 @bot.command(hidden=True)
 @commands.is_owner()
-async def reloadExt(ctx: commands.Context):
+async def reload(ctx: commands.Context):
     '''Reloads the bot extensions without rebooting the entire program'''
     await deleteMessage(ctx)
 
