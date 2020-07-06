@@ -1,9 +1,6 @@
 import discord
 from discord.ext import commands
 
-import asyncio
-import random
-
 
 class Dev(commands.Cog):
     def __init__(self, bot):

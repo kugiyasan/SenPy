@@ -14,7 +14,7 @@ async def giveMofuPoints(user, points):
 async def incrementEmbedCounter(user):
     with conn:
         conn.execute("""UPDATE users
-                        SET numberOfEmbedRequested = numberOfEmbedRequested + 1
+                        SET numberOfEmbedRequests = numberOfEmbedRequests + 1
                         WHERE id = ?""", (user.id,))
 
 
@@ -26,11 +26,11 @@ class MofuPoints(commands.Cog):
         if category == "mofupoints":
             rows = conn.execute("""SELECT id, mofupoints FROM users
                                     ORDER BY mofupoints DESC""").fetchall()
-        elif category == "numberOfEmbedRequested":
-            rows = conn.execute("""SELECT id, numberOfEmbedRequested FROM users
-                                    ORDER BY numberOfEmbedRequested DESC""").fetchall()
+        elif category == "numberOfEmbedRequests":
+            rows = conn.execute("""SELECT id, numberOfEmbedRequests FROM users
+                                    ORDER BY numberOfEmbedRequests DESC""").fetchall()
         else:
-            raise ValueError("Unknown category. Available arguments: mofupoints, numberOfEmbedRequested")
+            raise ValueError("Unknown category. Available arguments: mofupoints, numberOfEmbedRequests")
 
         users = []
 
@@ -52,7 +52,7 @@ class MofuPoints(commands.Cog):
     @commands.command(aliases=['imagetop'])
     async def nolife(self, ctx):
         """Show the leaderboard for who has requested the most images"""
-        users = await self.getUsersLeaderboard(ctx, 'numberOfEmbedRequested')
+        users = await self.getUsersLeaderboard(ctx, 'numberOfEmbedRequests')
 
         title = '***NO LIFE LEADERBOARD***'
         await prettyList(ctx, title, users, 'requests')

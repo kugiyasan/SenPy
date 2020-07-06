@@ -3,7 +3,7 @@ from discord.ext import commands
 
 import random
 import re
-
+import traceback
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -44,6 +44,25 @@ class Events(commands.Cog):
                 await ctx.send(msgSet.pop())
         except:
             pass
+
+    @commands.Cog.listener()
+    async def on_command_error(self, ctx: commands.Context, exception):
+        if not ctx.command:
+            return
+        if type(exception) == commands.errors.MissingRequiredArgument:
+            await ctx.send(exception)
+            await ctx.send_help(ctx.command)
+            return
+
+        print('Ignoring exception in command {}:'.format(ctx.command))
+        traceback.print_exception(type(exception), exception, exception.__traceback__)
+
+        await ctx.send("There was an unexpected error, I'll inform the bot dev, sorry for the incovenience")
+
+        channel = await self.bot.get_user(self.bot.owner_id).create_dm()
+        await channel.send(f"{ctx.author} raised an error with the command ***{ctx.command}***")
+        await channel.send(f"{type(exception)}\n{exception}")
+        await channel.send("```" + "".join(traceback.format_tb(exception.__traceback__)) + "```")
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user):

@@ -38,12 +38,11 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx: commands.Context, newPrefix):
         """change the command prefix for this server"""
-        if len(newPrefix) > 4:
-            await ctx.send('The new prefix is too long, can you make it shorter please?')
-            return
-
         with conn:
-            conn.execute("UPDATE guilds SET command_prefix = ? WHERE id = ?", (newPrefix, ctx.guild.id))
+            conn.execute("""INSERT INTO guilds (id, command_prefix)
+                            VALUES(?, ?) 
+                            ON CONFLICT(id) 
+                            DO UPDATE SET command_prefix = ?""", (ctx.guild.id, newPrefix, newPrefix))
 
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
 

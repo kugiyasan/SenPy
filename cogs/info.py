@@ -40,7 +40,8 @@ class Info(commands.Cog):
     @commands.command()
     async def hug(self, ctx: commands.Context):
         """Anyone wants a hug?"""
-        await sendEmbed(ctx, 'https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237')
+        # await sendEmbed(ctx, 'https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237')
+        await ctx.send('https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237')
 
     @commands.command(hidden=True)
     async def newhelp(self, ctx: commands.Context, category=None):

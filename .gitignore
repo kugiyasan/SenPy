@@ -7,3 +7,4 @@ media
 nohup.out
 output.txt
 tests
+users_settings.sqlite
