@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.dbms import conn
 
 
@@ -23,7 +24,7 @@ class Admin(commands.Cog):
     @commands.command(aliases=['purge', 'del'])
     async def delete(self, ctx: commands.Context, count: int = 1):
         """delete the last messages of the bot"""
-        await ctx.message.delete()
+        await deleteMessage(ctx)
         n = 0
 
         async for message in ctx.history(limit=100):

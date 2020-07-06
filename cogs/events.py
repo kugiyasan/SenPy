@@ -60,9 +60,10 @@ class Events(commands.Cog):
         await ctx.send("There was an unexpected error, I'll inform the bot dev, sorry for the incovenience")
 
         channel = await self.bot.get_user(self.bot.owner_id).create_dm()
-        await channel.send(f"{ctx.author} raised an error with the command ***{ctx.command}***")
-        await channel.send(f"{type(exception)}\n{exception}")
-        await channel.send("```" + "".join(traceback.format_tb(exception.__traceback__)) + "```")
+        text = (f"{ctx.author} raised an error with the command ***{ctx.command}***\n"
+                + f"{type(exception)}\n{exception}"
+                + "```" + "".join(traceback.format_tb(exception.__traceback__)) + "```")
+        await channel.send(text)
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user):

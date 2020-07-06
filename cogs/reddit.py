@@ -47,38 +47,22 @@ class RedditAPI(commands.Cog, name='Reddit'):
         await self.sendRedditImage(ctx, children[int(m.content)-1]['data']['url'][3:-1])
 
     @commands.command(aliases=['mofu'])
-    async def mofumofu(self, ctx: commands.Context, dayNumber: int = 0):
+    async def mofumofu(self, ctx: commands.Context):
         """Send blessing to the server!"""
-        if dayNumber:
-            await ctx.send(f'DAY {dayNumber} OF THE OWNER NOT REMOVING THIS CHANNEL')
-
-            if random.randint(0, 1):
-                file = discord.File("media/snekSenko.png", filename="snek.png")
-                await sendEmbed(ctx, "attachment://snek.png", localImageFile=file, title='Get cursed my son')
-                return
-
         subreddits = ('senko', 'SewayakiKitsune',
                       'ChurchOfSenko', 'fluffthetail')
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
     @commands.command(aliases=['ara'])
-    async def araara(self, ctx: commands.Context, *, args):
+    async def araara(self, ctx: commands.Context, *, args='ara'):
         """Ara ara you want to have a description of this command?"""
         """Ara ara you're calling this command?"""
-        araara = (
-            'https://tenor.com/view/akeno-ara-ara-ara-ara-akeno-dxd-gif-15672998',
-            'https://tenor.com/view/ara-anime-eyebrow-up-gif-15721758'
-        )
-        if not random.randint(0, 10):
-            await sendEmbed(ctx, random.choice(araara))
-            return
-
         subreddits = ('AnimeMILFS', 'AraAra')
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
-    @commands.command(name='r/', aliases=['bruh'])
-    async def sendRedditImage(self, ctx: commands.Context, subreddit):
-        '''Enter the name of a subreddit and get a random pic back!'''
+    @commands.command(name='subreddit', aliases=['sub'])
+    async def sendRedditImage(self, ctx: commands.Context, subreddit='all'):
+        '''Get a random pic from a subreddit!'''
         await deleteMessage(ctx)
 
         if not self.URLdata.get(subreddit):
@@ -90,7 +74,7 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 await ctx.send('No subreddit matches this name or there wasn\'t any image!')
                 return
 
-        url = self.URLdata[subreddit].pop()
+        url = self.URLdata[subreddit].pop(0)
         if url.startswith('NSFW'):
             if not ctx.channel.is_nsfw():
                 await ctx.send('Retry in a nsfw channel with this subreddit!')

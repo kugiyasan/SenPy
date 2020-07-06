@@ -56,7 +56,7 @@ class AIGeneratedImg(commands.Cog):
         await ctx.send(file=discord.File(img))
         await ctx.send(f'seed: {seed}')
 
-        incrementEmbedCounter(ctx.author)
+        await incrementEmbedCounter(ctx.author)
 
 
 def setup(bot):
