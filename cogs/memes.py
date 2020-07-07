@@ -7,8 +7,6 @@ import deeppyer
 import requests
 from io import BytesIO
 
-from cogs.utils.sendEmbed import sendEmbed
-
 
 class Memes(commands.Cog):
     def __init__(self, bot):

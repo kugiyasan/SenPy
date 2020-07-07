@@ -49,12 +49,10 @@ class AIGeneratedImg(commands.Cog):
             return
 
         number = str(seed).zfill(4)
-        img = open(
-            f'media/2019-05-06-stylegan-malefaces-1ksamples/{number}.jpg', 'rb')
+        imgPath = f'media/2019-05-06-stylegan-malefaces-1ksamples/{number}.jpg'
 
-        # await sendEmbed(ctx, None, description=f'seed: {seed}')
-        await ctx.send(file=discord.File(img))
-        await ctx.send(f'seed: {seed}')
+        file = discord.File(imgPath, filename="image.png")
+        await sendEmbed(ctx, "attachment://image.png", localImageFile=file, description=f'seed: {seed}')
 
         await incrementEmbedCounter(ctx.author)
 
