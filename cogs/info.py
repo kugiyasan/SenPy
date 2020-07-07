@@ -6,7 +6,6 @@ import re
 import sys
 
 from cogs.utils.deleteMessage import deleteMessage
-from cogs.utils.sendEmbed import sendEmbed
 from cogs.utils.prettyList import prettyList
 
 
@@ -17,7 +16,7 @@ class Info(commands.Cog):
     @commands.command(aliases=['credit', 'credits', 'invite'])
     async def about(self, ctx):
         """gives various informations about the bot"""
-        inviteLink = 'https://discord.com/oauth2/authorize?client_id=671722338848342036&scope=bot&permissions=3537984'
+        inviteLink = f'https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=3537984'
 
         e = discord.Embed(
             title='Click here to invite me on your server!',
@@ -40,7 +39,6 @@ class Info(commands.Cog):
     @commands.command()
     async def hug(self, ctx: commands.Context):
         """Anyone wants a hug?"""
-        # await sendEmbed(ctx, 'https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237')
         await ctx.send('https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237')
 
     @commands.command(hidden=True)

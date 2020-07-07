@@ -1,12 +1,14 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 
-from cogs.utils.sendEmbed import sendEmbed
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
+from cogs.mofupoints import incrementEmbedCounter
 
+import asyncio
 from fake_useragent import UserAgent
 import random
+import re
 import requests
 
 
@@ -15,6 +17,35 @@ class RedditAPI(commands.Cog, name='Reddit'):
         self.bot = bot
         self.ua = UserAgent()
         self.URLdata = {}
+        self.chikaByTheHour.start()
+
+    def cog_unload(self):
+        self.chikaByTheHour.cancel()
+
+    @tasks.loop(hours=1.0)
+    async def chikaByTheHour(self):
+        channel = self.bot.get_channel(722374291148111884)
+        subreddits = ('ChikaFujiwara', 'chikalewds')
+        await self.sendRedditImage(channel, random.choice(subreddits))
+
+    @chikaByTheHour.before_loop
+    async def before_chikaByTheHour(self):
+        await self.bot.wait_until_ready()
+        await asyncio.sleep(1)
+
+    @commands.command(aliases=['ara'])
+    async def araara(self, ctx: commands.Context, *, args='ara'):
+        """Ara ara you want to have a description of this command?"""
+        """Ara ara you're calling this command?"""
+        subreddits = ('AnimeMILFS', 'AraAra')
+        await self.sendRedditImage(ctx, random.choice(subreddits))
+
+    @commands.command(aliases=['mofu'])
+    async def mofumofu(self, ctx: commands.Context):
+        """Send blessing to the server!"""
+        subreddits = ('senko', 'SewayakiKitsune',
+                      'ChurchOfSenko', 'fluffthetail')
+        await self.sendRedditImage(ctx, random.choice(subreddits))
 
     @commands.command(aliases=['reddit'])
     async def search(self, ctx, *searchkws):
@@ -46,20 +77,6 @@ class RedditAPI(commands.Cog, name='Reddit'):
 
         await self.sendRedditImage(ctx, children[int(m.content)-1]['data']['url'][3:-1])
 
-    @commands.command(aliases=['mofu'])
-    async def mofumofu(self, ctx: commands.Context):
-        """Send blessing to the server!"""
-        subreddits = ('senko', 'SewayakiKitsune',
-                      'ChurchOfSenko', 'fluffthetail')
-        await self.sendRedditImage(ctx, random.choice(subreddits))
-
-    @commands.command(aliases=['ara'])
-    async def araara(self, ctx: commands.Context, *, args='ara'):
-        """Ara ara you want to have a description of this command?"""
-        """Ara ara you're calling this command?"""
-        subreddits = ('AnimeMILFS', 'AraAra')
-        await self.sendRedditImage(ctx, random.choice(subreddits))
-
     @commands.command(name='subreddit', aliases=['sub'])
     async def sendRedditImage(self, ctx: commands.Context, subreddit='all'):
         '''Get a random pic from a subreddit!'''
@@ -74,16 +91,30 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 await ctx.send('No subreddit matches this name or there wasn\'t any image!')
                 return
 
-        url = self.URLdata[subreddit].pop(0)
-        if url.startswith('NSFW'):
-            if not ctx.channel.is_nsfw():
-                await ctx.send('Retry in a nsfw channel with this subreddit!')
-                self.URLdata[subreddit].append(url)
-                return
-            else:
-                url = url[4:]
+        post = self.URLdata[subreddit].pop()
+        if post["over_18"]:
+            try:
+                nsfwChannel = ctx.channel.is_nsfw()
+            except:
+                nsfwChannel = ctx.is_nsfw()
 
-        await sendEmbed(ctx, url)
+            if not nsfwChannel:
+                await ctx.send('Retry in a nsfw channel with this subreddit!')
+                self.URLdata[subreddit].append(post)
+                return
+
+        if hasattr(ctx, 'author'):
+            await incrementEmbedCounter(ctx.author)
+
+        embed = discord.Embed(
+            color=discord.Colour.gold(),
+            title=f"r/{subreddit}: " + post["title"],
+            url="https://reddit.com" + post["permalink"])
+
+        embed.set_image(url=post["url"])
+        embed.set_footer(
+            text=f'{post["score"]}⬆️ {post["num_comments"]}💬 | posted by {post["author"]}')
+        await ctx.send(embed=embed)
 
     async def requestReddit(self, url):
         print('requesting reddit')
@@ -98,26 +129,24 @@ class RedditAPI(commands.Cog, name='Reddit'):
     async def getUrls(self, subreddit):
         requestURL = f'https://www.reddit.com/r/{subreddit}/randomrising/.json?kind=t3'
         response = await self.requestReddit(requestURL)
-        nsfwCount = 0
 
         if not self.URLdata.get(subreddit):
             self.URLdata[subreddit] = []
 
+        fields = ("title", "score", "over_18", "author",
+                  "num_comments", "permalink", "url")
         for child in response:
-            image_url = child['data']['url']
+            postInfo = {}
+            if not re.search(r"(\.jpg|\.png|\.jpeg)$", child["data"]["url"]):
+                print(child["data"]["url"])
+                continue
 
-            if child['data']['over_18']:
-                image_url = 'NSFW' + image_url
-                nsfwCount += 1
+            for field in fields:
+                postInfo[field] = child["data"][field]
 
-            exts = ('.png', '.jpg', '.jpeg')
-            for ext in exts:
-                if image_url.endswith(ext):
-                    self.URLdata[subreddit].append(image_url)
-                    break
+            self.URLdata[subreddit].append(postInfo)
 
-        print(
-            f'{len(self.URLdata[subreddit])} urls in the list for {subreddit} ({nsfwCount} of them are nsfw)')
+        print(f'{len(self.URLdata[subreddit])} urls for r/{subreddit}')
 
 
 def setup(bot):
