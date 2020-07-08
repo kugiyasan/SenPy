@@ -16,11 +16,6 @@ class Admin(commands.Cog):
             type=discord.ActivityType.playing, name=string)
         await self.bot.change_presence(activity=occupation)
 
-    @commands.command()
-    async def ban(self, ctx, member: discord.Member):
-        """wait the bot has ban permission?!?"""
-        await ctx.send(f"""`{member.name} has been banned from the server...\njust kidding I can\'t do that`""")
-
     @commands.command(aliases=['purge', 'del'])
     async def delete(self, ctx: commands.Context, count: int = 1):
         """delete the last messages of the bot"""

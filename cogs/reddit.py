@@ -26,7 +26,7 @@ class RedditAPI(commands.Cog, name='Reddit'):
     async def chikaByTheHour(self):
         channel = self.bot.get_channel(722374291148111884)
         subreddits = ('ChikaFujiwara', 'chikalewds')
-        await self.sendRedditImage(channel, random.choice(subreddits))
+        await self.sendRedditImage(channel, random.choice(subreddits), dropnsfw=True)
 
     @chikaByTheHour.before_loop
     async def before_chikaByTheHour(self):
@@ -78,9 +78,10 @@ class RedditAPI(commands.Cog, name='Reddit'):
         await self.sendRedditImage(ctx, children[int(m.content)-1]['data']['url'][3:-1])
 
     @commands.command(name='subreddit', aliases=['sub'])
-    async def sendRedditImage(self, ctx: commands.Context, subreddit='all'):
+    async def sendRedditImage(self, ctx: commands.Context, subreddit='all', dropnsfw=False):
         '''Get a random pic from a subreddit!'''
         await deleteMessage(ctx)
+        subreddit = subreddit.lower()
 
         if not self.URLdata.get(subreddit):
             await self.getUrls(subreddit)
@@ -92,6 +93,10 @@ class RedditAPI(commands.Cog, name='Reddit'):
                 return
 
         post = self.URLdata[subreddit].pop()
+        if dropnsfw:
+            while post["over_18"]:
+                post = self.URLdata[subreddit].pop()
+
         if post["over_18"]:
             try:
                 nsfwChannel = ctx.channel.is_nsfw()
@@ -108,8 +113,9 @@ class RedditAPI(commands.Cog, name='Reddit'):
 
         embed = discord.Embed(
             color=discord.Colour.gold(),
-            title=f"r/{subreddit}: " + post["title"],
-            url="https://reddit.com" + post["permalink"])
+            title=f"r/{subreddit}",
+            description=f'[{post["title"]}](https://reddit.com{post["permalink"]})',
+            url=f"https://reddit.com/r/{subreddit}")
 
         embed.set_image(url=post["url"])
         embed.set_footer(
