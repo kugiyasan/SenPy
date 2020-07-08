@@ -2,13 +2,6 @@ deeppyer
 discord.py
 fake_useragent
 lxml
-# matplotlib
 nekos.py
-numpy
 PyNaCl
-python-dateutil
 requests
-scipy
-# torch
-# torchvision
-wheel
