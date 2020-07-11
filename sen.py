@@ -6,6 +6,7 @@ from discord.ext import commands
 
 import sys
 
+from cogs.utils.embedPaginator import EmbedHelpCommand, EmbedPaginator
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.dbms import conn
 
@@ -20,14 +21,14 @@ async def prefixes(bot: commands.Bot, message: discord.Message):
             if temp:
                 prefix = temp[0]
 
-    return prefix + " ", prefix, f"<@!{bot.user.id}> "
+    return commands.when_mentioned_or(prefix + " ", prefix)(bot, message)
 
-description = '''JOACHIM IS THE MASTER OF THE UNIVERSE'''
+description = '''Senko-san wants to pamper you'''
 
 bot = commands.Bot(command_prefix=prefixes,
                    description=description,
-                   help_command=commands.DefaultHelpCommand())
-# bot.remove_command('help')
+                #    help_command=commands.DefaultHelpCommand())
+                   help_command=EmbedHelpCommand(paginator=EmbedPaginator()))
 
 extensions = ('cogs.Games.chessCog',
               'cogs.Games.mastermind',
@@ -40,8 +41,7 @@ extensions = ('cogs.Games.chessCog',
               'cogs.mofupoints',
               'cogs.neko',
               'cogs.reddit',
-              'cogs.thisDoesNotExist',
-              'cogs.voice')
+              'cogs.thisDoesNotExist')
 
 
 @bot.event

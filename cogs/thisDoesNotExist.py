@@ -13,30 +13,32 @@ class AIGeneratedImg(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['anime', 'neet', 'speedwagon'])
-    async def waifu(self, ctx, seed: int = None):
+    async def waifu(self, ctx, seed=None):
         """quality/diversity: ~50000: mq/md, ~75000 hq/ld, ~100000 lq/hd"""
-        if not seed:
-            seed = random.randint(0, 199999)
-
-        if seed < 0 or seed > 199999:
-            await ctx.send('Give me a seed between 0 and 199999 inclusively!')
-            return
-
-        url = f'https://thiswaifudoesnotexist.net/v2/example-{seed}.jpg'
-        await sendEmbed(ctx, url, description=f'seed: {seed}')
+        url = 'https://thiswaifudoesnotexist.net/v2/example-{}.jpg'
+        await self.sendAIImg(ctx, url, seed, 0, 199999)
 
     @commands.command(aliases=['yiff', 'fursona'])
-    async def furry(self, ctx, seed: int = None):
+    async def furry(self, ctx, seed=None):
         """Send AI generated image from thisfursonadoesnotexist.com"""
-        if not seed:
-            seed = random.randint(10000, 99999)
+        url = 'https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed{}.jpg'
+        await self.sendAIImg(ctx, url, seed, 10000, 99999)
 
-        if seed < 10000 or seed > 99999:
-            await ctx.send('Give me a valid 5-digits seed from 10000 to 99999!')
+    async def sendAIImg(self, ctx: commands.Context, url, seed, seedmin, seedmax):
+        if seed is None:
+            seed = random.randint(seedmin, seedmax)
+        else:
+            try:
+                seed = int(seed)
+            except ValueError:
+                await ctx.send("The seed isn't a number!")
+                return
+
+        if seed < seedmin or seed > seedmax:
+            await ctx.send(f'Give me a seed between {seedmin} and {seedmax} inclusively!')
             return
 
-        url = f'https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed{seed}.jpg'
-        await sendEmbed(ctx, url, description=f'seed: {seed}')
+        await sendEmbed(ctx, url.format(seed), description=f'seed: {seed}')
 
     @commands.command()
     async def husbando(self, ctx, seed: int = None):
