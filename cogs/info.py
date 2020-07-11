@@ -25,7 +25,7 @@ class Info(commands.Cog):
         )
 
         e.add_field(name=f'Running on {len(self.bot.guilds)} servers', value='Share this bot to increase this number!')
-        e.add_field(name='Github repos', value='https://github.com/kugiyasan/SenPy')
+        e.add_field(name='Github repository', value='https://github.com/kugiyasan/SenPy')
         e.add_field(name='Bot ID', value=self.bot.user.id)
         e.add_field(name='You have some feedback?', value='Use xd report', inline=False)
         await ctx.send(embed=e)
@@ -53,6 +53,10 @@ class Info(commands.Cog):
     @commands.command()
     async def say(self, ctx: commands.Context, *, words=''):
         """Make this little innocent bot speak for you, you pervert"""
+        if words == '':
+            await ctx.send("You need to add text or image in your message!")
+            return
+
         # TODO don't save the file locally, send it directly
         attachment = None
 

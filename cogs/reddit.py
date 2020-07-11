@@ -118,8 +118,12 @@ class RedditAPI(commands.Cog, name='Reddit'):
             url=f"https://reddit.com/r/{subreddit}")
 
         embed.set_image(url=post["url"])
+        embed.set_author(
+            name=post["author"],
+            url=f"https://reddit.com/u/{post['author']}"
+        )
         embed.set_footer(
-            text=f'{post["score"]}⬆️ {post["num_comments"]}💬 | posted by {post["author"]}')
+            text=f'{post["score"]}⬆️ {post["num_comments"]}💬')
         await ctx.send(embed=embed)
 
     async def requestReddit(self, url):
