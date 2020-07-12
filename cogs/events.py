@@ -35,7 +35,7 @@ class Events(commands.Cog):
         try:
             msgs = await ctx.history(limit=3).flatten()
 
-            msgSet = set(m.content for m in msgs)
+            msgSet = set(m.content.lower() for m in msgs)
             authors = set(m.author for m in msgs if not m.author.bot)
 
             if len(msgSet) == 1 and len(authors) == 3:
