@@ -1,6 +1,7 @@
 boto
 deeppyer
 discord.py
+python-dotenv
 fake_useragent
 lxml
 nekos.py
