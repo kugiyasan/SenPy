@@ -2,6 +2,10 @@ import discord
 from discord.ext import commands
 import asyncio
 
+from PIL import Image, ImageFont, ImageDraw
+from io import BytesIO
+import itertools
+import sys
 
 class Dev(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -18,6 +22,33 @@ class Dev(commands.Cog):
         embed = discord.Embed()
         embed.set_image(url="attachment://image.png")
         await ctx.send(file=file, embed=embed)
+
+    @commands.command(hidden=True)
+    async def haiku(self, ctx, *, text):
+        if sys.platform == "win32":
+            font = ImageFont.truetype(r"C:\Windows\Fonts\msgothic.ttc", 20)
+        elif sys.platform == "linux":
+            font = ImageFont.truetype("/Library/Fonts/Arial Unicode.ttf", 20)
+        else:
+            await ctx.send("This command doesn't work on this bot operating system")
+            return
+
+        text = itertools.zip_longest(*text.split("\n")[::-1], fillvalue="　")
+        text = "\n".join(("　".join(line) for line in text))
+
+        size = ImageDraw.Draw(Image.new("RGB", (1, 1))).textsize(text, font)
+        image = Image.new('RGB', (size[0]+20, size[1]+20))
+        draw = ImageDraw.Draw(image)
+
+        draw.text((5, 5), text, font=font, align="left")
+
+        with BytesIO() as image_binary:
+            image.save(image_binary, 'PNG')
+            image_binary.seek(0)
+            file = discord.File(fp=image_binary, filename="haiku.png")
+            embed = discord.Embed()
+            embed.set_image(url="attachment://haiku.png")
+            await ctx.send(file=file, embed=embed)
 
     @commands.command(hidden=True)
     async def e(self, ctx: commands.Context):
