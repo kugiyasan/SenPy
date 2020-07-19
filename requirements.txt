@@ -1,3 +1,4 @@
+boto
 deeppyer
 discord.py
 fake_useragent
