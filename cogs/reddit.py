@@ -25,8 +25,8 @@ class RedditAPI(commands.Cog, name='Reddit'):
     @tasks.loop(hours=1.0)
     async def chikaByTheHour(self):
         channel = self.bot.get_channel(722374291148111884)
-        subreddits = ('ChikaFujiwara', 'chikalewds')
-        await self.sendRedditImage(channel, random.choice(subreddits), dropnsfw=True)
+        # subreddits = ('ChikaFujiwara', 'chikalewds')
+        await self.sendRedditImage(channel, "ChikaFujiwara", dropnsfw=True)
 
     @chikaByTheHour.before_loop
     async def before_chikaByTheHour(self):
@@ -96,6 +96,10 @@ class RedditAPI(commands.Cog, name='Reddit'):
         if dropnsfw:
             while post["over_18"]:
                 post = self.URLdata[subreddit].pop()
+
+                if self.URLdata == []:
+                    await ctx.send(f"No SFW image on r/{subreddit}!")
+                    return
 
         if post["over_18"]:
             try:

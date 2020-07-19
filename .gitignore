@@ -1,7 +1,6 @@
 __pycache__
+.env
 .vscode
-discordToken.py
-media
 runtime.txt
 tests
 users_settings.sqlite

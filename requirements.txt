@@ -1,8 +1,9 @@
 boto
 deeppyer
 discord.py
+python-dotenv
 fake_useragent
 lxml
 nekos.py
-PyNaCl
+opencv-python-headless
 requests
