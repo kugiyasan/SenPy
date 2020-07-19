@@ -1,1 +1,1 @@
-web: python sen.py > output.txt
+web: python sen.py
