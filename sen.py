@@ -4,14 +4,15 @@
 import discord
 from discord.ext import commands
 
+import os
 import sys
+from dotenv import load_dotenv
 
 from cogs.utils.embedPaginator import EmbedHelpCommand, EmbedPaginator
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.dbms import conn
 
-from discordToken import token
-
+load_dotenv()
 
 async def prefixes(bot: commands.Bot, message: discord.Message):
     prefix = "xd"
@@ -79,4 +80,4 @@ if __name__ == "__main__":
     for ext in extensions:
         bot.load_extension(ext)
 
-    bot.run(token)
+    bot.run(os.environ['token'])

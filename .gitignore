@@ -1,6 +1,8 @@
 __pycache__
 .env
 .vscode
+media
+mydb.dump
 runtime.txt
 tests
 users_settings.sqlite

@@ -15,7 +15,7 @@ import requests
 class RedditAPI(commands.Cog, name='Reddit'):
     def __init__(self, bot):
         self.bot = bot
-        self.ua = UserAgent()
+        self.ua = UserAgent(verify_ssl=False)
         self.URLdata = {}
         self.chikaByTheHour.start()
 
