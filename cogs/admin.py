@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from cogs.utils.deleteMessage import deleteMessage
-from cogs.utils.dbms import conn
+from cogs.utils.dbms import conn, cursor
 
 
 class Admin(commands.Cog):
@@ -35,10 +35,10 @@ class Admin(commands.Cog):
     async def prefix(self, ctx: commands.Context, newPrefix):
         """change the command prefix for this server"""
         with conn:
-            conn.execute("""INSERT INTO guilds (id, command_prefix)
-                            VALUES(?, ?) 
+            cursor.execute("""INSERT INTO guilds (id, command_prefix)
+                            VALUES(%s, %s) 
                             ON CONFLICT(id) 
-                            DO UPDATE SET command_prefix = ?""", (ctx.guild.id, newPrefix, newPrefix))
+                            DO UPDATE SET command_prefix = %s""", (ctx.guild.id, newPrefix, newPrefix))
 
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
 

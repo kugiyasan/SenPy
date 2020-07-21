@@ -1,25 +1,25 @@
 import discord
 from discord.ext import commands
 
-from cogs.utils.dbms import conn
+from cogs.utils.dbms import conn, cursor
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 
 
 async def giveMofuPoints(user, points):
     with conn:
-        conn.execute("""INSERT INTO users (id, mofupoints)
-                        VALUES(?, ?) 
+        cursor.execute("""INSERT INTO users (id, mofupoints)
+                        VALUES(%s, %s) 
                         ON CONFLICT(id) 
-                        DO UPDATE SET mofupoints = mofupoints + ?""", (user.id, points, points))
+                        DO UPDATE SET mofupoints = users.mofupoints + %s""", (user.id, points, points))
 
 
 async def incrementEmbedCounter(user):
     with conn:
-        conn.execute("""INSERT INTO users (id, numberOfEmbedRequests)
-                        VALUES(?, 1) 
+        cursor.execute("""INSERT INTO users (id, numberOfEmbedRequests)
+                        VALUES(%s, 1) 
                         ON CONFLICT(id) 
-                        DO UPDATE SET numberOfEmbedRequests = numberOfEmbedRequests + 1""", (user.id,))
+                        DO UPDATE SET numberOfEmbedRequests = users.numberOfEmbedRequests + 1""", (user.id,))
 
 
 class MofuPoints(commands.Cog):
@@ -28,13 +28,16 @@ class MofuPoints(commands.Cog):
 
     async def getUsersLeaderboard(self, ctx, category):
         if category == "mofupoints":
-            rows = conn.execute("""SELECT id, mofupoints FROM users
-                                    ORDER BY mofupoints DESC""").fetchall()
+            cursor.execute("""SELECT id, mofupoints FROM users
+                                    ORDER BY mofupoints DESC""")
+            rows = cursor.fetchall()
         elif category == "numberOfEmbedRequests":
-            rows = conn.execute("""SELECT id, numberOfEmbedRequests FROM users
-                                    ORDER BY numberOfEmbedRequests DESC""").fetchall()
+            cursor.execute("""SELECT id, numberOfEmbedRequests FROM users
+                                    ORDER BY numberOfEmbedRequests DESC""")
+            rows = cursor.fetchall()
         else:
-            raise ValueError("Unknown category. Available arguments: mofupoints, numberOfEmbedRequests")
+            raise ValueError(
+                "Unknown category. Available arguments: mofupoints, numberOfEmbedRequests")
 
         users = []
 
@@ -42,7 +45,7 @@ class MofuPoints(commands.Cog):
             user = self.bot.get_user(k)
             if user in ctx.guild.members:
                 users.append((v, user.name))
-    
+
         return users
 
     @commands.command(aliases=['top'])
@@ -67,11 +70,13 @@ class MofuPoints(commands.Cog):
         await deleteMessage(ctx)
 
         with conn:
-            alreadyClaimed = conn.execute("SELECT easterEggClaimed FROM users WHERE id = ?", (ctx.author.id,)).fetchone()
-            conn.execute("""INSERT INTO users (id, easterEggClaimed)
-                            VALUES(?, 1) 
+            cursor.execute(
+                "SELECT easterEggClaimed FROM users WHERE id = %s", (ctx.author.id,))
+            alreadyClaimed = cursor.fetchone()
+            cursor.execute("""INSERT INTO users (id, easterEggClaimed)
+                            VALUES(%s, 1) 
                             ON CONFLICT(id) 
-                            DO UPDATE SET easterEggClaimed = 1""", (ctx.author.id,))
+                            DO UPDATE SET easterEggClaimed = TRUE""", (ctx.author.id,))
 
         if alreadyClaimed[0]:
             return

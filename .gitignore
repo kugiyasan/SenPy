@@ -1,6 +1,7 @@
 __pycache__
 .env
 .vscode
+createDB.py
 media
 mydb.dump
 runtime.txt

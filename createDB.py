@@ -7,6 +7,8 @@ guilds = connsqlite.execute("SELECT * FROM guilds").fetchall()
 users = connsqlite.execute("SELECT * FROM users").fetchall()
 connsqlite.close()
 
+print(guilds, users)
+
 DATABASE_URL = os.environ['DATABASE_URL']
 conn = psycopg2.connect(DATABASE_URL, sslmode='require')
 

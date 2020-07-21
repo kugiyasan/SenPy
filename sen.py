@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from cogs.utils.embedPaginator import EmbedHelpCommand, EmbedPaginator
 from cogs.utils.deleteMessage import deleteMessage
-from cogs.utils.dbms import conn
+from cogs.utils.dbms import conn, cursor
 
 load_dotenv()
 
@@ -18,7 +18,8 @@ async def prefixes(bot: commands.Bot, message: discord.Message):
     prefix = "xd"
     if message.guild != None:
         with conn:
-            temp = conn.execute("SELECT command_prefix FROM guilds WHERE id = ?", (message.guild.id,)).fetchone()
+            cursor.execute("SELECT command_prefix FROM guilds WHERE id = %s", (message.guild.id,))
+            temp = cursor.fetchone()
             if temp:
                 prefix = temp[0]
 
