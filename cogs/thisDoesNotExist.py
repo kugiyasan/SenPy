@@ -40,7 +40,7 @@ class AIGeneratedImg(commands.Cog):
 
         await sendEmbed(ctx, url.format(seed), description=f'seed: {seed}')
 
-    @commands.command()
+    @commands.command(hidden=True)
     async def husbando(self, ctx, seed: int = None):
         """AI generated husbandos"""
         if not seed:

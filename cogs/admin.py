@@ -16,7 +16,7 @@ class Admin(commands.Cog):
             type=discord.ActivityType.playing, name=string)
         await self.bot.change_presence(activity=occupation)
 
-    @commands.command(aliases=['purge', 'del'])
+    @commands.command(aliases=["purge", "del"])
     async def delete(self, ctx: commands.Context, count: int = 1):
         """delete the last messages of the bot"""
         await deleteMessage(ctx)
@@ -34,11 +34,18 @@ class Admin(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def prefix(self, ctx: commands.Context, newPrefix):
         """change the command prefix for this server"""
+        if newPrefix == "xd":
+            newPrefix = "null"
+
         with conn:
             cursor.execute("""INSERT INTO guilds (id, command_prefix)
                             VALUES(%s, %s) 
                             ON CONFLICT(id) 
                             DO UPDATE SET command_prefix = %s""", (ctx.guild.id, newPrefix, newPrefix))
+
+        if newPrefix == "null":
+            await ctx.send("The command prefix has been reset to xd!")
+            return
 
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
 

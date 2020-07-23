@@ -50,6 +50,11 @@ class Info(commands.Cog):
         """haha ping pong"""
         await ctx.send(f'Pong! The latency is about {int(self.bot.latency*1000)} ms')
 
+    @commands.command(hidden=True)
+    async def pong(self, ctx):
+        """haha ping pong"""
+        await ctx.send(f'Ping... You ugly btw')
+
     @commands.command()
     async def say(self, ctx: commands.Context, *, words=''):
         """Make this little innocent bot speak for you, you pervert"""

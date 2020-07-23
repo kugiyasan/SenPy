@@ -53,6 +53,9 @@ class Events(commands.Cog):
             await ctx.send(exception)
             await ctx.send_help(ctx.command)
             return
+        if type(exception) == commands.errors.NSFWChannelRequired:
+            await ctx.send(exception)
+            return
 
         print('Ignoring exception in command {}:'.format(ctx.command))
         traceback.print_exception(
@@ -69,7 +72,7 @@ class Events(commands.Cog):
     @ commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user):
         users = await reaction.users().flatten()
-        if len(users) == 1 and users[0].bot:
+        if len(users) < 3 or any(user.bot for user in users):
             return
 
         if reaction.emoji == "\U0001F44E" or reaction.emoji == '⬇️':  # thumbs down
@@ -77,10 +80,10 @@ class Events(commands.Cog):
 
         await reaction.message.add_reaction(reaction)
 
-    @ commands.Cog.listener()
-    async def on_member_join(self, member):
-        channel = await self.getGeneralchannel(member.guild)
-        await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
+    # @ commands.Cog.listener()
+    # async def on_member_join(self, member):
+    #     channel = await self.getGeneralchannel(member.guild)
+    #     await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
 
     @ commands.Cog.listener()
     async def on_member_remove(self, member):

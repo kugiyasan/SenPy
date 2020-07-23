@@ -11,14 +11,11 @@ class Neko(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.is_nsfw()
     @commands.command()
     async def neko(self, ctx: commands.Context, style='neko'):
         '''Send some cute nekos on your server!'''
         await deleteMessage(ctx)
-
-        if not ctx.channel.is_nsfw():
-            await ctx.send('Please try again in a nsfw channel')
-            return
 
         try:
             await sendEmbed(ctx, nekos.img(style))
