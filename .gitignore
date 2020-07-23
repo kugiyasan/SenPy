@@ -2,7 +2,7 @@ __pycache__
 .env
 .vscode
 createDB.py
-media
+media/2019-05-06-stylegan-malefaces-1ksamples
 mydb.dump
 runtime.txt
 tests
