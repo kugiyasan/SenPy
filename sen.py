@@ -22,7 +22,7 @@ async def prefixes(bot: commands.Bot, message: discord.Message):
             cursor.execute(
                 "SELECT command_prefix FROM guilds WHERE id = %s", (message.guild.id,))
             temp = cursor.fetchone()
-            if temp:
+            if temp and temp[0]:
                 prefix = temp[0]
 
     return commands.when_mentioned_or(prefix + " ", prefix)(bot, message)

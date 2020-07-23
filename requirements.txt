@@ -1,4 +1,3 @@
-boto
 deeppyer
 discord.py
 python-dotenv
