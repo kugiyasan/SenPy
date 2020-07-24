@@ -64,25 +64,6 @@ class MofuPoints(commands.Cog):
         title = '***NO LIFE LEADERBOARD***'
         await prettyList(ctx, title, users, 'requests')
 
-    @commands.command(hidden=True, aliases=['senkobad', 'rmt', 'marubestgirl', 'meguminbestgirl', 'hifumibestgirl'])
-    async def chikabestgirl(self, ctx):
-        # This is a secret command, congrats to you if you've found it!
-        await deleteMessage(ctx)
-
-        with conn:
-            cursor.execute(
-                "SELECT easterEggClaimed FROM users WHERE id = %s", (ctx.author.id,))
-            alreadyClaimed = cursor.fetchone()
-            cursor.execute("""INSERT INTO users (id, easterEggClaimed)
-                            VALUES(%s, 1) 
-                            ON CONFLICT(id) 
-                            DO UPDATE SET easterEggClaimed = TRUE""", (ctx.author.id,))
-
-        if alreadyClaimed[0]:
-            return
-
-        await giveMofuPoints(ctx.author, 100)
-
 
 def setup(bot):
     bot.add_cog(MofuPoints(bot))
