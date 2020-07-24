@@ -20,10 +20,6 @@ class Danbooru(commands.Cog):
     @commands.command(aliases=["cockonut"])
     async def coconut(self, ctx):
         """Who really wants images of Coconut?"""
-        if ctx.author.id == 276038064273489930:
-            await ctx.send("No Cockconut pics for Clovis")
-            return
-
         if not len(self.coconutURLs):
             url = f"https://danbooru.donmai.us/posts.json?page={self.coconutPageCount}&tags=coconut_%28nekopara%29+"
             await self.requestDanbooru(url)

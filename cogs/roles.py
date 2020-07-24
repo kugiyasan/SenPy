@@ -9,10 +9,21 @@ class Roles(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    @commands.guild_only()
+    @commands.command(aliases=["addRole"])
+    async def addrole(self, ctx: commands.Context, addingRole=True):
+        await self.roleEmbed(ctx, True)
+
+    @commands.guild_only()
+    @commands.command(aliases=["delRole", "deleteRole", "removeRole"])
+    async def delrole(self, ctx: commands.Context, addingRole=False):
+        await self.roleEmbed(ctx, False)
+
     async def getRoles(self, guildid):
         with conn:
-            cursor.execute("SELECT rolesToGive FROM guilds WHERE id=%s", (guildid,))
-            roles = cursor.fetchone()
+            cursor.execute(
+                "SELECT rolesToGive FROM guilds WHERE id=%s", (guildid,))
+            roles = cursor.fetchone()[0]
         return roles
 
     async def renderEmbed(self, ctx, roles, page):
@@ -37,21 +48,12 @@ class Roles(commands.Cog):
 
         return embed
 
-    @commands.guild_only()
-    @commands.command(aliases=["addRole"])
-    async def addrole(self, ctx: commands.Context, addingRole=True):
-        await self.roleEmbed(ctx, True)
-
-    @commands.guild_only()
-    @commands.command(aliases=["delRole", "deleteRole", "removeRole"])
-    async def delrole(self, ctx: commands.Context, addingRole=False):
-        await self.roleEmbed(ctx, False)
-
     async def roleEmbed(self, ctx: commands.Context, addingRole):
         roles = await self.getRoles(ctx.guild.id)
         if not addingRole:
-            print(set(roles), ctx.author.roles)
-            roles = set(roles).intersection(ctx.author.roles)
+            roles = set(roles).intersection(
+                role.id for role in ctx.author.roles)
+            roles = tuple(roles)
         page = 0
 
         message = await ctx.send(embed=await self.renderEmbed(ctx, roles, page))
@@ -78,18 +80,18 @@ class Roles(commands.Cog):
                     return
 
                 role = ctx.guild.get_role(roles[roleNumber])
-                
+
                 if addingRole:
                     await ctx.author.add_roles(role, reason="xd addrole")
                     await ctx.send(f"You chose : {role.name}! The role is added!")
                 else:
-                    await ctx.author.add_roles(role, reason="xd delrole")
+                    await ctx.author.remove_roles(role, reason="xd delrole")
                     await ctx.send(f"You chose : {role.name}! The role is removed!")
 
                 await message.clear_reactions()
                 return
 
-            page %= len(roles) // 9 + 1
+            page %= (len(roles)-1) // 9 + 1
             await message.edit(embed=await self.renderEmbed(ctx, roles, page))
 
             try:
