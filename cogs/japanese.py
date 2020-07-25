@@ -5,7 +5,7 @@ from PIL import Image, ImageFont, ImageDraw
 from io import BytesIO
 import itertools
 
-class Greetings(commands.Cog):
+class Japanese(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
@@ -31,4 +31,4 @@ class Greetings(commands.Cog):
             await ctx.send(file=file, embed=embed)
 
 def setup(bot):
-    bot.add_cog(Greetings(bot))
+    bot.add_cog(Japanese(bot))

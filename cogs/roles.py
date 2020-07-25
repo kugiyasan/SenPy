@@ -1,8 +1,16 @@
 import discord
 from discord.ext import commands
 import asyncio
+from enum import Enum
 
 from cogs.utils.dbms import conn, cursor
+
+
+class RoleActions(Enum):
+    ADD = 1
+    DEL = 2
+    MANAGEADD = 3
+    MANAGEDEL = 4
 
 
 class Roles(commands.Cog):
@@ -11,13 +19,13 @@ class Roles(commands.Cog):
 
     @commands.guild_only()
     @commands.command(aliases=["addRole"])
-    async def addrole(self, ctx: commands.Context, addingRole=True):
-        await self.roleEmbed(ctx, True)
+    async def addrole(self, ctx: commands.Context):
+        await self.roleEmbed(ctx, RoleActions.ADD)
 
     @commands.guild_only()
-    @commands.command(aliases=["delRole", "deleteRole", "removeRole"])
-    async def delrole(self, ctx: commands.Context, addingRole=False):
-        await self.roleEmbed(ctx, False)
+    @commands.command(aliases=["delRole", "deleteRole", "deleterole", "removeRole", "removerole"])
+    async def delrole(self, ctx: commands.Context):
+        await self.roleEmbed(ctx, RoleActions.DEL)
 
     async def getRoles(self, guildid):
         with conn:
@@ -35,7 +43,7 @@ class Roles(commands.Cog):
             if 9*page+n-1 < len(roles):
                 role = roles[9*page+n-1]
 
-            description.append(f"{n}\ufe0f\u20e3: {ctx.guild.get_role(role)}")
+            description.append(f"{n}\ufe0f\u20e3: {role}")
 
         description = "\n".join(description)
 
@@ -48,12 +56,14 @@ class Roles(commands.Cog):
 
         return embed
 
-    async def roleEmbed(self, ctx: commands.Context, addingRole):
+    async def roleEmbed(self, ctx: commands.Context, roleAction):
         roles = await self.getRoles(ctx.guild.id)
-        if not addingRole:
+        if roleAction == RoleActions.DEL:
             roles = set(roles).intersection(
                 role.id for role in ctx.author.roles)
-            roles = tuple(roles)
+
+        roles = [ctx.guild.get_role(role) for role in roles]
+
         page = 0
 
         message = await ctx.send(embed=await self.renderEmbed(ctx, roles, page))
@@ -79,12 +89,12 @@ class Roles(commands.Cog):
                     await message.clear_reactions()
                     return
 
-                role = ctx.guild.get_role(roles[roleNumber])
+                role = roles[roleNumber]
 
-                if addingRole:
+                if roleAction == RoleActions.ADD:
                     await ctx.author.add_roles(role, reason="xd addrole")
                     await ctx.send(f"You chose : {role.name}! The role is added!")
-                else:
+                elif roleAction == RoleActions.DEL:
                     await ctx.author.remove_roles(role, reason="xd delrole")
                     await ctx.send(f"You chose : {role.name}! The role is removed!")
 
