@@ -25,8 +25,7 @@ class Danbooru(commands.Cog):
 
         response = response.json()
         if type(response) == list:
-            # if not len(self.categoriesDict[tags]["urls"]):
-            if not self.categoriesDict.get(tags, None) or not len(self.categoriesDict["tags"]["urls"]):
+            if not self.categoriesDict.get(tags, None) or not len(self.categoriesDict[tags]["urls"]):
                 try:
                     await self.requestDanbooru(tags)
                 except Exception as err:
@@ -46,7 +45,7 @@ class Danbooru(commands.Cog):
 
     async def requestDanbooru(self, category):
         try:
-            page = self.categoriesDict[category]['pageCount']
+            page = self.categoriesDict[category]["pageCount"]
         except:
             page = 1
 

@@ -5,13 +5,14 @@ from PIL import Image, ImageFont, ImageDraw
 from io import BytesIO
 import itertools
 
+
 class Japanese(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command()
     async def haiku(self, ctx, *, text):
-        font = ImageFont.truetype("media/Sword.ttf", 20)
+        font = ImageFont.truetype("media/EPMGOBLD.TTF", 20)
 
         text = itertools.zip_longest(*text.split("\n")[::-1], fillvalue="　")
         text = "\n".join(("".join(line) for line in text))
@@ -26,9 +27,11 @@ class Japanese(commands.Cog):
             image.save(image_binary, 'PNG')
             image_binary.seek(0)
             file = discord.File(fp=image_binary, filename="haiku.png")
-            embed = discord.Embed()
-            embed.set_image(url="attachment://haiku.png")
-            await ctx.send(file=file, embed=embed)
+
+        embed = discord.Embed(color=discord.Color.gold())
+        embed.set_image(url="attachment://haiku.png")
+        await ctx.send(file=file, embed=embed)
+
 
 def setup(bot):
     bot.add_cog(Japanese(bot))
