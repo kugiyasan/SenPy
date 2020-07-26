@@ -18,12 +18,10 @@ class Events(commands.Cog):
 
         ctx = message.channel
 
-        dabs = ['dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/']
-        for dab in dabs:
-            if dab in message.content.lower().split():
-                style = '*' * random.randint(0, 3)
-                wrapper = style + '{}' + style
-                await ctx.send(wrapper.format(random.choice(dabs)))
+        dabs = ('dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/')
+        if re.search("|".join(dabs), message.content.lower()):
+            style = '*' * random.randint(0, 3)
+            await ctx.send(style + random.choice(dabs) + style)
 
         if message.guild:
             dash = message.guild.get_member(399705801717186571)
@@ -53,7 +51,8 @@ class Events(commands.Cog):
             await ctx.send(exception)
             await ctx.send_help(ctx.command)
             return
-        if type(exception) == commands.errors.NSFWChannelRequired:
+        if (type(exception) == commands.errors.NSFWChannelRequired
+                or type(exception) == commands.errors.MissingPermissions):
             await ctx.send(exception)
             return
 

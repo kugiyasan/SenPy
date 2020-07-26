@@ -20,22 +20,29 @@ class Roles(commands.Cog):
     @commands.guild_only()
     @commands.command(aliases=["addRole"])
     async def addrole(self, ctx: commands.Context):
+        """give yourself a certain role in the server"""
         await self.roleEmbed(ctx, RoleActions.ADD)
 
     @commands.guild_only()
     @commands.command(aliases=["delRole", "deleteRole", "deleterole", "removeRole", "removerole"])
     async def delrole(self, ctx: commands.Context):
+        """Remove roles from yourself"""
         await self.roleEmbed(ctx, RoleActions.DEL)
 
-    async def getRoles(self, guildid):
-        with conn:
-            cursor.execute(
-                "SELECT rolesToGive FROM guilds WHERE id=%s", (guildid,))
-            roles = cursor.fetchone()[0]
-        return roles
+    @commands.has_permissions(administrator=True)
+    @commands.command()
+    async def manageaddrole(self, ctx: commands.Context):
+        """Admin command. Let you choose which roles can be given by the bot"""
+        await self.roleEmbed(ctx, RoleActions.MANAGEADD)
+
+    @commands.has_permissions(administrator=True)
+    @commands.command()
+    async def managedelrole(self, ctx: commands.Context):
+        """Admin command. Let you choose which roles can be given by the bot"""
+        await self.roleEmbed(ctx, RoleActions.MANAGEDEL)
 
     async def renderEmbed(self, ctx, roles, page):
-        title = "React to the number associated with the role you want!"
+        title = "React to the number associated with the role you want to interact with!"
 
         description = []
         for n in range(1, 10):
@@ -57,12 +64,26 @@ class Roles(commands.Cog):
         return embed
 
     async def roleEmbed(self, ctx: commands.Context, roleAction):
-        roles = await self.getRoles(ctx.guild.id)
-        if roleAction == RoleActions.DEL:
-            roles = set(roles).intersection(
-                role.id for role in ctx.author.roles)
+        if roleAction == RoleActions.MANAGEADD:
+            roles = ctx.guild.roles
+        else:
+            with conn:
+                cursor.execute(
+                    "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
+                try:
+                    roles = cursor.fetchone()[0]
+                except:
+                    await ctx.send("There isn't an available role! Exiting...")
+                    return
 
-        roles = [ctx.guild.get_role(role) for role in roles]
+            if roleAction == RoleActions.ADD:
+                roles = set(roles).difference(
+                    role.id for role in ctx.author.roles)
+            elif roleAction == RoleActions.DEL:
+                roles = set(roles).intersection(
+                    role.id for role in ctx.author.roles)
+
+            roles = [ctx.guild.get_role(role) for role in roles]
 
         page = 0
 
@@ -75,7 +96,8 @@ class Roles(commands.Cog):
         emoji = ""
 
         def check(reaction, member):
-            return ctx.author == member
+            return (ctx.author == member
+                    and reaction.message.id == message.id)
 
         while True:
             if emoji == "◀":
@@ -97,6 +119,24 @@ class Roles(commands.Cog):
                 elif roleAction == RoleActions.DEL:
                     await ctx.author.remove_roles(role, reason="xd delrole")
                     await ctx.send(f"You chose : {role.name}! The role is removed!")
+                elif roleAction == RoleActions.MANAGEADD:
+                    with conn:
+                        cursor.execute(
+                            """INSERT INTO guilds (id, rolesToGive)
+                            VALUES (%s, Array [%s])
+                            ON CONFLICT(id)
+                            DO UPDATE SET rolesToGive=guilds.rolesToGive||%s""", (ctx.guild.id, role.id, role.id))
+
+                    await ctx.send(f"{role.name} is now available for the users!")
+                elif roleAction == RoleActions.MANAGEDEL:
+                    with conn:
+                        cursor.execute(
+                            "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
+                        newRoles = cursor.fetchone()[0].remove(role.id)
+                        cursor.execute(
+                            "UPDATE guilds SET rolesToGive=Array %s WHERE id=%s", (newRoles, ctx.guild.id))
+
+                    await ctx.send(f"{role.name} is now unavailable for the users!")
 
                 await message.clear_reactions()
                 return
