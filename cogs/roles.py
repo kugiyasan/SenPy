@@ -64,26 +64,29 @@ class Roles(commands.Cog):
         return embed
 
     async def roleEmbed(self, ctx: commands.Context, roleAction):
-        if roleAction == RoleActions.MANAGEADD:
-            roles = ctx.guild.roles
-        else:
-            with conn:
-                cursor.execute(
-                    "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
-                try:
-                    roles = cursor.fetchone()[0]
-                except:
-                    await ctx.send("There isn't an available role! Exiting...")
-                    return
+        with conn:
+            cursor.execute(
+                "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
+            try:
+                roles = cursor.fetchone()[0]
+            except:
+                roles = [];
 
-            if roleAction == RoleActions.ADD:
-                roles = set(roles).difference(
-                    role.id for role in ctx.author.roles)
-            elif roleAction == RoleActions.DEL:
-                roles = set(roles).intersection(
-                    role.id for role in ctx.author.roles)
+        if roleAction == RoleActions.ADD:
+            roles = set(roles).difference(
+                role.id for role in ctx.author.roles)
+        elif roleAction == RoleActions.DEL:
+            roles = set(roles).intersection(
+                role.id for role in ctx.author.roles)
+        elif roleAction == RoleActions.MANAGEADD:
+            roles = set(role.id for role in ctx.guild.roles if not role.managed and not role.is_default(
+            )).difference(roles)
 
-            roles = [ctx.guild.get_role(role) for role in roles]
+        roles = [ctx.guild.get_role(role) for role in roles]
+
+        if not len(roles):
+            await ctx.send("There isn't an available role! Exiting...")
+            return
 
         page = 0
 
@@ -132,9 +135,15 @@ class Roles(commands.Cog):
                     with conn:
                         cursor.execute(
                             "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
-                        newRoles = cursor.fetchone()[0].remove(role.id)
-                        cursor.execute(
-                            "UPDATE guilds SET rolesToGive=Array %s WHERE id=%s", (newRoles, ctx.guild.id))
+                        newRoles = cursor.fetchone()[0]
+                        newRoles.remove(role.id)
+
+                        if not len(newRoles):
+                            cursor.execute(
+                                "UPDATE guilds SET rolesToGive=ARRAY[]::BIGINT[] WHERE id=%s", (ctx.guild.id,))
+                        else:
+                            cursor.execute(
+                                "UPDATE guilds SET rolesToGive=Array %s WHERE id=%s", (newRoles, ctx.guild.id))
 
                     await ctx.send(f"{role.name} is now unavailable for the users!")
 

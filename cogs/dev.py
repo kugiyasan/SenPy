@@ -7,11 +7,6 @@ class Dev(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_message(self, message: discord.Message):
-        pass
-        # print(discord.Permissions.send_messages)
-
     @commands.command(hidden=True)
     async def test(self, ctx: commands.Context):
         file = discord.File("media/hanamaru.jpg", filename="image.png")
