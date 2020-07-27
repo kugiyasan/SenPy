@@ -52,6 +52,7 @@ extensions = ("cogs.Games.chessCog",
               "cogs.neko",
               "cogs.reddit",
               "cogs.roles",
+              "cogs.settings",
               "cogs.thisDoesNotExist")
 
 

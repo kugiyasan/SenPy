@@ -12,10 +12,12 @@ class Japanese(commands.Cog):
 
     @commands.command()
     async def haiku(self, ctx, *, text):
+        """Send your 5-7-5 and boom a clean display of your haiku"""
         font = ImageFont.truetype("media/EPMGOBLD.TTF", 20)
 
-        text = itertools.zip_longest(*text.split("\n")[::-1], fillvalue="　")
-        text = "\n".join(("".join(line) for line in text))
+        text = ["　"*i*2 + string for i, string in enumerate(text.split("\n"))][::-1]
+        text = itertools.zip_longest(*text, fillvalue="　")
+        text = "\n".join(("　".join(line) for line in text))
 
         size = ImageDraw.Draw(Image.new("RGB", (1, 1))).textsize(text, font)
         image = Image.new('RGB', (size[0]+20, size[1]+20))

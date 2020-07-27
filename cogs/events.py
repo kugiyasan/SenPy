@@ -6,6 +6,8 @@ import random
 import re
 import traceback
 
+from cogs.utils.dbms import conn, cursor
+
 
 class Events(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -13,7 +15,7 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.author == self.bot.user:
+        if message.author == self.bot.user or message.author.bot:
             return
 
         ctx = message.channel
@@ -79,15 +81,17 @@ class Events(commands.Cog):
 
         await reaction.message.add_reaction(reaction)
 
-    # @ commands.Cog.listener()
-    # async def on_member_join(self, member):
-    #     channel = await self.getGeneralchannel(member.guild)
-    #     await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
+    @ commands.Cog.listener()
+    async def on_member_join(self, member):
+        channel = await self.getGeneralchannel(member.guild)
+        if channel:
+            await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
 
     @ commands.Cog.listener()
     async def on_member_remove(self, member):
         channel = await self.getGeneralchannel(member.guild)
-        await channel.send(f'See you later alligator {member.mention}.')
+        if channel:
+            await channel.send(f'See you later alligator {member.mention}.')
 
     @ commands.Cog.listener()
     async def on_guild_emojis_update(self, guild: discord.Guild, before, after):
@@ -100,28 +104,9 @@ class Events(commands.Cog):
             await channel.send(newemojis)
 
     async def getGeneralchannel(self, guild: discord.Guild):
-        botMember = guild.get_member(self.bot.user.id)
-        async for channel in self.channelGenerator(guild):
-            if (channel != None
-                    and channel.permissions_for(botMember).send_messages):
-                return channel
-
-    async def channelGenerator(self, guild):
-        yield guild.system_channel
-
-        for channel in guild.channels:
-            if 'welcome' in channel.name.lower():
-                yield channel
-            elif re.search('g[eé]n[eé]ral', channel.name):
-                yield channel
-
-        for channel in guild.channels:
-            yield channel
-
-        raise self.NoWritableChannelError
-
-    class NoWritableChannelError(Exception):
-        pass
+        with conn:
+            cursor.execute("SELECT welcomebye FROM guilds WHERE id=%s", (guild.id,))
+            return self.bot.get_channel(cursor.fetchone()[0])
 
 
 def setup(bot):

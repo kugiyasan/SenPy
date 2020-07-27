@@ -6,4 +6,5 @@ lxml
 nekos.py
 opencv-python-headless
 psycopg2
+python-chess
 requests

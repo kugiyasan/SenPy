@@ -5,13 +5,13 @@ import asyncio
 import random
 
 
-class RussianRoulette(commands.Cog):
+class RussianRoulette(commands.Cog, name="Games"):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(aliases=["rr"])
     async def russianroulette(self, ctx, *adversaries: discord.Member):
-        """Remake of KiryaBRO#3091's russian roulette command"""
+        """Remake of KiryaBRO#2750's russian roulette command"""
         """Haha guns goes pew pew"""
         await ctx.send("https://tenor.com/view/gun-pistol-revolver-gif-9832859")
         await ctx.send(f"Russian Roulette game!! Take the gun, spin the barrel, shoot and hope to survive!")

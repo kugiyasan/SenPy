@@ -10,17 +10,9 @@ import re
 
 playingUsers = set()
 
-class Mastermind(commands.Cog):
+class Mastermind(commands.Cog, name="Games"):
     def __init__(self, bot):
         self.bot = bot
-
-    @commands.command(hidden=True)
-    async def gamers(self, ctx):
-        if not playingUsers:
-            await ctx.send('Nobody is playing mastermind')
-            return
-            
-        await ctx.send('Here is/are the player(s) currently playing mastermind: ' + ', '.join(p.name for p in playingUsers))
 
     def judgement(self, guess, answer):
         guess = [int(i) for i in guess]

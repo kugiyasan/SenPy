@@ -32,10 +32,10 @@ class Admin(commands.Cog):
 
     @commands.command()
     @commands.has_permissions(administrator=True)
-    async def prefix(self, ctx: commands.Context, newPrefix):
+    async def prefix(self, ctx: commands.Context, newPrefix=None):
         """change the command prefix for this server"""
         if newPrefix == "xd":
-            newPrefix = "null"
+            newPrefix = None
 
         with conn:
             cursor.execute("""INSERT INTO guilds (id, command_prefix)
@@ -43,7 +43,7 @@ class Admin(commands.Cog):
                             ON CONFLICT(id) 
                             DO UPDATE SET command_prefix = %s""", (ctx.guild.id, newPrefix, newPrefix))
 
-        if newPrefix == "null":
+        if not newPrefix:
             await ctx.send("The command prefix has been reset to xd!")
             return
 

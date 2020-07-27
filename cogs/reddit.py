@@ -35,8 +35,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
 
     @commands.command(aliases=["ara"])
     async def araara(self, ctx: commands.Context, *, args="ara"):
-        """Ara ara you want to have a description of this command?"""
-        """Ara ara you're calling this command?"""
+        """Ara ara you want a description of this command?"""
         subreddits = ("AnimeMILFS", "AraAra")
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
