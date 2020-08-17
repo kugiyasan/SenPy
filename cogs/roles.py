@@ -70,7 +70,7 @@ class Roles(commands.Cog):
             try:
                 roles = cursor.fetchone()[0]
             except:
-                pass
+                roles = [];
 
         if roleAction == RoleActions.ADD:
             roles = set(roles).difference(
