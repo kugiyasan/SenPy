@@ -115,47 +115,10 @@ class Roles(commands.Cog):
             elif emoji == "▶":
                 page += 1
             elif emoji.endswith("\ufe0f\u20e3"):
-                roleNumber = 9*page-1+int(emoji[0])
-                if roleNumber >= len(roles):
-                    await ctx.send("You chose None! Exiting...")
-                    await message.clear_reactions()
+                # if a emoji with a number is pressed
+                if emoji[0] != "0":
+                    await self.numberEmojiSelected(ctx, message, emoji, page, roles, roleAction)
                     return
-
-                role = roles[roleNumber]
-
-                if roleAction == RoleActions.ADD:
-                    await ctx.author.add_roles(role, reason="xd addrole")
-                    await ctx.send(f"You chose : {role.name}! The role is added!")
-                elif roleAction == RoleActions.DEL:
-                    await ctx.author.remove_roles(role, reason="xd delrole")
-                    await ctx.send(f"You chose : {role.name}! The role is removed!")
-                elif roleAction == RoleActions.MANAGEADD:
-                    with conn:
-                        cursor.execute(
-                            """INSERT INTO guilds (id, rolesToGive)
-                            VALUES (%s, Array [%s])
-                            ON CONFLICT(id)
-                            DO UPDATE SET rolesToGive=guilds.rolesToGive||%s""", (ctx.guild.id, role.id, role.id))
-
-                    await ctx.send(f"{role.name} is now available for the users!")
-                elif roleAction == RoleActions.MANAGEDEL:
-                    with conn:
-                        cursor.execute(
-                            "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
-                        newRoles = cursor.fetchone()[0]
-                        newRoles.remove(role.id)
-
-                        if not len(newRoles):
-                            cursor.execute(
-                                "UPDATE guilds SET rolesToGive=ARRAY[]::BIGINT[] WHERE id=%s", (ctx.guild.id,))
-                        else:
-                            cursor.execute(
-                                "UPDATE guilds SET rolesToGive=%s WHERE id=%s", (newRoles, ctx.guild.id))
-
-                    await ctx.send(f"{role.name} is now unavailable for the users!")
-
-                await message.clear_reactions()
-                return
 
             page %= (len(roles)-1) // 9 + 1
             await message.edit(embed=await self.renderEmbed(ctx, roles, page))
@@ -168,6 +131,48 @@ class Roles(commands.Cog):
 
             emoji = str(res[0].emoji)
             await message.remove_reaction(res[0].emoji, res[1])
+
+    async def numberEmojiSelected(self, ctx, message, emoji, page, roles, roleAction):
+        roleNumber = 9*page-1+int(emoji[0])
+        if roleNumber >= len(roles):
+            await ctx.send("You chose None! Exiting...")
+            await message.clear_reactions()
+            return
+
+        role = roles[roleNumber]
+
+        if roleAction == RoleActions.ADD:
+            await ctx.author.add_roles(role, reason="xd addrole")
+            await ctx.send(f"You chose : {role.name}! The role is added!")
+        elif roleAction == RoleActions.DEL:
+            await ctx.author.remove_roles(role, reason="xd delrole")
+            await ctx.send(f"You chose : {role.name}! The role is removed!")
+        elif roleAction == RoleActions.MANAGEADD:
+            with conn:
+                cursor.execute(
+                    """INSERT INTO guilds (id, rolesToGive)
+                        VALUES (%s, Array [%s])
+                        ON CONFLICT(id)
+                        DO UPDATE SET rolesToGive=guilds.rolesToGive||%s""", (ctx.guild.id, role.id, role.id))
+
+            await ctx.send(f"{role.name} is now available for the users!")
+        elif roleAction == RoleActions.MANAGEDEL:
+            with conn:
+                cursor.execute(
+                    "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
+                newRoles = cursor.fetchone()[0]
+                newRoles.remove(role.id)
+
+                if not len(newRoles):
+                    cursor.execute(
+                        "UPDATE guilds SET rolesToGive=ARRAY[]::BIGINT[] WHERE id=%s", (ctx.guild.id,))
+                else:
+                    cursor.execute(
+                        "UPDATE guilds SET rolesToGive=%s WHERE id=%s", (newRoles, ctx.guild.id))
+
+            await ctx.send(f"{role.name} is now unavailable for the users!")
+
+        await message.clear_reactions()
 
 
 def setup(bot):

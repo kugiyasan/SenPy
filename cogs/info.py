@@ -1,9 +1,7 @@
 import discord
 from discord.ext import commands
 
-import asyncio
 from datetime import datetime
-import re
 import sys
 
 from cogs.utils.deleteMessage import deleteMessage
@@ -13,6 +11,7 @@ from cogs.utils.prettyList import prettyList
 class Info(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.startTime = datetime.now()
 
     @commands.command(aliases=["credit", "credits", "invite"])
     async def about(self, ctx):
@@ -28,6 +27,8 @@ class Info(commands.Cog):
         realUsersCount = len(
             set(m for g in self.bot.guilds for m in g.members if not m.bot))
 
+        uptime = datetime.now() - self.startTime
+
         e.add_field(name=f"Running on {len(self.bot.guilds)} servers",
                     value="Share this bot to increase this number!")
         e.add_field(name=f"Serving {sum(g.member_count for g in self.bot.guilds)} users",
@@ -35,8 +36,8 @@ class Info(commands.Cog):
         e.add_field(name="Github repository",
                     value="https://github.com/kugiyasan/SenPy")
         e.add_field(name="Bot ID", value=self.bot.user.id)
-        e.add_field(name="You have some feedback?",
-                    value="Use xd report", inline=False)
+        e.add_field(name="Uptime", value=uptime)
+        e.add_field(name="You have some feedback?", value="Use xd report")
         await ctx.send(embed=e)
 
     @commands.command()
