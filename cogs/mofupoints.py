@@ -48,21 +48,21 @@ class MofuPoints(commands.Cog):
 
         return users
 
-    @commands.command(aliases=['top'])
+    @commands.command(aliases=["top"])
     async def leaderboard(self, ctx):
         """Show the leaderboard for the top fluffer"""
-        users = await self.getUsersLeaderboard(ctx, 'mofupoints')
+        users = await self.getUsersLeaderboard(ctx, "mofupoints")
 
-        title = '***MOFUPOINTS LEADERBOARD***'
-        await prettyList(ctx, title, users, 'points')
+        title = "***MOFUPOINTS LEADERBOARD***"
+        await prettyList(ctx, title, users, "points")
 
-    @commands.command(aliases=['imagetop'])
+    @commands.command(aliases=["requesttop", ])
     async def nolife(self, ctx):
-        """Show the leaderboard for who has requested the most images"""
-        users = await self.getUsersLeaderboard(ctx, 'numberOfEmbedRequests')
+        """leaderboard shows the people who requested the most pictures"""
+        users = await self.getUsersLeaderboard(ctx, "numberOfEmbedRequests")
 
-        title = '***NO LIFE LEADERBOARD***'
-        await prettyList(ctx, title, users, 'requests')
+        title = "***NO LIFE LEADERBOARD (people who requested the most images)***"
+        await prettyList(ctx, title, users, "requests")
 
 
 def setup(bot):

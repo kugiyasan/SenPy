@@ -18,18 +18,20 @@ class RedditAPI(commands.Cog, name="Reddit"):
         self.bot = bot
         self.ua = UserAgent(verify_ssl=False)
         self.URLdata = {}
-        self.chikaByTheHour.start()
+        self.waifuByTheHour.start()
 
     def cog_unload(self):
-        self.chikaByTheHour.cancel()
+        self.waifuByTheHour.cancel()
 
     @tasks.loop(hours=1.0)
-    async def chikaByTheHour(self):
+    async def waifuByTheHour(self):
         channel = self.bot.get_channel(722374291148111884)
-        await self.sendRedditImage(channel, "ChikaFujiwara", dropnsfw=True)
+        subreddits = ("ChikaFujiwara", "ZeroTwo")
+        subreddit = random.choice(subreddits)
+        await self.sendRedditImage(channel, subreddit, dropnsfw=True)
 
-    @chikaByTheHour.before_loop
-    async def before_chikaByTheHour(self):
+    @waifuByTheHour.before_loop
+    async def before_waifuByTheHour(self):
         await self.bot.wait_until_ready()
         await asyncio.sleep(1)
 
@@ -76,25 +78,35 @@ class RedditAPI(commands.Cog, name="Reddit"):
                     and int(m.content) > 0
                     and int(m.content) <= NUMBER_OF_SUGGESTIONS)
 
-        m = await self.bot.wait_for("message",
-                                    timeout=60.0,
-                                    check=checkresponse)
+        try:
+            m = await self.bot.wait_for("message",
+                                        timeout=60.0,
+                                        check=checkresponse)
+        except:
+            return
 
         await self.sendRedditImage(ctx, children[int(m.content)-1]["data"]["url"][3:-1])
 
-    @commands.command(name="subreddit", aliases=["sub"])
-    async def sendRedditImage(self, ctx: commands.Context, subreddit="all", dropnsfw=False):
+    @commands.command(aliases=["sub"])
+    async def subreddit(self, ctx, *, subreddit="all"):
         """Get a random pic from a subreddit!"""
+        await self.sendRedditImage(ctx, subreddit)
+
+    async def sendRedditImage(self, ctx: commands.Context, subreddit="all", dropnsfw=False):
         subreddit = subreddit.lower()
 
-        if not self.URLdata.get(subreddit):
-            await self.getUrls(subreddit)
+        try:
+            if not self.URLdata.get(subreddit):
+                await self.getUrls(subreddit)
 
-        if self.URLdata[subreddit] == []:
-            await self.getUrls(subreddit)
-            if not len(self.URLdata[subreddit]):
-                await ctx.send("No subreddit matches this name or there wasn't any image!")
-                return
+            if self.URLdata[subreddit] == []:
+                await self.getUrls(subreddit)
+                if not len(self.URLdata[subreddit]):
+                    await ctx.send("There wasn't any image in this subreddit!")
+                    return
+        except ConnectionError:
+            await ctx.send("No subreddit matches this name!")
+            return
 
         post = self.URLdata[subreddit].pop()
         if dropnsfw:
@@ -140,12 +152,14 @@ class RedditAPI(commands.Cog, name="Reddit"):
 
         if not response.ok:
             print(f"Error {url} responded {response.status_code}")
+            jsonObject = response.json()
             raise ConnectionError
 
         return response.json()["data"]["children"]
 
     async def getUrls(self, subreddit):
         requestURL = f"https://www.reddit.com/r/{subreddit}/randomrising/.json?kind=t3"
+
         response = await self.requestReddit(requestURL)
 
         if not self.URLdata.get(subreddit):

@@ -20,18 +20,6 @@ class Events(commands.Cog):
 
         ctx = message.channel
 
-        dabs = ('dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/')
-        if re.search("|".join(dabs), message.content.lower()):
-            style = '*' * random.randint(0, 3)
-            await ctx.send(style + random.choice(dabs) + style)
-
-        if message.guild:
-            dash = message.guild.get_member(399705801717186571)
-            if ('rekt' in message.content.lower()
-                and not message.author.bot
-                    and (not dash or dash.status != discord.Status.online)):
-                await ctx.send('Yeah get rekt, son!')
-
         try:
             msgs = await ctx.history(limit=3).flatten()
 
@@ -43,18 +31,34 @@ class Events(commands.Cog):
         except:
             pass
 
+        # TODO check in the db if the server enabled those features
+
+        # dabs = ('dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/')
+        # if re.search("|".join(dabs), message.content.lower()):
+        #     style = '*' * random.randint(0, 3)
+        #     await ctx.send(style + random.choice(dabs) + style)
+
+        # if message.guild:
+        #     dash = message.guild.get_member(399705801717186571)
+        #     if ('rekt' in message.content.lower()
+        #         and not message.author.bot
+        #             and (not dash or dash.status != discord.Status.online)):
+        #         await ctx.send('Yeah get rekt, son!')
+
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, exception):
         if (not ctx.command
             or type(exception) == asyncio.TimeoutError
                 or type(exception) == commands.errors.NotOwner):
             return
-        if type(exception) == commands.errors.MissingRequiredArgument:
+        if (type(exception) == commands.errors.MissingRequiredArgument
+                or type(exception) == commands.errors.BadArgument):
             await ctx.send(exception)
             await ctx.send_help(ctx.command)
             return
         if (type(exception) == commands.errors.NSFWChannelRequired
-                or type(exception) == commands.errors.MissingPermissions):
+                or type(exception) == commands.errors.MissingPermissions
+                or type(exception) == commands.errors.NoPrivateMessage):
             await ctx.send(exception)
             return
 
@@ -64,8 +68,12 @@ class Events(commands.Cog):
 
         await ctx.send("There was an unexpected error, I'll inform the bot dev, sorry for the incovenience")
 
+        guild = ""
+        if ctx.guild:
+            guild = f"from {ctx.guild.name} "
+
         owner = (await self.bot.application_info()).owner
-        text = (f"{ctx.author} raised an error with the command ***{ctx.command}***\n"
+        text = (f"{ctx.author} {guild}raised an error with the command ***{ctx.command}***\n"
                 + f"{type(exception)}\n{exception}"
                 + "```" + "".join(traceback.format_tb(exception.__traceback__)) + "```")
         await owner.send(text)
@@ -105,7 +113,8 @@ class Events(commands.Cog):
 
     async def getGeneralchannel(self, guild: discord.Guild):
         with conn:
-            cursor.execute("SELECT welcomebye FROM guilds WHERE id=%s", (guild.id,))
+            cursor.execute(
+                "SELECT welcomebye FROM guilds WHERE id=%s", (guild.id,))
             return self.bot.get_channel(cursor.fetchone()[0])
 
 
