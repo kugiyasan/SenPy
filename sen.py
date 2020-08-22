@@ -5,7 +5,6 @@ import discord
 from discord.ext import commands
 
 import os
-import sys
 from dotenv import load_dotenv
 
 from cogs.utils.embedPaginator import EmbedHelpCommand, EmbedPaginator
@@ -50,6 +49,7 @@ extensions = ("cogs.Games.chessCog",
               "cogs.memes",
               "cogs.mofupoints",
               "cogs.neko",
+              "cogs.owner",
               "cogs.reddit",
               "cogs.roles",
               "cogs.settings",

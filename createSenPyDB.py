@@ -25,9 +25,12 @@ cur = conn.cursor()
 #     easterEggClaimed BOOL DEFAULT FALSE
 # )""")
 
-cur.execute("SELECT * FROM guilds")
-print(cur.fetchall())
+# cur.execute("SELECT * FROM guilds")
+# print(cur.fetchall())
+
+with conn:
+    cur.execute("UPDATE guilds SET command_prefix=%s WHERE id=382248089450446848", ("xd2",))
 
 # conn.commit()
-cur.close()
-conn.close()
+# cur.close()
+# conn.close()

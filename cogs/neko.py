@@ -15,8 +15,6 @@ class Neko(commands.Cog):
     @commands.command()
     async def neko(self, ctx: commands.Context, style='neko'):
         '''Send some cute nekos on your server!'''
-        await deleteMessage(ctx)
-
         try:
             await sendEmbed(ctx, nekos.img(style))
         except nekos.InvalidArgument as err:

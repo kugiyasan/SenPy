@@ -14,6 +14,12 @@ class Danbooru(commands.Cog):
 
     @commands.is_nsfw()
     @commands.command()
+    async def coconut(self, ctx):
+        """Who really wants images of Coconut?"""
+        await self.danbooru(ctx, "coconut_%28nekopara%29+")
+
+    @commands.is_nsfw()
+    @commands.command()
     async def danbooru(self, ctx, tags):
         """Wow searching on danbooru that's so original"""
         url = f"https://danbooru.donmai.us/posts.json?tags={tags}"
@@ -35,13 +41,6 @@ class Danbooru(commands.Cog):
             await sendEmbed(ctx, self.categoriesDict[tags]["urls"].pop())
         else:
             await ctx.send(response.json()["body"])
-        
-
-    @commands.is_nsfw()
-    @commands.command()
-    async def coconut(self, ctx):
-        """Who really wants images of Coconut?"""
-        await self.danbooru(ctx, "coconut_%28nekopara%29+")
 
     async def requestDanbooru(self, category):
         try:
@@ -66,7 +65,8 @@ class Danbooru(commands.Cog):
                 self.categoriesDict[category]["urls"].append(post["file_url"])
 
         if not len(self.categoriesDict[category]["urls"]):
-            raise Exception("There is no image with this tag! Be sure to type the exact name!")
+            raise Exception(
+                "There is no image with this tag! Be sure to type the exact name!")
 
         random.shuffle(self.categoriesDict[category]["urls"])
 

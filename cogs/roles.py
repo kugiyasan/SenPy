@@ -33,6 +33,13 @@ class Roles(commands.Cog):
     @commands.command()
     async def manageaddrole(self, ctx: commands.Context):
         """Admin command. Let you choose which roles can be given by the bot"""
+        ch = ctx.channel
+        permissions = ch.permissions_for(ctx.author)
+
+        if permissions.manage_roles == False:
+            await ctx.send("Give me the manage_roles permissions if you want me to give roles!")
+            return
+
         await self.roleEmbed(ctx, RoleActions.MANAGEADD)
 
     @commands.has_permissions(administrator=True)
@@ -70,7 +77,7 @@ class Roles(commands.Cog):
             try:
                 roles = cursor.fetchone()[0]
             except:
-                roles = [];
+                roles = []
 
         if roleAction == RoleActions.ADD:
             roles = set(roles).difference(
@@ -143,7 +150,7 @@ class Roles(commands.Cog):
                                 "UPDATE guilds SET rolesToGive=ARRAY[]::BIGINT[] WHERE id=%s", (ctx.guild.id,))
                         else:
                             cursor.execute(
-                                "UPDATE guilds SET rolesToGive=Array %s WHERE id=%s", (newRoles, ctx.guild.id))
+                                "UPDATE guilds SET rolesToGive=%s WHERE id=%s", (newRoles, ctx.guild.id))
 
                     await ctx.send(f"{role.name} is now unavailable for the users!")
 

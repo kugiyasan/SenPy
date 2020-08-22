@@ -73,8 +73,8 @@ class Info(commands.Cog):
             await ctx.send("Write your feedback directly with the command e.g. xd feedback blah blah blah")
             return
 
-        channel = await self.bot.get_user(self.bot.owner_id).create_dm()
-        await channel.send(f"***{ctx.author}*** has some feedback!\n{text}")
+        owner = (await self.bot.application_info()).owner
+        await owner.send(f"***{ctx.author}*** has some feedback!\n{text}")
         await ctx.send("Your feedback was sent successfully!")
 
     @commands.is_owner()
