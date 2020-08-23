@@ -119,5 +119,5 @@ If you don't know how to play chess, go check out the wiki page https://en.wikip
         return header + "\n".join(number[i]+"".join(row) for i, row in enumerate(builder))
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(ChessCog(bot))

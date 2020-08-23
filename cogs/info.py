@@ -29,14 +29,22 @@ class Info(commands.Cog):
 
         uptime = datetime.now() - self.startTime
 
+        contributors = (502588820051591190, 534267874794143745,
+                        256149662979850251, 230702257480400896)
+        contributors = "\n".join(str(self.bot.get_user(userid))
+                                 for userid in contributors)
+
         e.add_field(name=f"Running on {len(self.bot.guilds)} servers",
                     value="Share this bot to increase this number!")
         e.add_field(name=f"Serving {sum(g.member_count for g in self.bot.guilds)} users",
                     value=f"Technically it's {realUsersCount} if you don't count bots and duplicated users but who cares")
         e.add_field(name="Github repository",
                     value="https://github.com/kugiyasan/SenPy")
+        e.add_field(name="Owner", value=(await self.bot.application_info()).owner)
         e.add_field(name="Bot ID", value=self.bot.user.id)
-        e.add_field(name="Uptime", value=uptime)
+        e.add_field(name="Uptime", value=str(uptime)[:-7])
+        e.add_field(name="Latency", value=f"{int(self.bot.latency*1000)} ms")
+        e.add_field(name="Contributors", value=contributors)
         e.add_field(name="You have some feedback?", value="Use xd report")
         await ctx.send(embed=e)
 
@@ -44,10 +52,6 @@ class Info(commands.Cog):
     async def hug(self, ctx: commands.Context):
         """Anyone wants a hug?"""
         await ctx.send("https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237")
-
-    @commands.command(hidden=True)
-    async def newhelp(self, ctx: commands.Context, category=None):
-        await ctx.send("New help command coming soon!")
 
     @commands.command()
     async def ping(self, ctx):
@@ -65,6 +69,18 @@ class Info(commands.Cog):
         attachment = await ctx.message.attachments[0].to_file() if ctx.message.attachments else None
         await deleteMessage(ctx)
         await ctx.send(words, file=attachment)
+
+    @commands.command(aliases=["SaY"])
+    async def sAy(self, ctx: commands.Context, *, words="_ _"):
+        """MaKe tHiS LiTtLe iNnOcEnT BoT SpEaK FoR YoU, yOu pErVeRt"""
+        alternateCase = ""
+        for i, c in enumerate(words.lower()):
+            if i % 2 == 0:
+                alternateCase += c
+            else:
+                alternateCase += c.upper()
+
+        await self.say(ctx, words=alternateCase)
 
     @commands.command(aliases=["suggest", "comment", "feedback"])
     async def report(self, ctx, *, text=""):
@@ -94,5 +110,5 @@ class Info(commands.Cog):
         await ctx.send("<:thinking1:710563810582200350><:thinking2:710563810804498452>\n<:thinking3:710563823819554816><:thinking4:710563824079732756>")
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Info(bot))

@@ -28,12 +28,9 @@ async def prefixes(bot: commands.Bot, message: discord.Message):
 
 description = """Senko-san wants to pamper you"""
 
-occupation = discord.Activity(type=discord.ActivityType.playing,
-                              name='xd help | xd about')
-
 bot = commands.Bot(command_prefix=prefixes,
                    description=description,
-                   activity=occupation,
+                   activity=discord.Game(name="xd help | xd about"),
                    #    help_command=commands.DefaultHelpCommand())
                    help_command=EmbedHelpCommand(paginator=EmbedPaginator()))
 
@@ -59,13 +56,9 @@ extensions = ("cogs.Games.chessCog",
 @bot.event
 async def on_ready():
     print(f"Logged in as {bot.user.name}")
-    print(f"Running on {len(bot.guilds)} servers\n")
-
-    for g in bot.guilds:
-        print(g.name, "member_count: ", g.member_count)
 
 
-@bot.command(hidden=True)
+@bot.command(hidden=True, aliases=["rl"])
 @commands.is_owner()
 async def reload(ctx: commands.Context):
     """Reloads the bot extensions without rebooting the entire program"""

@@ -59,5 +59,5 @@ class AIGeneratedImg(commands.Cog):
         await incrementEmbedCounter(ctx.author)
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(AIGeneratedImg(bot))

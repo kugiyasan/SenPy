@@ -118,5 +118,5 @@ class Events(commands.Cog):
             return self.bot.get_channel(cursor.fetchone()[0])
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Events(bot))

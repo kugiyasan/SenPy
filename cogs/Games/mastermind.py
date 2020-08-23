@@ -128,5 +128,5 @@ class Mastermind(commands.Cog, name="Games"):
         await ctx.send('You lose! The answer was ' + self.toEmoji(answer))
         playingUsers.discard(ctx.author)
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Mastermind(bot))

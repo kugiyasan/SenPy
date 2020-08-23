@@ -71,5 +71,5 @@ class Danbooru(commands.Cog):
         random.shuffle(self.categoriesDict[category]["urls"])
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Danbooru(bot))

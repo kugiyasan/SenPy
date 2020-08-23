@@ -175,5 +175,5 @@ class Roles(commands.Cog):
         await message.clear_reactions()
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Roles(bot))

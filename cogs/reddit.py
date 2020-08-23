@@ -181,5 +181,5 @@ class RedditAPI(commands.Cog, name="Reddit"):
         print(f"{len(self.URLdata[subreddit])} urls for r/{subreddit}")
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(RedditAPI(bot))

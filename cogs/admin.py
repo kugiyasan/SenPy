@@ -50,5 +50,5 @@ class Admin(commands.Cog):
         await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Admin(bot))

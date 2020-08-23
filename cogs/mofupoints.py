@@ -65,5 +65,5 @@ class MofuPoints(commands.Cog):
         await prettyList(ctx, title, users, "requests")
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(MofuPoints(bot))

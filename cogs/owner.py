@@ -53,5 +53,5 @@ class Owner(commands.Cog):
                 await ctx.send(f"```{err}```")
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Owner(bot))
