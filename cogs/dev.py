@@ -72,5 +72,5 @@ class Dev(commands.Cog):
             await message.remove_reaction(res[0].emoji, res[1])
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Dev(bot))

@@ -27,5 +27,5 @@ class Neko(commands.Cog):
         await ctx.send(nekos.fact())
 
 
-def setup(bot):
+def setup(bot: commands.Bot):
     bot.add_cog(Neko(bot))
