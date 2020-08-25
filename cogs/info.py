@@ -5,7 +5,6 @@ from datetime import datetime
 import sys
 
 from cogs.utils.deleteMessage import deleteMessage
-from cogs.utils.prettyList import prettyList
 
 
 class Info(commands.Cog):
@@ -45,6 +44,7 @@ class Info(commands.Cog):
         e.add_field(name="Uptime", value=str(uptime)[:-7])
         e.add_field(name="Latency", value=f"{int(self.bot.latency*1000)} ms")
         e.add_field(name="Contributors", value=contributors)
+        e.add_field(name="Support server", value="https://discord.gg/axTWGsc")
         e.add_field(name="You have some feedback?", value="Use xd report")
         await ctx.send(embed=e)
 
@@ -93,21 +93,6 @@ class Info(commands.Cog):
         owner = (await self.bot.application_info()).owner
         await owner.send(f"***{ctx.author}*** has some feedback!\n{text}")
         await ctx.send("Your feedback was sent successfully!")
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def servers(self, ctx):
-        title = f"Running on {len(self.bot.guilds)} servers"
-        guilds = [
-            f"{g.name} member_count: {g.member_count}" for g in self.bot.guilds]
-
-        await prettyList(ctx, title, guilds, maxLength=0)
-
-    @commands.command(hidden=True)
-    async def thonk(self, ctx):
-        """thonk emoji"""
-        await deleteMessage(ctx)
-        await ctx.send("<:thinking1:710563810582200350><:thinking2:710563810804498452>\n<:thinking3:710563823819554816><:thinking4:710563824079732756>")
 
 
 def setup(bot: commands.Bot):

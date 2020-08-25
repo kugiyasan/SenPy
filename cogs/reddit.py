@@ -17,7 +17,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
     def __init__(self, bot):
         self.bot = bot
         self.ua = UserAgent(verify_ssl=False)
-        self.URLdata = {}
+        self.urls = {}
         self.waifuByTheHour.start()
 
     def cog_unload(self):
@@ -26,6 +26,10 @@ class RedditAPI(commands.Cog, name="Reddit"):
     @tasks.loop(hours=1.0)
     async def waifuByTheHour(self):
         channel = self.bot.get_channel(722374291148111884)
+
+        if not channel:
+            return
+
         subreddits = ("ChikaFujiwara", "ZeroTwo")
         subreddit = random.choice(subreddits)
         await self.sendRedditImage(channel, subreddit, dropnsfw=True)
@@ -36,7 +40,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
         await asyncio.sleep(1)
 
     @commands.command(aliases=["ara"])
-    async def araara(self, ctx: commands.Context, *, args="ara"):
+    async def araara(self, ctx: commands.Context):
         """Ara ara you want a description of this command?"""
         subreddits = ("AnimeMILFS", "AraAra")
         await self.sendRedditImage(ctx, random.choice(subreddits))
@@ -48,6 +52,11 @@ class RedditAPI(commands.Cog, name="Reddit"):
                       "ChurchOfSenko", "fluffthetail")
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
+    @commands.command(aliases=["sub"])
+    async def subreddit(self, ctx, *, subreddit="all"):
+        """Get a random pic from a subreddit!"""
+        await self.sendRedditImage(ctx, subreddit)
+
     @commands.command(aliases=["reddit"])
     async def search(self, ctx, *searchkws):
         """Search a subreddit name"""
@@ -56,17 +65,14 @@ class RedditAPI(commands.Cog, name="Reddit"):
                 inspect.Parameter("searchkws", inspect.Parameter.POSITIONAL_ONLY))
 
         print("requesting search to reddit")
-        requestURL = "https://www.reddit.com/subreddits/search.json?q={}&include_over_18=on".format(
-            "%20".join(searchkws))
+        requestURL = f"https://www.reddit.com/subreddits/search.json?q={'%20'.join(searchkws)}&include_over_18=on"
         NUMBER_OF_SUGGESTIONS = 5
 
-        suggestions = []
         children = await self.requestReddit(requestURL)
-        for child in children[:NUMBER_OF_SUGGESTIONS]:
-            subredditName = child["data"]["url"][3:-1]
-            suggestions.append(subredditName)
+        suggestions = [child["data"]["url"][3:-1]
+                       for child in children[:NUMBER_OF_SUGGESTIONS]]
 
-        NUMBER_OF_SUGGESTIONS = min(len(suggestions), NUMBER_OF_SUGGESTIONS)
+        NUMBER_OF_SUGGESTIONS = len(suggestions)
 
         title = f"**Top {NUMBER_OF_SUGGESTIONS} subreddits based on your search keyword (Select with 1-{NUMBER_OF_SUGGESTIONS}):**"
         await prettyList(ctx, title, suggestions, maxLength=NUMBER_OF_SUGGESTIONS)
@@ -79,41 +85,34 @@ class RedditAPI(commands.Cog, name="Reddit"):
                     and int(m.content) <= NUMBER_OF_SUGGESTIONS)
 
         try:
-            m = await self.bot.wait_for("message",
-                                        timeout=60.0,
-                                        check=checkresponse)
+            m = await self.bot.wait_for("message", timeout=60.0, check=checkresponse)
         except:
             return
 
-        await self.sendRedditImage(ctx, children[int(m.content)-1]["data"]["url"][3:-1])
-
-    @commands.command(aliases=["sub"])
-    async def subreddit(self, ctx, *, subreddit="all"):
-        """Get a random pic from a subreddit!"""
-        await self.sendRedditImage(ctx, subreddit)
+        await self.sendRedditImage(ctx, suggestions[int(m.content)-1])
 
     async def sendRedditImage(self, ctx: commands.Context, subreddit="all", dropnsfw=False):
         subreddit = subreddit.lower()
 
         try:
-            if not self.URLdata.get(subreddit):
-                await self.getUrls(subreddit)
+            if not self.urls.get(subreddit):
+                await self.getSubredditURLs(subreddit)
 
-            if self.URLdata[subreddit] == []:
-                await self.getUrls(subreddit)
-                if not len(self.URLdata[subreddit]):
+            if self.urls[subreddit] == []:
+                await self.getSubredditURLs(subreddit)
+                if not len(self.urls[subreddit]):
                     await ctx.send("There wasn't any image in this subreddit!")
                     return
         except ConnectionError:
             await ctx.send("No subreddit matches this name!")
             return
 
-        post = self.URLdata[subreddit].pop()
+        post = self.urls[subreddit].pop()
         if dropnsfw:
             while post["over_18"]:
-                post = self.URLdata[subreddit].pop()
+                post = self.urls[subreddit].pop()
 
-                if self.URLdata == []:
+                if self.urls == []:
                     await ctx.send(f"No SFW image on r/{subreddit}!")
                     return
 
@@ -125,12 +124,15 @@ class RedditAPI(commands.Cog, name="Reddit"):
 
             if not nsfwChannel:
                 await ctx.send("Retry in a nsfw channel with this subreddit!")
-                self.URLdata[subreddit].append(post)
+                self.urls[subreddit].append(post)
                 return
 
         if hasattr(ctx, "author"):
             await incrementEmbedCounter(ctx.author)
 
+        await ctx.send(embed=await self.redditEmbed(subreddit, post))
+
+    async def redditEmbed(self, subreddit, post):
         embed = discord.Embed(
             color=discord.Colour.gold(),
             title=f"r/{subreddit}",
@@ -144,7 +146,6 @@ class RedditAPI(commands.Cog, name="Reddit"):
         )
         embed.set_footer(
             text=f'{post["score"]}⬆️ {post["num_comments"]}💬')
-        await ctx.send(embed=embed)
 
     async def requestReddit(self, url):
         print("requesting reddit")
@@ -152,33 +153,32 @@ class RedditAPI(commands.Cog, name="Reddit"):
 
         if not response.ok:
             print(f"Error {url} responded {response.status_code}")
-            jsonObject = response.json()
             raise ConnectionError
 
         return response.json()["data"]["children"]
 
-    async def getUrls(self, subreddit):
+    async def getSubredditURLs(self, subreddit):
         requestURL = f"https://www.reddit.com/r/{subreddit}/randomrising/.json?kind=t3"
 
         response = await self.requestReddit(requestURL)
 
-        if not self.URLdata.get(subreddit):
-            self.URLdata[subreddit] = []
+        if not self.urls.get(subreddit):
+            self.urls[subreddit] = []
 
         fields = ("title", "score", "over_18", "author",
                   "num_comments", "permalink", "url")
         for child in response:
             postInfo = {}
-            if not re.search(r"(\.jpg|\.png|\.jpeg)$", child["data"]["url"]):
+            if not re.search(r"(\.jpg|\.png|\.jpeg|\.gif)$", child["data"]["url"]):
                 print(child["data"]["url"])
                 continue
 
             for field in fields:
                 postInfo[field] = child["data"][field]
 
-            self.URLdata[subreddit].append(postInfo)
+            self.urls[subreddit].append(postInfo)
 
-        print(f"{len(self.URLdata[subreddit])} urls for r/{subreddit}")
+        print(f"{len(self.urls[subreddit])} urls for r/{subreddit}")
 
 
 def setup(bot: commands.Bot):

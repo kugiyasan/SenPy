@@ -32,7 +32,12 @@ class Settings(commands.Cog):
             await ctx.send("You can't use the channel of another server to welcome people!")
             return
 
-        await channel.send("Welcoming will now be sent in this channel!\nThis message will deleted automatically in 30 seconds", delete_after=30.0)
+        try:
+            await channel.send("Welcoming will now be sent in this channel!\nThis message will deleted automatically in 30 seconds", delete_after=30.0)
+        except discord.errors.Forbidden:
+            await ctx.send("I don't have Permissions to write in that channel!")
+            return
+
         await ctx.send(f"A test have been sent into the {channel.mention} channel!")
 
         with conn:

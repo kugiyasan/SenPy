@@ -3,54 +3,46 @@ from discord.ext import commands
 
 import asyncio
 
+from cogs.utils.deleteMessage import deleteMessage
+from cogs.utils.prettyList import prettyList
+
 
 class Owner(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.is_owner()
-    @commands.command(hidden=True)
-    async def eval(self, ctx, *, code):
-        """evaluate code sent from discord CAN BREAK THE BOT"""
-        try:
-            await ctx.send(f"```{eval(code.strip('`'))}```")
-        except Exception as err:
-                await ctx.send(f"```{err}```")
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def exec(self, ctx, *, code):
+    @commands.command(name="exec", hidden=True)
+    async def _exec(self, context, *, code):
         """execute code sent from discord CAN BREAK THE BOT"""
-        try:
-            await ctx.send(f"```{exec(code.strip('`'))}```")
-        except Exception as err:
-                await ctx.send(f"```{err}```")
+        code = code.strip("`")
+
+        global bot, ctx
+        bot = self.bot
+        ctx = context
+
+        exec(
+            "async def __ex():\n global bot\n global ctx\n " + 
+                "\n ".join(code.split("\n"))
+        )
+
+        await locals()['__ex']()
 
     @commands.is_owner()
     @commands.command(hidden=True)
-    async def starteval(self, ctx):
-        """execute multiple lines of code"""
-        await ctx.send("```Waiting for code...```")
+    async def servers(self, ctx):
+        title = f"Running on {len(self.bot.guilds)} servers"
+        guilds = [
+            f"{g.name} member_count: {g.member_count}" for g in self.bot.guilds]
 
-        def check(m):
-            return (m.author == ctx.author
-                    and m.channel == ctx.channel)
+        await prettyList(ctx, title, guilds, maxLength=0)
 
-        while True:
-            try:
-                res = await self.bot.wait_for("message", check=check, timeout=300)
-            except asyncio.exceptions.TimeoutError:
-                await ctx.send("```Exiting...```")
-                return
-
-            if res.content == "stop":
-                await ctx.send("```Exiting...```")
-                return
-
-            try:
-                await ctx.send(f"```{eval(res.content.strip('`'))}```")
-            except Exception as err:
-                await ctx.send(f"```{err}```")
+    @commands.is_owner()
+    @commands.command(hidden=True)
+    async def thonk(self, ctx):
+        """thonk emoji"""
+        await deleteMessage(ctx)
+        await ctx.send("<:thinking1:710563810582200350><:thinking2:710563810804498452>\n<:thinking3:710563823819554816><:thinking4:710563824079732756>")
 
 
 def setup(bot: commands.Bot):
