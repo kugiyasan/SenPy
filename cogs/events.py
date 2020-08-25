@@ -56,9 +56,11 @@ class Events(commands.Cog):
             await ctx.send(exception)
             await ctx.send_help(ctx.command)
             return
-        if (type(exception) == commands.errors.NSFWChannelRequired
-                or type(exception) == commands.errors.MissingPermissions
-                or type(exception) == commands.errors.NoPrivateMessage):
+
+        errors = (commands.errors.NSFWChannelRequired, commands.errors.MissingPermissions,
+                  commands.errors.NoPrivateMessage, commands.errors.CommandOnCooldown)
+
+        if (type(exception) in errors):
             await ctx.send(exception)
             return
 

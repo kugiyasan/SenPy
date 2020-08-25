@@ -4,6 +4,7 @@ from discord.ext import commands
 from lxml import html
 from PIL import Image
 import deeppyer
+import random
 import requests
 from io import BytesIO
 
@@ -11,26 +12,27 @@ from io import BytesIO
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.someoneEnabled = False
 
     @commands.command()
     async def insult(self, ctx, *, member: discord.Member = None):
         """random compliment from the web"""
-        url = 'http://www.robietherobot.com/insult-generator.htm'
+        url = "http://www.robietherobot.com/insult-generator.htm"
         webpage = requests.get(url)
         if(webpage.status_code == 200):
             tree = html.fromstring(webpage.content)
-            insultText = tree.xpath('//h1')[1].text.strip()
+            insultText = tree.xpath("//h1")[1].text.strip()
 
             if not member:
                 await ctx.send("You're a " + insultText)
             else:
                 await ctx.send(str(member) + " is a " + insultText)
         else:
-            print('Error not the good status code 200 !=', webpage.status_code)
+            print("Error not the good status code 200 !=", webpage.status_code)
 
-    @commands.command(aliases=['loli'])
+    @commands.command(aliases=["loli"])
     async def legalize(self, ctx, age):
-        '''All lolis can be legal, if you let me handle it!'''
+        """All lolis can be legal, if you let me handle it!"""
         try:
             age = int(age)
             if age < 1:
@@ -40,7 +42,7 @@ class Memes(commands.Cog):
             return
 
         if age < 4:
-            await ctx.send("Rip dude, I can't legalize your loli, get ready to get caught!")
+            await ctx.send("Rip dude, I can't legalize your loli, get ready to be caught!")
         elif age < 6:
             await ctx.send(f"{age}? That's just 10{age%2}, in base 2!")
         elif age > 20:
@@ -48,9 +50,9 @@ class Memes(commands.Cog):
         else:
             await ctx.send(f"{age}? That's {20+age%2}, in base {age//2}!")
 
-    @commands.command(aliases=['cat'])
+    @commands.command(aliases=["cat"])
     async def catyears(self, ctx, age):
-        '''The following program does not endorse in any way, shape or form the slavery of sapient beings'''
+        """The following program does not endorse in any way, shape or form the slavery of sapient beings"""
         try:
             age = int(age)
             if age < 1:
@@ -60,31 +62,51 @@ class Memes(commands.Cog):
             return
 
         if age == 1:
-            await ctx.send("Hmm, while there have been no scientific consensus as of yet, your cat seems to be... 12.5 years old. To safely engage in intercourse, you would need to say \"no beasto\" and \"no pedo\" at the same time, which is sadly not physically possible. I advise you wait just a few months before indulging in your deep fantasies.")
+            await ctx.send('Hmm, while there have been no scientific consensus as of yet, your cat seems to be... 12.5 years old. To safely engage in intercourse, you would need to say \"no beasto\" and \"no pedo\" at the same time, which is sadly not physically possible. I advise you wait just a few months before indulging in your deep fantasies.')
         elif age == 2:
-            await ctx.send("Hmm. Your cat has finished its initial growth stage, bringing them to the very mature age of 25 years old. Your patience has been justly rewarded. You may... proceed. Remember to say \"no beasto\", though.")
+            await ctx.send('Hmm. Your cat has finished its initial growth stage, bringing them to the very mature age of 25 years old. Your patience has been justly rewarded. You may... proceed. Remember to say \"no beasto\", though.')
         elif age > 20:
             await ctx.send(f"What? Your cat is already {age}? That means... they are now {25+(age-2)*4}, in human years! Although... a doubt still plagues my mind. Are you sure that your cat is still alive and well? They should be deceased by now, according to statistical evidence. I'd be cautious if I were you. Saying \"no beasto\" and \"no necro\" at the same time is sadly not physically possible.")
-        elif age > 2:
+        else:
             await ctx.send(f"What? Your cat is already {age}? That means... they are now {25+(age-2)*4}, in human years! Make haste, before death does you part! I know these beings are... disposable, but that is not a good reason to leave them decay, untouched by your love.")
 
-    @commands.command(aliases=['df'])
+    @commands.command(aliases=["df"])
     async def deepfry(self, ctx: commands.Context):
-        '''haha image goes brrrrrrrr'''
+        """haha image goes brrrrrrrr"""
 
         if not ctx.message.attachments:
-            await ctx.send('Please attach an image!')
+            await ctx.send("Please attach an image!")
             return
 
-        PATH = f'media/deepfry_{ctx.author.name}.png'
+        PATH = f"media/deepfry_{ctx.author.name}.png"
         file = await ctx.message.attachments[0].read()
         img = Image.open(BytesIO(file))
         img = await deeppyer.deepfry(img, flares=False)
 
-        img.save(PATH, format='PNG')
+        img.save(PATH, format="PNG")
 
         await ctx.send(file=discord.File(PATH))
+
+    @commands.is_owner()
+    @commands.command()
+    async def togglesomeone(self, ctx):
+        self.someoneEnabled = not self.someoneEnabled
+        if self.someoneEnabled:
+            await ctx.send("You can now use xd someone!")
+        else:
+            await ctx.send("xd someone has been disabled!")
+
+    @commands.cooldown(1, 60.0, commands.BucketType.user)
+    @commands.command()
+    async def someone(self, ctx: commands.Context):
+        """Tag someone on the server, like the april fools joke discord made"""
+        if not self.someoneEnabled:
+            await ctx.send("Command is disabled")
+            return
+
+        await ctx.send(random.choice(ctx.guild.members).mention)
 
 
 def setup(bot: commands.Bot):
     bot.add_cog(Memes(bot))
+    
