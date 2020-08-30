@@ -18,26 +18,33 @@ class RedditAPI(commands.Cog, name="Reddit"):
         self.bot = bot
         self.ua = UserAgent(verify_ssl=False)
         self.urls = {}
-        self.waifuByTheHour.start()
+    #     self.waifuByTheHour.start()
 
-    def cog_unload(self):
-        self.waifuByTheHour.cancel()
+    # def cog_unload(self):
+    #     self.waifuByTheHour.cancel()
 
     @tasks.loop(hours=1.0)
     async def waifuByTheHour(self):
-        channel = self.bot.get_channel(722374291148111884)
-
-        if not channel:
-            return
-
-        subreddits = ("ChikaFujiwara", "ZeroTwo")
-        subreddit = random.choice(subreddits)
-        await self.sendRedditImage(channel, subreddit, dropnsfw=True)
+        channelID = 722374291148111884
+        subreddits = ("chikafujiwara", "zerotwo")
+        await self.hourlyRedditImage(channelID, subreddits)
+        channelID = 749341279208341514
+        subreddits = ("goodanimemes",)
+        await self.hourlyRedditImage(channelID, subreddits)
 
     @waifuByTheHour.before_loop
     async def before_waifuByTheHour(self):
         await self.bot.wait_until_ready()
         await asyncio.sleep(1)
+
+    async def hourlyRedditImage(self, channelID, subreddits):
+        channel = self.bot.get_channel(channelID)
+
+        if not channel:
+            return
+
+        subreddit = random.choice(subreddits)
+        await self.sendRedditImage(channel, subreddit, dropnsfw=True)
 
     @commands.command(aliases=["ara"])
     async def araara(self, ctx: commands.Context):
@@ -146,6 +153,8 @@ class RedditAPI(commands.Cog, name="Reddit"):
         )
         embed.set_footer(
             text=f'{post["score"]}⬆️ {post["num_comments"]}💬')
+
+        return embed
 
     async def requestReddit(self, url):
         print("requesting reddit")

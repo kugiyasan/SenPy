@@ -70,7 +70,7 @@ class Roles(commands.Cog):
 
         return embed
 
-    async def roleEmbed(self, ctx: commands.Context, roleAction):
+    async def initEmbed(self, ctx, roleAction, page):
         with conn:
             cursor.execute(
                 "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
@@ -95,13 +95,18 @@ class Roles(commands.Cog):
             await ctx.send("There isn't an available role! Exiting...")
             return
 
-        page = 0
 
         message = await ctx.send(embed=await self.renderEmbed(ctx, roles, page))
         await message.add_reaction("◀")
         await message.add_reaction("▶")
         for n in range(1, 10):
             await message.add_reaction(f"{n}\ufe0f\u20e3")
+
+        return roles, message
+
+    async def roleEmbed(self, ctx: commands.Context, roleAction):
+        page = 0
+        roles, message = await self.initEmbed(ctx, roleAction, page)
 
         emoji = ""
 

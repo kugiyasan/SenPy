@@ -5,6 +5,7 @@ import asyncio
 
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
+from cogs.utils.dbms import conn, cursor
 
 
 class Owner(commands.Cog):
@@ -15,18 +16,43 @@ class Owner(commands.Cog):
     @commands.command(name="exec", hidden=True)
     async def _exec(self, context, *, code):
         """execute code sent from discord CAN BREAK THE BOT"""
-        code = code.strip("`")
-
         global bot, ctx
         bot = self.bot
         ctx = context
 
-        exec(
-            "async def __ex():\n global bot\n global ctx\n " + 
-                "\n ".join(code.split("\n"))
-        )
+        code = code.strip("`")
+        code = "async def __ex():\n  global bot, ctx\n  " + \
+            "\n  ".join(code.split("\n"))
 
-        await locals()['__ex']()
+        print(code)
+        exec(code)
+
+        await locals()["__ex"]()
+
+    @commands.is_owner()
+    @commands.command(hidden=True)
+    async def sql(self, context, code, *values):
+        global ctx, conn, cursor
+        ctx = context
+        conn = conn
+        cursor = cursor
+
+        code = code.strip("`").lower()
+        wrappedCode = f"async def __ex():\n  global ctx, conn, cursor\n  with conn:\n    cursor.execute(\"\"\"{code}\"\"\", {values})"
+        if code.startswith("select"):
+            wrappedCode += "\n    await ctx.send(str(cursor.fetchall()))"
+
+        print(wrappedCode)
+        exec(wrappedCode)
+
+        await locals()["__ex"]()
+
+    @commands.is_owner()
+    @commands.command(hidden=True)
+    async def activity(self, ctx, *, string):
+        occupation = discord.Activity(
+            type=discord.ActivityType.playing, name=string)
+        await self.bot.change_presence(activity=occupation)
 
     @commands.is_owner()
     @commands.command(hidden=True)
