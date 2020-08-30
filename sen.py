@@ -7,7 +7,6 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 
-from cogs.utils.embedPaginator import EmbedHelpCommand, EmbedPaginator
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.dbms import conn, cursor
 
@@ -30,27 +29,15 @@ description = """Senko-san wants to pamper you"""
 
 bot = commands.Bot(command_prefix=prefixes,
                    description=description,
-                   activity=discord.Game(name="xd help | xd about"),
-                   #    help_command=commands.DefaultHelpCommand())
-                   help_command=EmbedHelpCommand(paginator=EmbedPaginator()))
+                   activity=discord.Game(name="xd help | xd about"))
 
-extensions = ("cogs.Games.chessCog",
-              "cogs.Games.mastermind",
-              "cogs.Games.russianRoulette",
-              "cogs.admin",
-              "cogs.danbooru",
-              "cogs.dev",
-              "cogs.events",
-              "cogs.info",
-              "cogs.japanese",
-              "cogs.memes",
-              "cogs.mofupoints",
-              "cogs.neko",
-              "cogs.owner",
-              "cogs.reddit",
-              "cogs.roles",
-              "cogs.settings",
-              "cogs.thisDoesNotExist")
+
+def getExtensions():
+    for path in ("cogs", "cogs/Games"):
+        for f in os.listdir(path):
+            pathname = os.path.join(path, f)
+            if os.path.isfile(pathname):
+                yield pathname[:-3].replace("/", ".").replace("\\", ".")
 
 
 @bot.event
@@ -65,8 +52,11 @@ async def reload(ctx: commands.Context):
     await deleteMessage(ctx)
 
     try:
-        for ext in extensions:
-            bot.reload_extension(ext)
+        for ext in getExtensions():
+            try:
+                bot.reload_extension(ext)
+            except commands.errors.ExtensionNotLoaded:
+                bot.load_extension(ext)
     except:
         await ctx.send("Reloading failed")
         raise
@@ -80,8 +70,9 @@ async def logout(ctx: commands.Context):
     await deleteMessage(ctx)
     await bot.logout()
 
+
 if __name__ == "__main__":
-    for ext in extensions:
+    for ext in getExtensions():
         bot.load_extension(ext)
 
     bot.run(os.environ["DISCORD_TOKEN"])

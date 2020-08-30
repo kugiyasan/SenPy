@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import asyncio
+from datetime import datetime
 import random
 import re
 import traceback
@@ -33,17 +34,17 @@ class Events(commands.Cog):
 
         # TODO check in the db if the server enabled those features
 
-        # dabs = ('dab', 'DAB', '<0/', r'\0>', '<0/   <0/   <0/')
+        # dabs = ("dab", "DAB", "<0/", r"\0>", "<0/   <0/   <0/")
         # if re.search("|".join(dabs), message.content.lower()):
-        #     style = '*' * random.randint(0, 3)
+        #     style = "*" * random.randint(0, 3)
         #     await ctx.send(style + random.choice(dabs) + style)
 
         # if message.guild:
         #     dash = message.guild.get_member(399705801717186571)
-        #     if ('rekt' in message.content.lower()
+        #     if ("rekt" in message.content.lower()
         #         and not message.author.bot
         #             and (not dash or dash.status != discord.Status.online)):
-        #         await ctx.send('Yeah get rekt, son!')
+        #         await ctx.send("Yeah get rekt, son!")
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, exception):
@@ -64,7 +65,7 @@ class Events(commands.Cog):
             await ctx.send(exception)
             return
 
-        print('Ignoring exception in command {}:'.format(ctx.command))
+        print("Ignoring exception in command {}:".format(ctx.command))
         traceback.print_exception(
             type(exception), exception, exception.__traceback__)
 
@@ -81,27 +82,17 @@ class Events(commands.Cog):
         await owner.send(text)
 
     @ commands.Cog.listener()
-    async def on_reaction_add(self, reaction: discord.Reaction, user):
-        users = await reaction.users().flatten()
-        if len(users) < 3 or any(user.bot for user in users):
-            return
-
-        if reaction.emoji == "\U0001F44E" or reaction.emoji == '⬇️':  # thumbs down
-            return
-
-        await reaction.message.add_reaction(reaction)
-
-    @ commands.Cog.listener()
     async def on_member_join(self, member):
         channel = await self.getGeneralchannel(member.guild)
         if channel:
-            await channel.send(f'おかえりなのじゃ　Okaeri nanojya {member.mention}!')
+            await channel.send(f"おかえりなのじゃ　Okaeri nanojya {member.mention}!")
 
     @ commands.Cog.listener()
-    async def on_member_remove(self, member):
+    async def on_member_remove(self, member: discord.Member):
         channel = await self.getGeneralchannel(member.guild)
         if channel:
-            await channel.send(f'See you later alligator {member.mention}.')
+            timeInTheGuild = datetime.utcnow() - member.joined_at
+            await channel.send(f"See you later alligator {member.mention}.\nYou stayed in this server for {str(timeInTheGuild)[:-3]}!")
 
     @ commands.Cog.listener()
     async def on_guild_emojis_update(self, guild: discord.Guild, before, after):
@@ -109,8 +100,8 @@ class Events(commands.Cog):
         if diff:
             channel = await self.getGeneralchannel(guild)
 
-            await channel.send('**NEW EMOJIS**')
-            newemojis = ' '.join(map(lambda x: str(x), diff))
+            await channel.send("**NEW EMOJIS**")
+            newemojis = " ".join(str(x) for x in diff)
             await channel.send(newemojis)
 
     async def getGeneralchannel(self, guild: discord.Guild):

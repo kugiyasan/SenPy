@@ -13,6 +13,25 @@ class Settings(commands.Cog):
     #     """Regroup all the settings in one command"""
     #     pass
 
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def prefix(self, ctx: commands.Context, newPrefix=None):
+        """change the command prefix for this server"""
+        if newPrefix == "xd":
+            newPrefix = None
+
+        with conn:
+            cursor.execute("""INSERT INTO guilds (id, command_prefix)
+                            VALUES(%s, %s) 
+                            ON CONFLICT(id) 
+                            DO UPDATE SET command_prefix = %s""", (ctx.guild.id, newPrefix, newPrefix))
+
+        if not newPrefix:
+            await ctx.send("The command prefix has been reset to xd!")
+            return
+
+        await ctx.send(f'The new command prefix for this server is "{newPrefix}"')
+
     @commands.has_permissions(administrator=True)
     @commands.command(aliases=["welcome", "welcomechannel"])
     async def welcomeChannel(self, ctx, channel:commands.TextChannelConverter=None):
@@ -23,7 +42,7 @@ class Settings(commands.Cog):
                     "SELECT welcomebye FROM guilds WHERE id=%s", (ctx.guild.id,))
                 channel = cursor.fetchone()[0]
 
-                await ctx.send(f"Welcome messages are sent in the {self.bot.get_channel(channel)} channel (id: {channel})\n"
+                await ctx.send(f"Welcome messages are sent in the {self.bot.get_channel(channel).mention} channel (id: {channel})\n"
                                + "to change the channel, type 'xd welcome #welcome' and put the actual channel name")
 
                 return

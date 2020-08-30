@@ -48,10 +48,19 @@ class Info(commands.Cog):
         e.add_field(name="You have some feedback?", value="Use xd report")
         await ctx.send(embed=e)
 
-    @commands.command()
-    async def hug(self, ctx: commands.Context):
-        """Anyone wants a hug?"""
-        await ctx.send("https://tenor.com/view/anime-friends-friendship-funny-best-gif-15959237")
+    @commands.command(aliases=["purge", "del"])
+    async def delete(self, ctx: commands.Context, count: int = 1):
+        """delete the last messages of the bot"""
+        await deleteMessage(ctx)
+        n = 0
+
+        async for message in ctx.history(limit=100):
+            if message.author == self.bot.user:
+                await message.delete()
+                n += 1
+
+                if n == count:
+                    break
 
     @commands.command()
     async def ping(self, ctx):
@@ -62,6 +71,18 @@ class Info(commands.Cog):
     async def pong(self, ctx):
         """haha ping pong"""
         await ctx.send(f"Ping... You ugly btw")
+
+    @commands.command(aliases=["suggest", "comment", "feedback"])
+    async def report(self, ctx, *, text=""):
+        """Send your thoughts about this bot to the bot dev"""
+
+        if text == "":
+            await ctx.send("Write your feedback directly with the command e.g. xd feedback blah blah blah")
+            return
+
+        owner = (await self.bot.application_info()).owner
+        await owner.send(f"***{ctx.author}*** has some feedback!\n{text}")
+        await ctx.send("Your feedback was sent successfully!")
 
     @commands.command()
     async def say(self, ctx: commands.Context, *, words="_ _"):
@@ -81,18 +102,6 @@ class Info(commands.Cog):
                 alternateCase += c.upper()
 
         await self.say(ctx, words=alternateCase)
-
-    @commands.command(aliases=["suggest", "comment", "feedback"])
-    async def report(self, ctx, *, text=""):
-        """Send your thoughts about this bot to the bot dev"""
-
-        if text == "":
-            await ctx.send("Write your feedback directly with the command e.g. xd feedback blah blah blah")
-            return
-
-        owner = (await self.bot.application_info()).owner
-        await owner.send(f"***{ctx.author}*** has some feedback!\n{text}")
-        await ctx.send("Your feedback was sent successfully!")
 
 
 def setup(bot: commands.Bot):

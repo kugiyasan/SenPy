@@ -29,6 +29,7 @@ class Memes(commands.Cog):
                 await ctx.send(str(member) + " is a " + insultText)
         else:
             print("Error not the good status code 200 !=", webpage.status_code)
+            raise ConnectionError
 
     @commands.command(aliases=["loli"])
     async def legalize(self, ctx, age):
@@ -87,26 +88,6 @@ class Memes(commands.Cog):
 
         await ctx.send(file=discord.File(PATH))
 
-    @commands.is_owner()
-    @commands.command()
-    async def togglesomeone(self, ctx):
-        self.someoneEnabled = not self.someoneEnabled
-        if self.someoneEnabled:
-            await ctx.send("You can now use xd someone!")
-        else:
-            await ctx.send("xd someone has been disabled!")
-
-    @commands.cooldown(1, 60.0, commands.BucketType.user)
-    @commands.command()
-    async def someone(self, ctx: commands.Context):
-        """Tag someone on the server, like the april fools joke discord made"""
-        if not self.someoneEnabled:
-            await ctx.send("Command is disabled")
-            return
-
-        await ctx.send(random.choice(ctx.guild.members).mention)
-
 
 def setup(bot: commands.Bot):
     bot.add_cog(Memes(bot))
-    

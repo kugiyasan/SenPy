@@ -1,10 +1,14 @@
+bs4
 deeppyer
 discord.py
 python-dotenv
 fake_useragent
+html5lib
 lxml
 nekos.py
 opencv-python-headless
+Pillow
 psycopg2
 python-chess
 requests
+yfinance

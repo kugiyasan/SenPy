@@ -2,12 +2,12 @@ import os
 import psycopg2
 
 try:
-    DATABASE_URL = os.environ['DATABASE_URL']
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    DATABASE_URL = os.environ["DATABASE_URL"]
+    conn = psycopg2.connect(DATABASE_URL, sslmode="require")
 except:
     from dotenv import load_dotenv
     load_dotenv()
-    DATABASE_URL = os.environ['DATABASE_URL']
+    DATABASE_URL = os.environ["DATABASE_URL"]
     conn = psycopg2.connect(DATABASE_URL)
 
 cur = conn.cursor()
@@ -28,8 +28,8 @@ cur = conn.cursor()
 # cur.execute("SELECT * FROM guilds")
 # print(cur.fetchall())
 
-with conn:
-    cur.execute("UPDATE guilds SET command_prefix=%s WHERE id=382248089450446848", ("xd2",))
+# with conn:
+#     cur.execute("UPDATE guilds SET command_prefix=%s WHERE id=382248089450446848", ("xd2",))
 
 # conn.commit()
 # cur.close()
