@@ -16,19 +16,19 @@ load_dotenv()
 async def prefixes(bot: commands.Bot, message: discord.Message):
     prefix = "xd"
     if message.guild != None:
-        with conn:
-            cursor.execute(
-                "SELECT command_prefix FROM guilds WHERE id = %s", (message.guild.id,))
-            temp = cursor.fetchone()
-            if temp and temp[0]:
-                prefix = temp[0]
+        try:
+            with conn:
+                cursor.execute(
+                    "SELECT command_prefix FROM guilds WHERE id = %s", (message.guild.id,))
+                temp = cursor.fetchone()
+                if temp and temp[0]:
+                    prefix = temp[0]
+        except:
+            print("Wasn't able to communicate with the database")
 
     return commands.when_mentioned_or(prefix + " ", prefix)(bot, message)
 
-description = """Senko-san wants to pamper you"""
-
 bot = commands.Bot(command_prefix=prefixes,
-                   description=description,
                    activity=discord.Game(name="xd help | xd about"))
 
 
@@ -42,15 +42,13 @@ def getExtensions():
 
 @bot.event
 async def on_ready():
-    print(f"Logged in as {bot.user.name}")
+    print(f"Logged in as {bot.user.name} on {len(bot.guilds)} servers")
 
 
 @bot.command(hidden=True, aliases=["rl"])
 @commands.is_owner()
 async def reload(ctx: commands.Context):
     """Reloads the bot extensions without rebooting the entire program"""
-    await deleteMessage(ctx)
-
     try:
         for ext in getExtensions():
             try:
@@ -61,13 +59,14 @@ async def reload(ctx: commands.Context):
         await ctx.send("Reloading failed")
         raise
 
+    await ctx.message.add_reaction("✅")
     print("\033[94mReloading successfully finished!\033[0m\n")
 
 
 @bot.command(hidden=True)
 @commands.is_owner()
 async def logout(ctx: commands.Context):
-    await deleteMessage(ctx)
+    await ctx.message.add_reaction("✅")
     await bot.logout()
 
 

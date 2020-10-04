@@ -18,18 +18,15 @@ class RedditAPI(commands.Cog, name="Reddit"):
         self.bot = bot
         self.ua = UserAgent(verify_ssl=False)
         self.urls = {}
-    #     self.waifuByTheHour.start()
+        self.waifuByTheHour.start()
 
-    # def cog_unload(self):
-    #     self.waifuByTheHour.cancel()
+    def cog_unload(self):
+        self.waifuByTheHour.cancel()
 
     @tasks.loop(hours=1.0)
     async def waifuByTheHour(self):
         channelID = 722374291148111884
         subreddits = ("chikafujiwara", "zerotwo")
-        await self.hourlyRedditImage(channelID, subreddits)
-        channelID = 749341279208341514
-        subreddits = ("goodanimemes",)
         await self.hourlyRedditImage(channelID, subreddits)
 
     @waifuByTheHour.before_loop
@@ -137,9 +134,9 @@ class RedditAPI(commands.Cog, name="Reddit"):
         if hasattr(ctx, "author"):
             await incrementEmbedCounter(ctx.author)
 
-        await ctx.send(embed=await self.redditEmbed(subreddit, post))
+        await ctx.send(embed=self.redditEmbed(subreddit, post))
 
-    async def redditEmbed(self, subreddit, post):
+    def redditEmbed(self, subreddit, post):
         embed = discord.Embed(
             color=discord.Colour.gold(),
             title=f"r/{subreddit}",

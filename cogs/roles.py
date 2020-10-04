@@ -130,7 +130,7 @@ class Roles(commands.Cog):
 
             try:
                 res = await self.bot.wait_for("reaction_add", check=check, timeout=30)
-            except asyncio.exceptions.TimeoutError:
+            except asyncio.TimeoutError:
                 await message.clear_reactions()
                 return
 

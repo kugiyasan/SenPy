@@ -11,11 +11,17 @@ class Japanese(commands.Cog):
         self.bot = bot
 
     @commands.command()
+    async def anki(self, ctx, member: discord.Member):
+        """Remind your friends to do their Anki!"""
+        await ctx.send(f"{member.mention}, did you do your anki yet?")
+
+    @commands.command()
     async def haiku(self, ctx, *, text):
         """Send your 5-7-5 and boom a clean display of your haiku"""
         font = ImageFont.truetype("media/EPMGOBLD.TTF", 20)
 
-        text = ["　"*i*2 + string for i, string in enumerate(text.split("\n"))][::-1]
+        text = ["　"*i*2 + string for i,
+                string in enumerate(text.split("\n"))][::-1]
         text = itertools.zip_longest(*text, fillvalue="　")
         text = "\n".join(("　".join(line) for line in text))
 

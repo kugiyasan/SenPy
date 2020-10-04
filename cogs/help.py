@@ -14,7 +14,7 @@ class MyHelpCommand(commands.HelpCommand):
     async def send_bot_help(self, mapping):
         ctx = self.context
         text = ""
-
+        
         def get_category(command):
             cog = command.cog
             return cog.qualified_name if cog is not None else "No Category"
