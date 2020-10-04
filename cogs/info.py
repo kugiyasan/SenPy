@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 from datetime import datetime
+import random
 import sys
 
 from cogs.utils.deleteMessage import deleteMessage
@@ -15,7 +16,7 @@ class Info(commands.Cog):
     @commands.command(aliases=["credit", "credits", "invite"])
     async def about(self, ctx):
         """gives various informations about the bot"""
-        inviteLink = f"https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=3537984"
+        inviteLink = f"https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=268827712"
 
         e = discord.Embed(
             title="Click here to invite me on your server!",
@@ -53,14 +54,25 @@ class Info(commands.Cog):
         """delete the last messages of the bot"""
         await deleteMessage(ctx)
         n = 0
+        msgs = []
+
+        if count < 1:
+            return
 
         async for message in ctx.history(limit=100):
             if message.author == self.bot.user:
-                await message.delete()
+                msgs.append(message)
                 n += 1
 
-                if n == count:
+                if n >= count:
                     break
+        
+        try:
+            await ctx.channel.delete_messages(msgs)
+        except discord.errors.Forbidden:
+            for msg in msgs:
+                await msg.delete()
+
 
     @commands.command()
     async def ping(self, ctx):
@@ -95,11 +107,11 @@ class Info(commands.Cog):
     async def sAy(self, ctx: commands.Context, *, words="_ _"):
         """MaKe tHiS LiTtLe iNnOcEnT BoT SpEaK FoR YoU, yOu pErVeRt"""
         alternateCase = ""
-        for i, c in enumerate(words.lower()):
-            if i % 2 == 0:
-                alternateCase += c
-            else:
+        for c in words.lower():
+            if random.randint(0, 1):
                 alternateCase += c.upper()
+            else:
+                alternateCase += c
 
         await self.say(ctx, words=alternateCase)
 

@@ -28,31 +28,26 @@ class Owner(commands.Cog):
         exec(code)
 
         await locals()["__ex"]()
+        await context.message.add_reaction("✅")
 
     @commands.is_owner()
     @commands.command(hidden=True)
     async def sql(self, context, code, *values):
-        global ctx, conn, cursor
-        ctx = context
-        conn = conn
-        cursor = cursor
-
         code = code.strip("`").lower()
-        wrappedCode = f"async def __ex():\n  global ctx, conn, cursor\n  with conn:\n    cursor.execute(\"\"\"{code}\"\"\", {values})"
-        if code.startswith("select"):
-            wrappedCode += "\n    await ctx.send(str(cursor.fetchall()))"
+        with conn:
+            cursor.execute(code, values)
 
-        print(wrappedCode)
-        exec(wrappedCode)
+            if code.startswith("select"):
+                await ctx.send(cursor.fetchall())
 
-        await locals()["__ex"]()
+        await context.message.add_reaction("✅")
 
     @commands.is_owner()
     @commands.command(hidden=True)
     async def activity(self, ctx, *, string):
-        occupation = discord.Activity(
-            type=discord.ActivityType.playing, name=string)
+        occupation = discord.Game(name=string)
         await self.bot.change_presence(activity=occupation)
+        await ctx.message.add_reaction("✅")
 
     @commands.is_owner()
     @commands.command(hidden=True)

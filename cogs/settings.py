@@ -52,7 +52,7 @@ class Settings(commands.Cog):
             return
 
         try:
-            await channel.send("Welcoming will now be sent in this channel!\nThis message will deleted automatically in 30 seconds", delete_after=30.0)
+            await channel.send("Welcoming will now be sent in this channel!\nThis message will be deleted automatically in 30 seconds", delete_after=30.0)
         except discord.errors.Forbidden:
             await ctx.send("I don't have Permissions to write in that channel!")
             return

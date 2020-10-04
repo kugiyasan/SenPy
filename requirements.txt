@@ -1,4 +1,3 @@
-bs4
 deeppyer
 discord.py
 python-dotenv
@@ -9,6 +8,6 @@ nekos.py
 opencv-python-headless
 Pillow
 psycopg2
+pybooru
 python-chess
 requests
-yfinance
