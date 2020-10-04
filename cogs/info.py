@@ -69,7 +69,7 @@ class Info(commands.Cog):
         
         try:
             await ctx.channel.delete_messages(msgs)
-        except discord.errors.Forbidden:
+        except: # discord.errors.Forbidden or AttributeError
             for msg in msgs:
                 await msg.delete()
 
