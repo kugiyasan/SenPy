@@ -32,15 +32,13 @@ class Owner(commands.Cog):
 
     @commands.is_owner()
     @commands.command(hidden=True)
-    async def sql(self, context, code, *values):
+    async def sql(self, ctx, code, *values):
         code = code.strip("`").lower()
         with conn:
             cursor.execute(code, values)
 
             if code.startswith("select"):
                 await ctx.send(cursor.fetchall())
-
-        await context.message.add_reaction("✅")
 
     @commands.is_owner()
     @commands.command(hidden=True)
