@@ -2,23 +2,9 @@ import discord
 from discord.ext import commands
 
 from pybooru import Danbooru, Moebooru
-import functools
 import random
-import requests
-import time
 
-from cogs.utils.sendEmbed import sendEmbed
 from cogs.mofupoints import incrementEmbedCounter
-
-clovisProtection = False
-
-
-def booruCommandName(func):
-    # https://stackoverflow.com/questions/42043226/using-a-coroutine-as-decorator
-    @functools.wraps(func)
-    async def wrapped(self, *args, **kwargs):
-        return await func(self, *args, **kwargs)
-    return wrapped
 
 
 class BooruCog(commands.Cog, name="Booru"):
@@ -29,9 +15,6 @@ class BooruCog(commands.Cog, name="Booru"):
         self.client = Client(site_name, site_url)
         self.post_url = post_url
 
-    # @commands.command(name=self.site_name, aliases=self.aliases)
-    # @commands.is_nsfw()
-    # @booruCommandName
     async def booru(self, ctx: commands.Context, *, tags="rating:s"):
         """Wow searching on booru site that's so original"""
         if not len(self.urlsTags.get(tags, {})):
@@ -47,15 +30,6 @@ class BooruCog(commands.Cog, name="Booru"):
                 and not isinstance(ctx.channel, discord.DMChannel)
                 and not ctx.channel.is_nsfw()):
             raise commands.errors.NSFWChannelRequired(ctx.channel)
-
-        if ctx.author.id == 276038064273489930 and clovisProtection == True:
-            if "rating:e" in tags:
-                await ctx.send("I couldn't find any image with that tag!")
-                return
-
-            while post["rating"] == "e":
-                print(f"dropping {post}")
-                post = self.urlsTags[tags].pop()
 
         await ctx.send(embed=self.booruEmbed(post))
         await incrementEmbedCounter(ctx.author)
@@ -123,6 +97,7 @@ class DanbooruCog(BooruCog, name="Danbooru"):
             "maru": "kunikida_hanamaru",
             "megumin": "megumin",
             "rem": "rem_(re:zero)",
+            "rinari":   "tennouji_rina",
             "ruby": "kurosawa_ruby",
             "ruka": "sarashina_ruka",
             "senko": "senko_(sewayaki_kitsune_no_senko-san)",
@@ -143,22 +118,18 @@ class DanbooruCog(BooruCog, name="Danbooru"):
             return
 
         args = ctx.message.content[len(ctx.prefix):].split(" ")
-        # try:
-        #     shortcut = self.shortcuts.get(args[:args.index(" ")], None)
-        #     args = args[args.index(" ")+1:]
-        # except:
-        #     shortcut = self.shortcuts.get(args, None)
-        #     args = ""
 
-        if not shortcut:
+        if args[0] not in self.shortcuts.keys():
             return
+
+        args = [self.shortcuts.get(arg, arg) for arg in args]
 
         try:
             if (not isinstance(ctx.channel, discord.DMChannel)
                     and not ctx.channel.is_nsfw()):
                 raise commands.errors.NSFWChannelRequired(ctx.channel)
 
-            await self.booru(ctx, tags=shortcut + " " + args)
+            await self.booru(ctx, tags=" ".join(args))
         except commands.errors.NSFWChannelRequired as err:
             #! should handle the errors with the default on_command_error
             await ctx.send(err)
@@ -203,16 +174,6 @@ class DanbooruCog(BooruCog, name="Danbooru"):
         del self.shortcuts[key]
         await ctx.message.add_reaction("✅")
 
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def togglensfw(self, ctx):
-        global clovisProtection
-        clovisProtection = not clovisProtection
-        if clovisProtection:
-            await ctx.message.add_reaction("✅")
-        else:
-            await ctx.message.add_reaction("❎")
-
     @commands.is_nsfw()
     @commands.command(aliases=["dan", "db"])
     async def danbooru(self, ctx, *, tags="rating:s"):
@@ -233,10 +194,7 @@ class Konachan(BooruCog, name="Booru"):
     @commands.command(aliases=["kon"])
     async def konachan(self, ctx, *, tags="rating:s"):
         """Wow searching on konachan that's so original"""
-        start = time.time()
         await self.booru(ctx, tags=tags)
-        end = time.time() - start
-        print(end)
 
 
 class Safebooru(BooruCog, name="Booru"):

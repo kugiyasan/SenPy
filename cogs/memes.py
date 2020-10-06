@@ -2,12 +2,7 @@ import discord
 from discord.ext import commands
 
 from lxml import html
-from PIL import Image
-import deeppyer
-import random
 import requests
-from io import BytesIO
-
 
 class Memes(commands.Cog):
     def __init__(self, bot):
@@ -16,7 +11,7 @@ class Memes(commands.Cog):
 
     @commands.command()
     async def insult(self, ctx, *, member: discord.Member = None):
-        """random compliment from the web"""
+        """random compliment from the web (robietherobot.com/insult-generator.htm)"""
         url = "http://www.robietherobot.com/insult-generator.htm"
         webpage = requests.get(url)
         if(webpage.status_code == 200):
@@ -31,7 +26,7 @@ class Memes(commands.Cog):
             print("Error not the good status code 200 !=", webpage.status_code)
             raise ConnectionError
 
-    @commands.command(aliases=["loli"])
+    @commands.command(aliases=["legal"])
     async def legalize(self, ctx, age):
         """All lolis can be legal, if you let me handle it!"""
         try:
@@ -70,23 +65,6 @@ class Memes(commands.Cog):
             await ctx.send(f"What? Your cat is already {age}? That means... they are now {25+(age-2)*4}, in human years! Although... a doubt still plagues my mind. Are you sure that your cat is still alive and well? They should be deceased by now, according to statistical evidence. I'd be cautious if I were you. Saying \"no beasto\" and \"no necro\" at the same time is sadly not physically possible.")
         else:
             await ctx.send(f"What? Your cat is already {age}? That means... they are now {25+(age-2)*4}, in human years! Make haste, before death does you part! I know these beings are... disposable, but that is not a good reason to leave them decay, untouched by your love.")
-
-    @commands.command(aliases=["df"])
-    async def deepfry(self, ctx: commands.Context):
-        """haha image goes brrrrrrrr"""
-
-        if not ctx.message.attachments:
-            await ctx.send("Please attach an image!")
-            return
-
-        PATH = f"media/deepfry_{ctx.author.name}.png"
-        file = await ctx.message.attachments[0].read()
-        img = Image.open(BytesIO(file))
-        img = await deeppyer.deepfry(img, flares=False)
-
-        img.save(PATH, format="PNG")
-
-        await ctx.send(file=discord.File(PATH))
 
 
 def setup(bot: commands.Bot):
