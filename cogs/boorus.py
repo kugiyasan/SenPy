@@ -51,6 +51,7 @@ class BooruCog(commands.Cog, name="Booru"):
         for post in posts:
             try:
                 miniPost = {k: post[k] for k in keys}
+                miniPost["file_url"] = miniPost["file_url"].replace(" ", "%20")
 
                 if isinstance(self.client, Danbooru):
                     miniPost["author"] = post["tag_string_artist"]
