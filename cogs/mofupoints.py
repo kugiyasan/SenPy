@@ -41,10 +41,17 @@ class MofuPoints(commands.Cog):
 
         users = []
 
-        for k, v in rows:
-            user = self.bot.get_user(k)
-            if user in ctx.guild.members:
-                users.append((v, user.name))
+        if ctx.guild == None:
+            for k, v in rows:
+                user = self.bot.get_user(k)
+                name = user.name if user != None else k
+                users.append((v, name))
+        else:
+            for k, v in rows:
+                user = self.bot.get_user(k)
+                if user in ctx.guild.members:
+                    name = user.name if user != None else k
+                    users.append((v, name))
 
         return users
 
