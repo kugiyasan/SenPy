@@ -6,8 +6,7 @@ import itertools
 
 class MyHelpCommand(commands.HelpCommand):
     def divideInTwoColumns(self, text):
-        l = len(text)//2
-        l = text[l:].index("\n\n") + l
+        l = text.index("\n\n", len(text)//2)
         return text[:l], text[l:]
 
         # This function triggers when somone type `<prefix>help`
@@ -52,8 +51,8 @@ class MyHelpCommand(commands.HelpCommand):
         embed.set_thumbnail(url=ctx.me.avatar_url)
 
         for command in filtered:
-            embed.add_field(name=command.name + "".join(" / " + c for c in command.aliases),
-                            value=command.short_doc, inline=False)
+            embed.add_field(name=" / ".join([command.name, *command.aliases]),
+                            value=command.short_doc or "No description", inline=False)
 
         await ctx.send(embed=embed)
 
