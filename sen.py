@@ -14,7 +14,7 @@ load_dotenv()
 
 
 async def prefixes(bot: commands.Bot, message: discord.Message):
-    prefix = "xd"
+    prefix = os.environ["DEFAULT_COMMAND_PREFIX"]
     if message.guild != None:
         try:
             with conn:
