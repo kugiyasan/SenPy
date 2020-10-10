@@ -2,7 +2,9 @@ import discord
 from discord.ext import commands
 
 from pybooru import Danbooru, Moebooru
+import json
 import random
+import requests
 
 from cogs.mofupoints import incrementEmbedCounter
 
@@ -12,7 +14,7 @@ class BooruCog(commands.Cog, name="Booru"):
         self.bot = bot
         self.site_name = site_name
         self.urlsTags = {}
-        self.client = Client(site_name, site_url)
+        self.client = Client(site_name=site_name, site_url=site_url)
         self.post_url = post_url
 
     async def booru(self, ctx: commands.Context, *, tags="rating:s"):
@@ -26,9 +28,11 @@ class BooruCog(commands.Cog, name="Booru"):
                 return
 
         post = self.urlsTags[tags].pop()
-        if (post["rating"] != "s"
-                and not isinstance(ctx.channel, discord.DMChannel)
-                and not ctx.channel.is_nsfw()):
+        if (
+            post["rating"] != "s"
+            and not isinstance(ctx.channel, discord.DMChannel)
+            and not ctx.channel.is_nsfw()
+        ):
             raise commands.errors.NSFWChannelRequired(ctx.channel)
 
         await ctx.send(embed=self.booruEmbed(post))
@@ -55,10 +59,12 @@ class BooruCog(commands.Cog, name="Booru"):
 
                 if isinstance(self.client, Danbooru):
                     miniPost["author"] = post["tag_string_artist"]
+                elif isinstance(self.client, GelbooruClient):
+                    miniPost["author"] = post["owner"]
                 else:
                     miniPost["author"] = post["author"]
-                if self.site_name == "yandere":
-                    # file_url is too slow to load on yande.re
+
+                if post.get("file_size", 0) > 8000000:
                     miniPost["file_url"] = post["preview_url"]
 
                 self.urlsTags[tags].append(miniPost)
@@ -69,39 +75,47 @@ class BooruCog(commands.Cog, name="Booru"):
         print(f"{len(self.urlsTags[tags])} urls for {tags}")
 
     def booruEmbed(self, post):
-        post_url = self.post_url + str(post['id'])
+        post_url = self.post_url + str(post["id"])
         print(post_url)
-        embed = discord.Embed(
-            color=discord.Colour.gold(),
-            title=f"sauce",
-            url=post_url
-        )
+        # print(post["file_url"])
+        embed = discord.Embed(color=discord.Colour.gold(), title=f"sauce", url=post_url)
 
         embed.set_image(url=post["file_url"])
         embed.set_author(name=post["author"])
-        embed.set_footer(
-            text=f'{post["score"]}⬆️ created at: {post["created_at"]}')
+        embed.set_footer(text=f'{post["score"]}⬆️ created at: {post["created_at"]}')
 
         return embed
 
 
 class DanbooruCog(BooruCog, name="Danbooru"):
-    def __init__(self, bot):
-        super().__init__(bot, Danbooru, "danbooru", "https://danbooru.donmai.us/posts/")
+    def __init__(self, bot, Client, site_name, post_url):
+        super().__init__(bot, Client, site_name, post_url)
+        # TODO put the list in the database
         self.shortcuts = {
             "02": "zero_two_(darling_in_the_franxx)",
-            "akashi": "akashi_(azur_lane)",
+            "18+": "rating:e",
+            "Z23": "Z23_(azur_lane)",
+            "akashi": "akashi_(azur_lane) rating:s",
+            "aqua": "aqua_(konosuba)",
+            "astolfo": "astolfo_(fate)",
+            "atago": "atago_(azur_lane)",
+            "birb": "minami_kotori",
             "chika": "fujiwara_chika",
             "emilia": "emilia_(re:zero)",
             "hanamaru": "kunikida_hanamaru",
             "korone": "inugami_korone",
+            "loliwaifu": "unicorn_(azur_lane)",
+            "long_island": "long_island_(azur_lane)",
+            "mari": "ohara_mari",
             "maru": "kunikida_hanamaru",
             "megumin": "megumin",
+            "nozomi": "toujou_nozomi",
             "rem": "rem_(re:zero)",
-            "rinari":   "tennouji_rina",
+            "rinari": "tennouji_rina",
             "ruby": "kurosawa_ruby",
             "ruka": "sarashina_ruka",
             "senko": "senko_(sewayaki_kitsune_no_senko-san)",
+            "shinano": "shinano_(azur_lane)",
             "shiro": "shiro_(sewayaki_kitsune_no_senko-san)",
             "sumi": "sakurasawa_sumi",
             "unicorn": "unicorn_(azur_lane)",
@@ -111,14 +125,14 @@ class DanbooruCog(BooruCog, name="Danbooru"):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot or self.site_name != "danbooru":
+        if message.author.bot:
             return
 
         ctx = await self.bot.get_context(message)
         if ctx.command is not None or ctx.prefix is None:
             return
 
-        args = ctx.message.content[len(ctx.prefix):].split(" ")
+        args = ctx.message.content[len(ctx.prefix) :].split(" ")
 
         if args[0] not in self.shortcuts.keys():
             return
@@ -126,8 +140,10 @@ class DanbooruCog(BooruCog, name="Danbooru"):
         args = [self.shortcuts.get(arg, arg) for arg in args]
 
         try:
-            if (not isinstance(ctx.channel, discord.DMChannel)
-                    and not ctx.channel.is_nsfw()):
+            if (
+                not isinstance(ctx.channel, discord.DMChannel)
+                and not ctx.channel.is_nsfw()
+            ):
                 raise commands.errors.NSFWChannelRequired(ctx.channel)
 
             await self.booru(ctx, tags=" ".join(args))
@@ -141,15 +157,19 @@ class DanbooruCog(BooruCog, name="Danbooru"):
         longestKey = max(len(k) for k in self.shortcuts.keys())
         shortcuts = "**Available shortcuts:**```"
         for k in sorted(self.shortcuts):
-            shortcut = f"\n{k}:" + ' ' * \
-                (longestKey - len(k) + 1) + self.shortcuts[k]
-            if len(shortcuts) + len(shortcut) > 2000-3:
+            shortcut = f"\n{k}:" + " " * (longestKey - len(k) + 1) + self.shortcuts[k]
+            if len(shortcuts + shortcut) > 2000 - 3:
                 await ctx.send(shortcuts + "```")
                 shortcuts = "```" + shortcut
             else:
                 shortcuts += shortcut
 
-        await ctx.send(f"{shortcuts}```You can add your waifus using xd addshortcut :)")
+        footer = "You can add your waifus using xd addshortcut :)"
+        if len(shortcuts + footer) > 2000 - 3:
+            await ctx.send(shortcuts + "```")
+            shortcuts = ""
+
+        await ctx.send(shortcuts + "```" + footer)
 
     @commands.cooldown(5, 3600.0, commands.BucketType.user)
     @commands.command()
@@ -160,7 +180,7 @@ class DanbooruCog(BooruCog, name="Danbooru"):
         elif self.bot.get_command(key):
             await ctx.send("You can't name a shortcut with the name of a command!")
         elif len(key) > 20:
-            await ctx.send("The key is too long, make it shorter")
+            await ctx.send("The key is too long, make it 20 characters or less")
         else:
             self.shortcuts[key] = danbooruTags
             await ctx.message.add_reaction("✅")
@@ -206,11 +226,40 @@ class Safebooru(BooruCog, name="Booru"):
         await self.booru(ctx, tags=tags)
 
 
+class GelbooruClient:
+    def __init__(self, *, site_name, site_url):
+        self.site_name = site_name
+        self.site_url = site_url
+
+    def post_list(self, *, limit=3, page=None, tags="", random=False):
+        res = requests.get(
+            f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit={limit}&tags={tags}&json=1"
+        )
+        return json.loads(res.content)
+
+
+class Gelbooru(BooruCog, name="Booru"):
+    @commands.is_nsfw()
+    @commands.command(aliases=["gel"])
+    async def gelbooru(self, ctx, *, tags="rating:s"):
+        """Wow searching on gelbooru that's so original"""
+        await self.booru(ctx, tags=tags)
+
+
 def setup(bot: commands.Bot):
-    bot.add_cog(DanbooruCog(bot))
-    bot.add_cog(Yandere(bot, Moebooru, "yandere",
-                        "https://yande.re/post/show/"))
-    bot.add_cog(Konachan(bot, Moebooru, "konachan",
-                         "https://konachan.com/post/show/"))
-    bot.add_cog(Safebooru(bot, Danbooru, "safebooru",
-                          "https://safebooru.donmai.us/posts/"))
+    bot.add_cog(
+        DanbooruCog(bot, Danbooru, "danbooru", "https://danbooru.donmai.us/posts/")
+    )
+    bot.add_cog(Yandere(bot, Moebooru, "yandere", "https://yande.re/post/show/"))
+    bot.add_cog(Konachan(bot, Moebooru, "konachan", "https://konachan.com/post/show/"))
+    bot.add_cog(
+        Safebooru(bot, Danbooru, "safebooru", "https://safebooru.donmai.us/posts/")
+    )
+    bot.add_cog(
+        Gelbooru(
+            bot,
+            GelbooruClient,
+            "gelbooru",
+            "https://gelbooru.com/index.php?page=post&s=view&id=",
+        )
+    )

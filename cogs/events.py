@@ -31,6 +31,9 @@ class Events(commands.Cog):
                 await ctx.send(msgSet.pop())
         except:
             pass
+        
+        if re.match("^(?:great|good|nice) bot", message.content.lower()):
+            await ctx.send("Aww :flushed:, thank you~~! :kissing_heart:")
 
         # TODO check in the db if the server enabled those features
 
@@ -77,7 +80,7 @@ class Events(commands.Cog):
 
         owner = (await self.bot.application_info()).owner
         text = (f"{ctx.author} {guild}raised an error with the command ***{ctx.command}***\n"
-                + f"{type(exception)}\n{exception}"
+                + f"{type(exception)}\n{exception}\n"
                 + "```" + "".join(traceback.format_tb(exception.__traceback__)) + "```")
         await owner.send(text)
 
