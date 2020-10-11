@@ -4,35 +4,53 @@ from discord.ext import commands
 from PIL import Image, ImageFont, ImageDraw
 from io import BytesIO
 import itertools
+import json
+import random
 
 
 class Japanese(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        with open("cogs/gyaru_dict.json") as jsonFile:
+            self.gyaruDict = json.load(jsonFile)
 
-    @commands.command()
-    async def anki(self, ctx, member: discord.Member):
+    @commands.command(aliases=["あんき"])
+    async def anki(self, ctx, *members: discord.Member):
         """Remind your friends to do their Anki!"""
-        await ctx.send(f"{member.mention}, did you do your anki yet?")
+        for member in members:
+            await ctx.send(f"{member.mention}, did you do your anki yet?")
 
-    @commands.command()
+    @commands.command(aliases=["ぎゃる", "ギャル"])
+    async def gyaru(self, ctx, *, text="_ _"):
+        """まじ卍"""
+        output = ""
+        for c in text.upper():
+            #! keys than are more than an character don't work
+            output += random.choice(self.gyaruDict.get(c, c))
+
+        # for k, v in gyaruDict.items():
+        #     #! will do some nested replacement
+        #     text = text.replace(k, random.choice(v))
+
+        await ctx.send(output)
+
+    @commands.command(aliases=["はいく", "俳句"])
     async def haiku(self, ctx, *, text):
         """Send your 5-7-5 and boom a clean display of your haiku"""
         font = ImageFont.truetype("media/EPMGOBLD.TTF", 20)
 
-        text = ["　"*i*2 + string for i,
-                string in enumerate(text.split("\n"))][::-1]
+        text = ["　" * i * 2 + string for i, string in enumerate(text.split("\n"))][::-1]
         text = itertools.zip_longest(*text, fillvalue="　")
         text = "\n".join(("　".join(line) for line in text))
 
         size = ImageDraw.Draw(Image.new("RGB", (1, 1))).textsize(text, font)
-        image = Image.new('RGB', (size[0]+20, size[1]+20))
+        image = Image.new("RGB", (size[0] + 20, size[1] + 20))
         draw = ImageDraw.Draw(image)
 
         draw.text((5, 5), text, font=font, align="left")
 
         with BytesIO() as image_binary:
-            image.save(image_binary, 'PNG')
+            image.save(image_binary, "PNG")
             image_binary.seek(0)
             file = discord.File(fp=image_binary, filename="haiku.png")
 
