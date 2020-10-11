@@ -28,8 +28,9 @@ async def prefixes(bot: commands.Bot, message: discord.Message):
 
     return commands.when_mentioned_or(prefix + " ", prefix)(bot, message)
 
+prefix = os.environ["DEFAULT_COMMAND_PREFIX"]
 bot = commands.Bot(command_prefix=prefixes,
-                   activity=discord.Game(name="xd help | xd about"))
+                   activity=discord.Game(name=f"{prefix} help | {prefix} about"))
 
 
 def getExtensions():

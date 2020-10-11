@@ -10,18 +10,18 @@ class ChessCog(commands.Cog, name="Games"):
         self.bot = bot
         self.playingUsers = set()
         self.symbolToEmoji = {
-            "b": "<:BB:717894296396890154>",
-            "k": "<:BK:717894296459542587>",
-            "n": "<:BN:717894296329781250>",
-            "p": "<:BP:717894296572788787>",
-            "q": "<:BQ:717894296409473047>",
-            "r": "<:BR:717894296870584320>",
-            "B": "<:WB:717894297109659748>",
-            "K": "<:WK:717894296673452041>",
-            "N": "<:WN:717894296698617877>",
-            "P": "<:WP:717894296992219176>",
-            "Q": "<:WQ:717894296967315517>",
-            "R": "<:WR:717894296807931984>"
+            "b": "<:BB:764573853136715827>",
+            "k": "<:BK:764573853132259349>",
+            "n": "<:BN:764573853132390400>",
+            "q": "<:BQ:764573853225451590>",
+            "p": "<:BP:764573853119807489>",
+            "r": "<:BR:764573853208018964>",
+            "B": "<:WB:764573853157949440>",
+            "K": "<:WK:764573853233709116>",
+            "N": "<:WN:764573853275127840>",
+            "P": "<:WP:764573853225582602>",
+            "Q": "<:WQ:764573853313400832>",
+            "R": "<:WR:764573853259005952>",
         }
 
     @commands.command()
@@ -36,8 +36,10 @@ class ChessCog(commands.Cog, name="Games"):
             return
         self.playingUsers.update((ctx.author, adversary))
 
-        await ctx.send("""CHESS!!\nThe invited person plays first, a valid has the form "e2e4" where e2 is the piece initial coordinate and e4 is the destination
-If you don't know how to play chess, go check out the wiki page https://en.wikipedia.org/wiki/Chess""")
+        await ctx.send(
+            """CHESS!!\nThe invited person plays first, a valid has the form "e2e4" where e2 is the piece initial coordinate and e4 is the destination
+If you don't know how to play chess, go check out the wiki page <https://en.wikipedia.org/wiki/Chess>"""
+        )
 
         turn = 0
         board = chess.Board()
@@ -45,18 +47,14 @@ If you don't know how to play chess, go check out the wiki page https://en.wikip
 
         def checkresponse(m):
             if turn == 1:
-                return (m.author == ctx.author
-                        and m.channel == ctx.channel)
-            return (m.author == adversary
-                    and m.channel == ctx.channel)
+                return m.author == ctx.author and m.channel == ctx.channel
+            return m.author == adversary and m.channel == ctx.channel
 
         # MAIN LOOP
         while 1:  # NOT CHECKMATE
             try:
                 m = await self.bot.wait_for(
-                    "message",
-                    timeout=60.0,
-                    check=checkresponse
+                    "message", timeout=60.0, check=checkresponse
                 )
             except asyncio.TimeoutError:
                 await ctx.send("Stopping chess, timeout expired")
@@ -79,7 +77,9 @@ If you don't know how to play chess, go check out the wiki page https://en.wikip
 
             await boardMsg.delete()
             player = (ctx.author, adversary)[turn]
-            boardMsg = await ctx.send(self.discordBoard(board) + f"\nit's {player.name}'s turn!\n{boardState}")
+            boardMsg = await ctx.send(
+                self.discordBoard(board) + f"\nit's {player.name}'s turn!\n{boardState}"
+            )
 
             if board.is_checkmate():
                 await ctx.send("CHECKMATE!")
@@ -99,24 +99,36 @@ If you don't know how to play chess, go check out the wiki page https://en.wikip
         for y in range(8):
             builder.append([])
             for x in range(8):
-                piece = board.piece_at(8*y+x)
+                piece = board.piece_at(8 * y + x)
 
                 if piece:
                     builder[y].append(self.symbolToEmoji[piece.symbol()])
                 else:
-                    builder[y].append(("⬛", "⬜")[(x+y) % 2])
+                    builder[y].append(("⬛", "⬜")[(x + y) % 2])
 
-        number = (":one:", ":two:", ":three:", ":four:",
-                  ":five:", ":six:", ":seven:", ":eight:")
-        header = ("⬛:regional_indicator_a:"
-                  + ":regional_indicator_b:"
-                  + ":regional_indicator_c:"
-                  + ":regional_indicator_d:"
-                  + ":regional_indicator_e:"
-                  + ":regional_indicator_f:"
-                  + ":regional_indicator_g:"
-                  + ":regional_indicator_h:\n")
-        return header + "\n".join(number[i]+"".join(row) for i, row in enumerate(builder))
+        number = (
+            ":one:",
+            ":two:",
+            ":three:",
+            ":four:",
+            ":five:",
+            ":six:",
+            ":seven:",
+            ":eight:",
+        )
+        header = (
+            "⬛:regional_indicator_a:"
+            + ":regional_indicator_b:"
+            + ":regional_indicator_c:"
+            + ":regional_indicator_d:"
+            + ":regional_indicator_e:"
+            + ":regional_indicator_f:"
+            + ":regional_indicator_g:"
+            + ":regional_indicator_h:\n"
+        )
+        return header + "\n".join(
+            number[i] + "".join(row) for i, row in enumerate(builder)
+        )
 
 
 def setup(bot: commands.Bot):

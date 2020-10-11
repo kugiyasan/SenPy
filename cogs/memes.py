@@ -3,10 +3,12 @@ from discord.ext import commands
 
 from lxml import html
 from PIL import Image, ImageDraw
-import math
+from math import sin, cos, pi
 import io
 import os
+import random
 import requests
+import typing
 
 
 class Memes(commands.Cog):
@@ -85,55 +87,75 @@ class Memes(commands.Cog):
                 f"What? Your cat is already {age}? That means... they are now {25+(age-2)*4}, in human years! Make haste, before death does you part! I know these beings are... disposable, but that is not a good reason to leave them decay, untouched by your love."
             )
 
-    def petpetFrames(
-        self,
-        petImg,
-        x=50,
-        y=75,
-        width=200,
-        height=200,
-        squish_x_amp=10,
-        squish_y_amp=10,
-    ):
+    def petpetFrames(self, petImg):
+        x = 50
+        y = 75
+        width = 200
+        height = 200
+        # squish_x_amp = 10
+        squish_y_amp = 10
+        shake_x_amp = 4
+        shake_y_amp = 4
+
         CYCLE = 6
         frames = []
+
         for i in range(CYCLE):
             frame = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
 
-            squish_x = int(squish_x_amp * math.sin(2 * math.pi / CYCLE * i))
-            squish_y = int(squish_y_amp * math.cos(2 * math.pi / CYCLE * i))
+            squish_y = int(squish_y_amp * cos(2 * pi / CYCLE * i))
+            squish_x = width * height // (squish_y + height) - width
+
+            shake_x = int(shake_x_amp * sin(2 * pi / CYCLE * i))
+            shake_y = int(shake_y_amp * -cos(2 * pi / CYCLE * i))
+
+            petCoords = (x - squish_x // 2 + shake_x, y - squish_y + shake_y)
 
             frame.paste(
-                petImg.resize((width + squish_x, height + squish_y)),
-                (x - squish_x // 2, y - squish_y),
+                petImg.resize((squish_x + width, squish_y + height)),
+                petCoords,
             )
             hand = self.hand_frames[6 * i // CYCLE]
-            frame.paste(hand, mask=hand)
+            frame.paste(hand, (shake_x, shake_y), hand)
             frames.append(frame)
 
         return frames
 
     @commands.command(aliases=["pet", "headpat", "pat"])
-    async def petpet(self, ctx, user: discord.User = None, **params):
+    async def petpet(
+        self,
+        ctx,
+        userOrLink: typing.Union[discord.Member, discord.User, str] = None,
+        speed_ms: int = None,
+    ):
         """Headpat people or images that needs to be protected!"""
         PATH = f"media/pet_{ctx.author.name}.gif"
-        if not user:
+        if not userOrLink:
             if not ctx.message.attachments:
                 await ctx.send("Please attach an image or tag a person!")
                 return
 
             image = await ctx.message.attachments[0].read()
-        else:
-            image = await user.avatar_url_as(format="png", size=256).read()
+        elif isinstance(userOrLink, (discord.Member, discord.User)):
+            image = await userOrLink.avatar_url_as(format="png", size=256).read()
+        else:  # isinstance(userOrLink, str):
+            try:
+                image = requests.get(userOrLink).content
+            except requests.exceptions.MissingSchema as err:
+                await ctx.send(err)
+                return
 
-        images = self.petpetFrames(Image.open(io.BytesIO(image)), **params)
+        images = self.petpetFrames(Image.open(io.BytesIO(image)))
+
+        if speed_ms is None:
+            speed_ms = random.choice((20, 30, 60))
 
         images[0].save(
             fp=PATH,
             format="GIF",
             save_all=True,
             append_images=images[1:],
-            duration=1000 / 30,
+            duration=speed_ms,
             transparency=0,
             loop=0,
             optimize=True,
@@ -143,7 +165,6 @@ class Memes(commands.Cog):
         embed = discord.Embed(title="MUST PROTECC", color=discord.Color.gold())
         embed.set_image(url="attachment://petpet.gif")
         await ctx.send(file=file, embed=embed)
-
         os.remove(PATH)
 
 
