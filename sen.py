@@ -36,6 +36,8 @@ bot = commands.Bot(command_prefix=prefixes,
 def getExtensions():
     for path in ("cogs", "cogs/Games"):
         for f in os.listdir(path):
+            if f[-2:] != "py":
+                continue
             pathname = os.path.join(path, f)
             if os.path.isfile(pathname):
                 yield pathname[:-3].replace("/", ".").replace("\\", ".")

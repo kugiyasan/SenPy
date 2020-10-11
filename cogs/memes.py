@@ -129,7 +129,7 @@ class Memes(commands.Cog):
         speed_ms: int = None,
     ):
         """Headpat people or images that needs to be protected!"""
-        PATH = f"media/pet_{ctx.author.name}.gif"
+        PATH = f"media/pet_{ctx.message.id}.gif"
         if not userOrLink:
             if not ctx.message.attachments:
                 await ctx.send("Please attach an image or tag a person!")
