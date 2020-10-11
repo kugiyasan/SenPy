@@ -1,11 +1,8 @@
-deeppyer
 discord.py
 python-dotenv
 fake_useragent
-html5lib
 lxml
 nekos.py
-opencv-python-headless
 Pillow
 psycopg2
 pybooru
