@@ -133,7 +133,7 @@ class Memes(commands.Cog):
         userOrLink: typing.Union[discord.Member, discord.User, str] = None,
         speed_ms: int = None,
     ):
-        """Headpat people or images that needs to be protected!"""
+        """Headpat people or images that need to be protected! """
         if not userOrLink:
             if not ctx.message.attachments:
                 await ctx.send("Please attach an image or tag a person!")
