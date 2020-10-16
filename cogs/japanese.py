@@ -5,6 +5,7 @@ from PIL import Image, ImageFont, ImageDraw
 from io import BytesIO
 import itertools
 import json
+from pathlib import Path
 import random
 import re
 
@@ -12,7 +13,7 @@ import re
 class Japanese(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        with open("cogs/gyaru_dict.json") as jsonFile:
+        with open(Path(__file__).parent / "gyaru_dict.json") as jsonFile:
             gyaruDict = json.load(jsonFile)
 
         self.multipleCharacterDict = gyaruDict["multiple_characters"]

@@ -5,6 +5,7 @@ from lxml import html
 from PIL import Image
 from math import sin, cos, pi
 import io
+from pathlib import Path
 import random
 import requests
 import typing
@@ -13,7 +14,12 @@ import typing
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.hand_frames = [Image.open(f"media/hand/frame{i+1}.png") for i in range(6)]
+        self.hand_frames = [
+            Image.open(
+                Path(__file__).parent.parent / "media" / "hand" / f"frame{i+1}.png"
+            )
+            for i in range(6)
+        ]
 
     @commands.command()
     async def insult(self, ctx, *, member: discord.Member = None):
