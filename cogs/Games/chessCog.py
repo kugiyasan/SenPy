@@ -37,8 +37,11 @@ class ChessCog(commands.Cog, name="Games"):
         self.playingUsers.update((ctx.author, adversary))
 
         await ctx.send(
-            """CHESS!!\nThe invited person plays first, a valid has the form "e2e4" where e2 is the piece initial coordinate and e4 is the destination
-If you don't know how to play chess, go check out the wiki page <https://en.wikipedia.org/wiki/Chess>"""
+            "CHESS!!\n"
+            + 'The invited person plays first, a valid move is in the form "e2e4" '
+            + "where e2 is the piece initial coordinate and e4 is the destination\n"
+            + "If you don't know how to play chess, "
+            + "go check out the wiki page <https://en.wikipedia.org/wiki/Chess>"
         )
 
         turn = 0

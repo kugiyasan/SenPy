@@ -14,7 +14,10 @@ class RussianRoulette(commands.Cog, name="Games"):
         """Remake of KiryaBRO#2750's russian roulette command"""
         """Haha guns goes pew pew"""
         await ctx.send("https://tenor.com/view/gun-pistol-revolver-gif-9832859")
-        await ctx.send(f"Russian Roulette game!! Take the gun, spin the barrel, shoot and hope to survive!")
+        await ctx.send(
+            "Russian Roulette game!! "
+            + "Take the gun, spin the barrel, shoot and hope to survive!"
+        )
 
         players = list(adversaries)
         if len(players) == 0:
@@ -25,8 +28,7 @@ class RussianRoulette(commands.Cog, name="Games"):
         turn = 0
 
         def checkresponse(m):
-            return (m.channel == ctx.channel
-                    and m.author == players[turn])
+            return m.channel == ctx.channel and m.author == players[turn]
 
         # MAIN LOOP
         while True:
@@ -34,12 +36,13 @@ class RussianRoulette(commands.Cog, name="Games"):
             if players[turn] != self.bot.user:
                 try:
                     m = await self.bot.wait_for(
-                        "message",
-                        timeout=30.0,
-                        check=checkresponse
+                        "message", timeout=30.0, check=checkresponse
                     )
                 except asyncio.TimeoutError:
-                    await ctx.send(f"Stopping russian roulette, timeout expired\n{players[turn].mention} loses!")
+                    await ctx.send(
+                        "Stopping russian roulette, timeout expired\n"
+                        + f"{players[turn].mention} loses!"
+                    )
                     return
 
                 if m.content.lower() in ("stop", "exit", "quit", "q"):
@@ -53,10 +56,14 @@ class RussianRoulette(commands.Cog, name="Games"):
             await asyncio.sleep(1)
 
             if random.randint(0, 5):
-                await ctx.send(f"{players[turn].mention}, click... you are lucky, my friend...")
+                await ctx.send(
+                    f"{players[turn].mention}, click... you are lucky, my friend..."
+                )
                 turn = (turn + 1) % NUMBER_OF_PLAYERS
             else:
-                await ctx.send(f"***POW!!!!*** {players[turn].mention} got shot and died.")
+                await ctx.send(
+                    f"***POW!!!!*** {players[turn].mention} got shot and died."
+                )
                 return
 
 
