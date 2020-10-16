@@ -48,7 +48,7 @@ class BooruCog(commands.Cog, name="Booru"):
             print(f"No post with {tags}")
             return
 
-        if self.urlsTags.get(tags, None) == None:
+        if self.urlsTags.get(tags, None) is None:
             self.urlsTags[tags] = []
 
         keys = ("id", "created_at", "score", "rating", "file_url")
@@ -68,8 +68,8 @@ class BooruCog(commands.Cog, name="Booru"):
                     miniPost["file_url"] = post["preview_url"]
 
                 self.urlsTags[tags].append(miniPost)
-            except:
-                pass
+            except Exception as err:
+                print(err)
 
         random.shuffle(self.urlsTags[tags])
         print(f"{len(self.urlsTags[tags])} urls for {tags}")
@@ -78,7 +78,7 @@ class BooruCog(commands.Cog, name="Booru"):
         post_url = self.post_url + str(post["id"])
         print(post_url)
         # print(post["file_url"])
-        embed = discord.Embed(color=discord.Colour.gold(), title=f"sauce", url=post_url)
+        embed = discord.Embed(color=discord.Colour.gold(), title="sauce", url=post_url)
 
         embed.set_image(url=post["file_url"])
         embed.set_author(name=post["author"])
@@ -220,7 +220,7 @@ class Konachan(BooruCog, name="Booru"):
 
 class Safebooru(BooruCog, name="Booru"):
     @commands.is_nsfw()
-    @commands.command(aliases=["safe"])
+    @commands.command(aliases=["safe", "sb"])
     async def safebooru(self, ctx, *, tags="rating:s"):
         """Wow searching on safebooru that's so original"""
         await self.booru(ctx, tags=tags)
@@ -240,7 +240,7 @@ class GelbooruClient:
 
 class Gelbooru(BooruCog, name="Booru"):
     @commands.is_nsfw()
-    @commands.command(aliases=["gel"])
+    @commands.command(aliases=["gel", "gb"])
     async def gelbooru(self, ctx, *, tags="rating:s"):
         """Wow searching on gelbooru that's so original"""
         await self.booru(ctx, tags=tags)

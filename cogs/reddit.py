@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands, tasks
 
-from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 from cogs.mofupoints import incrementEmbedCounter
 
@@ -90,7 +89,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
 
         try:
             m = await self.bot.wait_for("message", timeout=60.0, check=checkresponse)
-        except:
+        except Exception:
             return
 
         await self.sendRedditImage(ctx, suggestions[int(m.content)-1])
@@ -123,7 +122,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
         if post["over_18"]:
             try:
                 nsfwChannel = ctx.channel.is_nsfw()
-            except:
+            except Exception:
                 nsfwChannel = ctx.is_nsfw()
 
             if not nsfwChannel:

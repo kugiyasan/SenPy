@@ -1,4 +1,3 @@
-import discord
 from discord.ext import commands
 
 import nekos
@@ -27,7 +26,9 @@ class Neko(commands.Cog):
         await ctx.send(nekos.fact())
 
     @commands.command()
-    async def owo(self, ctx: commands.Context, *, text: str = "give me a text to owoify!"):
+    async def owo(
+        self, ctx: commands.Context, *, text: str = "give me a text to owoify!"
+    ):
         """yay cute wwitinyg >w<"""
         await deleteMessage(ctx)
         await ctx.send(nekos.owoify(text))

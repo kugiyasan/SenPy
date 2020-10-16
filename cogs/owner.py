@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-import asyncio
-
 from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 from cogs.utils.dbms import conn, cursor
@@ -13,6 +11,21 @@ class Owner(commands.Cog):
         self.bot = bot
 
     @commands.is_owner()
+    @commands.command(name="eval", hidden=True)
+    async def _eval(self, context, *, code):
+        global bot, ctx
+        bot = self.bot
+        ctx = context
+
+        code = f"async def __ex():\n  global bot, ctx\n  await ctx.send({code})"
+
+        print(code)
+        exec(code)
+
+        await locals()["__ex"]()
+        await context.message.add_reaction("✅")
+
+    @commands.is_owner()
     @commands.command(name="exec", hidden=True)
     async def _exec(self, context, *, code):
         """execute code sent from discord CAN BREAK THE BOT"""
@@ -21,8 +34,9 @@ class Owner(commands.Cog):
         ctx = context
 
         code = code.strip("`")
-        code = "async def __ex():\n  global bot, ctx\n  " + \
-            "\n  ".join(code.split("\n"))
+        code = "async def __ex():\n  global bot, ctx\n  " + "\n  ".join(
+            code.split("\n")
+        )
 
         print(code)
         exec(code)
@@ -51,8 +65,7 @@ class Owner(commands.Cog):
     @commands.command(hidden=True)
     async def servers(self, ctx):
         title = f"Running on {len(self.bot.guilds)} servers"
-        guilds = [
-            f"{g.name} member_count: {g.member_count}" for g in self.bot.guilds]
+        guilds = [f"{g.name} member_count: {g.member_count}" for g in self.bot.guilds]
 
         await prettyList(ctx, title, guilds, maxLength=0)
 
@@ -61,7 +74,10 @@ class Owner(commands.Cog):
     async def thonk(self, ctx):
         """thonk emoji"""
         await deleteMessage(ctx)
-        await ctx.send("<:thinking1:710563810582200350><:thinking2:710563810804498452>\n<:thinking3:710563823819554816><:thinking4:710563824079732756>")
+        await ctx.send(
+            "<:thinking1:710563810582200350><:thinking2:710563810804498452>\n"
+            + "<:thinking3:710563823819554816><:thinking4:710563824079732756>"
+        )
 
 
 def setup(bot: commands.Bot):

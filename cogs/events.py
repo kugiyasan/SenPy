@@ -3,7 +3,6 @@ from discord.ext import commands
 
 import asyncio
 from datetime import datetime
-import random
 import re
 import traceback
 
@@ -30,7 +29,7 @@ class Events(commands.Cog):
 
             if len(msgSet) == 1 and len(authors) == 3:
                 await ctx.send(msgSet.pop())
-        except:
+        except discord.Forbidden:
             pass
 
         if re.match("^(?:great|good|nice) bot", message.content.lower()):
@@ -81,7 +80,7 @@ class Events(commands.Cog):
         traceback.print_exception(type(exception), exception, exception.__traceback__)
 
         await ctx.send(
-            "There was an unexpected error, I'll inform the bot dev, sorry for the incovenience"
+            "There was an unexpected error, I'll inform the bot dev, sorry~~"
         )
 
         guild = ""
@@ -90,7 +89,7 @@ class Events(commands.Cog):
 
         owner = (await self.bot.application_info()).owner
         text = (
-            f"{ctx.author} {guild}raised an error with the command ***{ctx.command}***\n"
+            f"{ctx.author} {guild}raised an error with ***{ctx.command}***\n"
             + f"{type(exception)}\n{exception}\n"
             + "```"
             + "".join(traceback.format_tb(exception.__traceback__))
@@ -109,9 +108,11 @@ class Events(commands.Cog):
         channel = await self.getGeneralchannel(member.guild)
         if channel:
             timeInTheGuild = datetime.utcnow() - member.joined_at
-            await channel.send(
-                f"See you later alligator {member.mention}.\nYou stayed in this server for {str(timeInTheGuild)[:-3]}!"
+            text = (
+                f"See you later alligator {member.mention}.\n"
+                + f"You stayed in this server for {str(timeInTheGuild)[:-3]}!"
             )
+            await channel.send(text)
 
     @commands.Cog.listener()
     async def on_guild_emojis_update(self, guild: discord.Guild, before, after):

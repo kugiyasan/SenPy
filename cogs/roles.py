@@ -24,7 +24,9 @@ class Roles(commands.Cog):
         await self.roleEmbed(ctx, RoleActions.ADD)
 
     @commands.guild_only()
-    @commands.command(aliases=["delRole", "deleteRole", "deleterole", "removeRole", "removerole"])
+    @commands.command(
+        aliases=["delRole", "deleteRole", "deleterole", "removeRole", "removerole"]
+    )
     async def delrole(self, ctx: commands.Context):
         """Remove roles from yourself"""
         await self.roleEmbed(ctx, RoleActions.DEL)
@@ -36,8 +38,10 @@ class Roles(commands.Cog):
         ch = ctx.channel
         permissions = ch.permissions_for(ctx.author)
 
-        if permissions.manage_roles == False:
-            await ctx.send("Give me the manage_roles permissions if you want me to give roles!")
+        if not permissions.manage_roles:
+            await ctx.send(
+                "Give me the manage_roles permissions if you want me to give roles!"
+            )
             return
 
         await self.roleEmbed(ctx, RoleActions.MANAGEADD)
@@ -49,22 +53,22 @@ class Roles(commands.Cog):
         await self.roleEmbed(ctx, RoleActions.MANAGEDEL)
 
     async def renderEmbed(self, ctx, roles, page):
-        title = "React to the number associated with the role you want to interact with!"
+        title = (
+            "React to the number associated with the role you want to interact with!"
+        )
 
         description = []
         for n in range(1, 10):
             role = None
-            if 9*page+n-1 < len(roles):
-                role = roles[9*page+n-1]
+            if 9 * page + n - 1 < len(roles):
+                role = roles[9 * page + n - 1]
 
             description.append(f"{n}\ufe0f\u20e3: {role}")
 
         description = "\n".join(description)
 
         embed = discord.Embed(
-            title=title,
-            description=description,
-            colour=discord.Colour.gold()
+            title=title, description=description, colour=discord.Colour.gold()
         )
         embed.set_footer(text=f"Page {page+1}")
 
@@ -73,28 +77,29 @@ class Roles(commands.Cog):
     async def initEmbed(self, ctx, roleAction, page):
         with conn:
             cursor.execute(
-                "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
+                "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,)
+            )
             try:
                 roles = cursor.fetchone()[0]
-            except:
+            except Exception:
                 roles = []
 
         if roleAction == RoleActions.ADD:
-            roles = set(roles).difference(
-                role.id for role in ctx.author.roles)
+            roles = set(roles).difference(role.id for role in ctx.author.roles)
         elif roleAction == RoleActions.DEL:
-            roles = set(roles).intersection(
-                role.id for role in ctx.author.roles)
+            roles = set(roles).intersection(role.id for role in ctx.author.roles)
         elif roleAction == RoleActions.MANAGEADD:
-            roles = set(role.id for role in ctx.guild.roles if not role.managed and not role.is_default(
-            )).difference(roles)
+            roles = set(
+                role.id
+                for role in ctx.guild.roles
+                if not role.managed and not role.is_default()
+            ).difference(roles)
 
         roles = [ctx.guild.get_role(role) for role in roles]
 
         if not len(roles):
             await ctx.send("There isn't an available role! Exiting...")
             return
-
 
         message = await ctx.send(embed=await self.renderEmbed(ctx, roles, page))
         await message.add_reaction("◀")
@@ -111,8 +116,7 @@ class Roles(commands.Cog):
         emoji = ""
 
         def check(reaction, member):
-            return (ctx.author == member
-                    and reaction.message.id == message.id)
+            return ctx.author == member and reaction.message.id == message.id
 
         while True:
             if emoji == "◀":
@@ -122,10 +126,12 @@ class Roles(commands.Cog):
             elif emoji.endswith("\ufe0f\u20e3"):
                 # if a emoji with a number is pressed
                 if emoji[0] != "0":
-                    await self.numberEmojiSelected(ctx, message, emoji, page, roles, roleAction)
+                    await self.numberEmojiSelected(
+                        ctx, message, emoji, page, roles, roleAction
+                    )
                     return
 
-            page %= (len(roles)-1) // 9 + 1
+            page %= (len(roles) - 1) // 9 + 1
             await message.edit(embed=await self.renderEmbed(ctx, roles, page))
 
             try:
@@ -138,7 +144,7 @@ class Roles(commands.Cog):
             await message.remove_reaction(res[0].emoji, res[1])
 
     async def numberEmojiSelected(self, ctx, message, emoji, page, roles, roleAction):
-        roleNumber = 9*page-1+int(emoji[0])
+        roleNumber = 9 * page - 1 + int(emoji[0])
         if roleNumber >= len(roles):
             await ctx.send("You chose None! Exiting...")
             await message.clear_reactions()
@@ -158,22 +164,29 @@ class Roles(commands.Cog):
                     """INSERT INTO guilds (id, rolesToGive)
                         VALUES (%s, Array [%s])
                         ON CONFLICT(id)
-                        DO UPDATE SET rolesToGive=guilds.rolesToGive||%s""", (ctx.guild.id, role.id, role.id))
+                        DO UPDATE SET rolesToGive=guilds.rolesToGive||%s""",
+                    (ctx.guild.id, role.id, role.id),
+                )
 
             await ctx.send(f"{role.name} is now available for the users!")
         elif roleAction == RoleActions.MANAGEDEL:
             with conn:
                 cursor.execute(
-                    "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,))
+                    "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,)
+                )
                 newRoles = cursor.fetchone()[0]
                 newRoles.remove(role.id)
 
                 if not len(newRoles):
                     cursor.execute(
-                        "UPDATE guilds SET rolesToGive=ARRAY[]::BIGINT[] WHERE id=%s", (ctx.guild.id,))
+                        "UPDATE guilds SET rolesToGive=ARRAY[]::BIGINT[] WHERE id=%s",
+                        (ctx.guild.id,),
+                    )
                 else:
                     cursor.execute(
-                        "UPDATE guilds SET rolesToGive=%s WHERE id=%s", (newRoles, ctx.guild.id))
+                        "UPDATE guilds SET rolesToGive=%s WHERE id=%s",
+                        (newRoles, ctx.guild.id),
+                    )
 
             await ctx.send(f"{role.name} is now unavailable for the users!")
 
