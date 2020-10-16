@@ -5,6 +5,7 @@ import discord
 from discord.ext import commands
 
 import os
+from pathlib import Path
 from dotenv import load_dotenv
 
 from cogs.utils.dbms import conn, cursor
@@ -38,13 +39,14 @@ bot = commands.Bot(
 
 
 def getExtensions():
+    here = Path(__file__).parent
     for path in ("cogs", "cogs/Games"):
-        for f in os.listdir(path):
+        for f in os.listdir(here / path):
             if f[-2:] != "py":
                 continue
-            pathname = os.path.join(path, f)
-            if os.path.isfile(pathname):
-                yield pathname[:-3].replace("/", ".").replace("\\", ".")
+            pathname = here / path / f
+            if pathname.is_file():
+                yield str(pathname.relative_to(here))[:-3].replace("/", ".").replace("\\", ".")
 
 
 @bot.event
@@ -79,6 +81,7 @@ async def logout(ctx: commands.Context):
 
 if __name__ == "__main__":
     for ext in getExtensions():
+        print(ext)
         bot.load_extension(ext)
 
     bot.run(os.environ["DISCORD_TOKEN"])
