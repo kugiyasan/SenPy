@@ -41,12 +41,12 @@ bot = commands.Bot(
 def getExtensions():
     here = Path(__file__).parent
     for path in ("cogs", "cogs/Games"):
-        for f in os.listdir(here / path):
-            if f[-2:] != "py":
-                continue
-            pathname = here / path / f
-            if pathname.is_file():
-                yield str(pathname.relative_to(here))[:-3].replace("/", ".").replace("\\", ".")
+        for f in (here / path).iterdir():
+            if f.is_file():
+                pathname = str(f.relative_to(here))
+                if pathname[-3:] != ".py":
+                    continue
+                yield pathname[:-3].replace("/", ".").replace("\\", ".")
 
 
 @bot.event
@@ -64,7 +64,7 @@ async def reload(ctx: commands.Context):
                 bot.reload_extension(ext)
             except commands.errors.ExtensionNotLoaded:
                 bot.load_extension(ext)
-    except Exception:
+    except commands.ExtensionFailed:
         await ctx.send("Reloading failed")
         raise
 
@@ -81,7 +81,6 @@ async def logout(ctx: commands.Context):
 
 if __name__ == "__main__":
     for ext in getExtensions():
-        print(ext)
         bot.load_extension(ext)
 
     bot.run(os.environ["DISCORD_TOKEN"])
