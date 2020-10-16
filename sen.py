@@ -7,7 +7,6 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 
-from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.dbms import conn, cursor
 
 load_dotenv()
@@ -15,22 +14,27 @@ load_dotenv()
 
 async def prefixes(bot: commands.Bot, message: discord.Message):
     prefix = os.environ["DEFAULT_COMMAND_PREFIX"]
-    if message.guild != None:
+    if message.guild is not None:
         try:
             with conn:
                 cursor.execute(
-                    "SELECT command_prefix FROM guilds WHERE id = %s", (message.guild.id,))
+                    "SELECT command_prefix FROM guilds WHERE id = %s",
+                    (message.guild.id,),
+                )
                 temp = cursor.fetchone()
                 if temp and temp[0]:
                     prefix = temp[0]
-        except:
+        except Exception:
             print("Wasn't able to communicate with the database")
 
     return commands.when_mentioned_or(prefix + " ", prefix)(bot, message)
 
+
 prefix = os.environ["DEFAULT_COMMAND_PREFIX"]
-bot = commands.Bot(command_prefix=prefixes,
-                   activity=discord.Game(name=f"{prefix} help | {prefix} about"))
+bot = commands.Bot(
+    command_prefix=prefixes,
+    activity=discord.Game(name=f"{prefix} help | {prefix} about"),
+)
 
 
 def getExtensions():
@@ -58,7 +62,7 @@ async def reload(ctx: commands.Context):
                 bot.reload_extension(ext)
             except commands.errors.ExtensionNotLoaded:
                 bot.load_extension(ext)
-    except:
+    except Exception:
         await ctx.send("Reloading failed")
         raise
 

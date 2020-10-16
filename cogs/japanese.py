@@ -6,13 +6,17 @@ from io import BytesIO
 import itertools
 import json
 import random
+import re
 
 
 class Japanese(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         with open("cogs/gyaru_dict.json") as jsonFile:
-            self.gyaruDict = json.load(jsonFile)
+            gyaruDict = json.load(jsonFile)
+
+        self.multipleCharacterDict = gyaruDict["multiple_characters"]
+        self.singleCharacterDict = gyaruDict["single_character"]
 
     @commands.command(aliases=["あんき"])
     async def anki(self, ctx, *members: discord.Member):
@@ -23,14 +27,21 @@ class Japanese(commands.Cog):
     @commands.command(aliases=["ぎゃる", "ギャル"])
     async def gyaru(self, ctx, *, text="_ _"):
         """まじ卍"""
-        output = ""
-        for c in text.upper():
-            #! keys than are more than an character don't work
-            output += random.choice(self.gyaruDict.get(c, c))
+        # replace with multipleCharacterDict and note the changes in a bool list
+        changes = [False] * len(text)
+        for k, v in self.multipleCharacterDict.items():
+            for m in re.finditer(k, text):
+                changes[m.start():m.end()] = [True] * len(k)
+            text = text.replace(k, random.choice(v))
 
-        # for k, v in gyaruDict.items():
-        #     #! will do some nested replacement
-        #     text = text.replace(k, random.choice(v))
+        # replace with singleCharacterDict
+        # if it isn't already changed by multipleCharacterDict
+        output = ""
+        for i, c in enumerate(text.upper()):
+            if changes[i]:
+                output += c
+            else:
+                output += random.choice(self.singleCharacterDict.get(c, c))
 
         await ctx.send(output)
 

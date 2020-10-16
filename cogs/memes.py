@@ -2,10 +2,9 @@ import discord
 from discord.ext import commands
 
 from lxml import html
-from PIL import Image, ImageDraw
+from PIL import Image
 from math import sin, cos, pi
 import io
-import os
 import random
 import requests
 import typing
@@ -18,7 +17,7 @@ class Memes(commands.Cog):
 
     @commands.command()
     async def insult(self, ctx, *, member: discord.Member = None):
-        """random compliment from the web (robietherobot.com/insult-generator.htm)"""
+        """get an free insult from robietherobot.com/insult-generator.htm"""
         url = "http://www.robietherobot.com/insult-generator.htm"
         webpage = requests.get(url)
         if webpage.status_code == 200:
@@ -64,7 +63,7 @@ class Memes(commands.Cog):
             age = int(age)
             if age < 1:
                 raise ValueError
-        except:
+        except ValueError:
             await ctx.send(
                 "As far as I can tell, it is impossible to have a relationship with a being that does not exist (yet). However, a legend says some mythical man once succeded in this seemingly unachievable feat, through his infinite love for a certain heterochromatic nekomimi..."
             )
@@ -129,7 +128,6 @@ class Memes(commands.Cog):
         speed_ms: int = None,
     ):
         """Headpat people or images that needs to be protected!"""
-        PATH = f"media/pet_{ctx.message.id}.gif"
         if not userOrLink:
             if not ctx.message.attachments:
                 await ctx.send("Please attach an image or tag a person!")
@@ -150,22 +148,24 @@ class Memes(commands.Cog):
         if speed_ms is None:
             speed_ms = random.choice((20, 30, 60))
 
-        images[0].save(
-            fp=PATH,
-            format="GIF",
-            save_all=True,
-            append_images=images[1:],
-            duration=speed_ms,
-            transparency=0,
-            loop=0,
-            optimize=True,
-        )
+        with io.BytesIO() as image_binary:
+            images[0].save(
+                image_binary,
+                format="GIF",
+                save_all=True,
+                append_images=images[1:],
+                duration=speed_ms,
+                transparency=0,
+                loop=0,
+                optimize=True,
+            )
+            image_binary.seek(0)
+            gifFile = discord.File(fp=image_binary, filename="petpet.gif")
 
-        file = discord.File(PATH, filename="petpet.gif")
         embed = discord.Embed(title="MUST PROTECC", color=discord.Color.gold())
+
         embed.set_image(url="attachment://petpet.gif")
-        await ctx.send(file=file, embed=embed)
-        os.remove(PATH)
+        await ctx.send(file=gifFile, embed=embed)
 
 
 def setup(bot: commands.Bot):
