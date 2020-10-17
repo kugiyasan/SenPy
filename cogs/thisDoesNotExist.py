@@ -62,7 +62,7 @@ class AIGeneratedImg(commands.Cog):
             description=f"seed: {seed}",
         )
 
-        await incrementEmbedCounter(ctx.author)
+        incrementEmbedCounter(ctx.author)
 
 
 def setup(bot: commands.Bot):

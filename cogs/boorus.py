@@ -28,15 +28,15 @@ class BooruCog(commands.Cog, name="Booru"):
                 return
 
         post = self.urlsTags[tags].pop()
-        if (
-            post["rating"] != "s"
-            and not isinstance(ctx.channel, discord.DMChannel)
-            and not ctx.channel.is_nsfw()
+        if not (
+            post["rating"] in ("s", "safe")
+            or isinstance(ctx.channel, discord.DMChannel)
+            or ctx.channel.is_nsfw()
         ):
             raise commands.errors.NSFWChannelRequired(ctx.channel)
 
         await ctx.send(embed=self.booruEmbed(post))
-        await incrementEmbedCounter(ctx.author)
+        incrementEmbedCounter(ctx.author)
 
     async def requestBooru(self, tags):
         print("requesting " + self.site_name)
@@ -51,10 +51,21 @@ class BooruCog(commands.Cog, name="Booru"):
         if self.urlsTags.get(tags, None) is None:
             self.urlsTags[tags] = []
 
+        self.fillUrlsDict(tags, posts)
+
+        random.shuffle(self.urlsTags[tags])
+        print(f"{len(self.urlsTags[tags])} urls for {tags}")
+
+    def fillUrlsDict(self, tags, posts):
         keys = ("id", "created_at", "score", "rating", "file_url")
         for post in posts:
             try:
-                miniPost = {k: post[k] for k in keys}
+                miniPost = {k: post.get(k, None) for k in keys}
+                if miniPost["file_url"] is None:
+                    miniPost["file_url"] = (
+                        f"https://furry.booru.org//images/{post['directory']}/"
+                        + post["image"]
+                    )
                 miniPost["file_url"] = miniPost["file_url"].replace(" ", "%20")
 
                 if isinstance(self.client, Danbooru):
@@ -71,13 +82,10 @@ class BooruCog(commands.Cog, name="Booru"):
             except Exception as err:
                 print(err)
 
-        random.shuffle(self.urlsTags[tags])
-        print(f"{len(self.urlsTags[tags])} urls for {tags}")
-
     def booruEmbed(self, post):
         post_url = self.post_url + str(post["id"])
         print(post_url)
-        # print(post["file_url"])
+        print(post["file_url"])
         embed = discord.Embed(color=discord.Colour.gold(), title="sauce", url=post_url)
 
         embed.set_image(url=post["file_url"])
@@ -140,9 +148,8 @@ class DanbooruCog(BooruCog, name="Danbooru"):
         args = [self.shortcuts.get(arg, arg) for arg in args]
 
         try:
-            if (
-                not isinstance(ctx.channel, discord.DMChannel)
-                and not ctx.channel.is_nsfw()
+            if not (
+                isinstance(ctx.channel, discord.DMChannel) or ctx.channel.is_nsfw()
             ):
                 raise commands.errors.NSFWChannelRequired(ctx.channel)
 
@@ -174,7 +181,7 @@ class DanbooruCog(BooruCog, name="Danbooru"):
     @commands.cooldown(5, 3600.0, commands.BucketType.user)
     @commands.command()
     async def addshortcut(self, ctx, key, danbooruTags):
-        """add a shortcut for your waifu. 1 hour cooldown after 5 calls, so use it carefully"""
+        """add a shortcut for your waifu. 1 hour cooldown after 5 calls"""
         if self.shortcuts.get(key, None):
             await ctx.send("There is already a shortcut with that key!")
         elif self.bot.get_command(key):
@@ -226,14 +233,14 @@ class Safebooru(BooruCog, name="Booru"):
         await self.booru(ctx, tags=tags)
 
 
-class GelbooruClient:
+class GelbooruClient(object):
     def __init__(self, *, site_name, site_url):
         self.site_name = site_name
         self.site_url = site_url
 
-    def post_list(self, *, limit=3, page=None, tags="", random=False):
+    def post_list(self, *, limit=200, page=None, tags="", random=False):
         res = requests.get(
-            f"https://gelbooru.com/index.php?page=dapi&s=post&q=index&limit={limit}&tags={tags}&json=1"
+            f"https://{self.site_url}/index.php?page=dapi&s=post&q=index&limit={limit}&tags={tags}&json=1"
         )
         return json.loads(res.content)
 
@@ -241,8 +248,16 @@ class GelbooruClient:
 class Gelbooru(BooruCog, name="Booru"):
     @commands.is_nsfw()
     @commands.command(aliases=["gel", "gb"])
-    async def gelbooru(self, ctx, *, tags="rating:s"):
+    async def gelbooru(self, ctx, *, tags="unicorn_(azur_lane)"):
         """Wow searching on gelbooru that's so original"""
+        await self.booru(ctx, tags=tags)
+
+
+class Furrybooru(BooruCog, name="Booru"):
+    @commands.is_nsfw()
+    @commands.command(aliases=["fur"])
+    async def furrybooru(self, ctx, *, tags="puro_(changed)"):
+        """Wow searching on furrybooru that's so original"""
         await self.booru(ctx, tags=tags)
 
 
@@ -261,5 +276,15 @@ def setup(bot: commands.Bot):
             GelbooruClient,
             "gelbooru",
             "https://gelbooru.com/index.php?page=post&s=view&id=",
+            "gelbooru.com",
+        )
+    )
+    bot.add_cog(
+        Furrybooru(
+            bot,
+            GelbooruClient,
+            "furrybooru",
+            "https://furry.booru.org/index.php?page=post&s=view&id=",
+            "furry.booru.org",
         )
     )
