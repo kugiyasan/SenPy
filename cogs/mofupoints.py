@@ -1,10 +1,12 @@
 from discord.ext import commands
 
+import random
+
 from cogs.utils.dbms import conn, cursor
 from cogs.utils.prettyList import prettyList
 
 
-async def giveMofuPoints(user, points):
+def giveMofuPoints(user, points):
     with conn:
         cursor.execute(
             """INSERT INTO users (id, mofupoints)
@@ -15,13 +17,13 @@ async def giveMofuPoints(user, points):
         )
 
 
-async def incrementEmbedCounter(user):
+def incrementEmbedCounter(user):
     with conn:
         cursor.execute(
             """INSERT INTO users (id, numberOfEmbedRequests)
                 VALUES(%s, 1)
                 ON CONFLICT(id)
-                DO UPDATE SET 
+                DO UPDATE SET
                 numberOfEmbedRequests = users.numberOfEmbedRequests + 1""",
             (user.id,),
         )
@@ -46,7 +48,7 @@ class MofuPoints(commands.Cog):
             rows = cursor.fetchall()
         else:
             raise ValueError(
-                "Unknown category. Available arguments: mofupoints, numberOfEmbedRequests"
+                "Unknown category. Available args: mofupoints, numberOfEmbedRequests"
             )
 
         users = []
@@ -80,6 +82,16 @@ class MofuPoints(commands.Cog):
 
         title = "***NO LIFE LEADERBOARD (people who requested the most images)***"
         await prettyList(ctx, title, users, "requests")
+
+    @commands.cooldown(1, 3600 * 24, commands.BucketType.user)
+    @commands.command()
+    async def daily(self, ctx):
+        """Get your daily portion of mofupoints"""
+        amount = random.randint(2, 50)
+        giveMofuPoints(ctx.author, amount)
+        await ctx.send(
+            f"You received {amount} points! They've been added to your balance!"
+        )
 
 
 def setup(bot: commands.Bot):

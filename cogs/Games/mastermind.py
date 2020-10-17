@@ -7,12 +7,11 @@ import asyncio
 import random
 import re
 
-playingUsers = set()
-
 
 class Mastermind(commands.Cog, name="Games"):
     def __init__(self, bot):
         self.bot = bot
+        self.playingUsers = set()
 
     def judgement(self, guess, answer):
         guess = [int(i) for i in guess]
@@ -48,12 +47,7 @@ class Mastermind(commands.Cog, name="Games"):
 
         # INIT
         NUMBER_OF_TRIES = 10
-        if guessLength < 4:
-            await ctx.send("Choose a harder difficulty!")
-            return
-        if guessLength > 10:
-            await ctx.send("Choose a easier difficulty!")
-            return
+        guessLength = max(4, min(10, guessLength))
 
         if repeatedColor:
             answer = [random.randint(1, 6) for _ in range(guessLength)]
@@ -66,10 +60,10 @@ class Mastermind(commands.Cog, name="Games"):
             random.shuffle(answer)
             answer = answer[:guessLength]
 
-        if ctx.author in playingUsers:
+        if ctx.author in self.playingUsers:
             await ctx.send("You've already started a game, please stop it first!")
             return
-        playingUsers.add(ctx.author)
+        self.playingUsers.add(ctx.author)
 
         text = (
             "1 :🔴\t2 : 🟠\t3 : 🟡\t4 : 🟢\t5 : 🔵\t6 : 🟣\n"
@@ -92,19 +86,22 @@ class Mastermind(commands.Cog, name="Games"):
                     "message", timeout=300.0, check=checkresponse
                 )
             except asyncio.TimeoutError:
-                await ctx.send("Stopping mastermind, timeout expired")
-                await ctx.send(f"The answer was {self.toEmoji(answer)}")
-                playingUsers.discard(ctx.author)
+                await ctx.send(
+                    "Stopping mastermind, timeout expired\n"
+                    + f"The answer was {self.toEmoji(answer)}"
+                )
+                self.playingUsers.discard(ctx.author)
                 return
 
             msg = m.content.replace(" ", "")
             if "stop" in msg.lower():
-                await ctx.send("Stopping the game...", delete_after=10.0)
-                await ctx.send(f"The answer was {self.toEmoji(answer)}")
-                playingUsers.discard(ctx.author)
+                await ctx.send(
+                    "Stopping the game..." + f"The answer was {self.toEmoji(answer)}"
+                )
+                self.playingUsers.discard(ctx.author)
                 return
 
-            if "show" in msg.lower() or "drop" in msg.lower():
+            if re.search("show|drop", msg.lower()):
                 boardMessage = await ctx.send(boardMessage.content)
                 continue
 
@@ -127,14 +124,14 @@ class Mastermind(commands.Cog, name="Games"):
                 await ctx.send(
                     f"{guessLength**2} points will be added to your account!"
                 )
-                playingUsers.discard(ctx.author)
-                await giveMofuPoints(ctx.author, guessLength ** 2)
+                self.playingUsers.discard(ctx.author)
+                giveMofuPoints(ctx.author, guessLength ** 2)
                 return
 
             tryCount += 1
 
         await ctx.send("You lose! The answer was " + self.toEmoji(answer))
-        playingUsers.discard(ctx.author)
+        self.playingUsers.discard(ctx.author)
 
 
 def setup(bot: commands.Bot):

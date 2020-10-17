@@ -131,7 +131,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
                 return
 
         if hasattr(ctx, "author"):
-            await incrementEmbedCounter(ctx.author)
+            incrementEmbedCounter(ctx.author)
 
         await ctx.send(embed=self.redditEmbed(subreddit, post))
 

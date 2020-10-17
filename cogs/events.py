@@ -51,15 +51,13 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, exception):
-        if (
-            not ctx.command
-            or type(exception) == asyncio.TimeoutError
-            or type(exception) == commands.errors.NotOwner
+        if not ctx.command or isinstance(
+            exception, (asyncio.TimeoutError, commands.errors.NotOwner)
         ):
             return
-        if (
-            type(exception) == commands.errors.MissingRequiredArgument
-            or type(exception) == commands.errors.BadArgument
+        if isinstance(
+            exception,
+            (commands.errors.MissingRequiredArgument, commands.errors.BadArgument),
         ):
             await ctx.send(exception)
             await ctx.send_help(ctx.command)

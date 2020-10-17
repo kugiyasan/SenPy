@@ -1,7 +1,6 @@
 import discord
 from discord.ext import commands
 
-from cogs.utils.deleteMessage import deleteMessage
 from cogs.utils.prettyList import prettyList
 from cogs.utils.dbms import conn, cursor
 
@@ -68,16 +67,6 @@ class Owner(commands.Cog):
         guilds = [f"{g.name} member_count: {g.member_count}" for g in self.bot.guilds]
 
         await prettyList(ctx, title, guilds, maxLength=0)
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def thonk(self, ctx):
-        """thonk emoji"""
-        await deleteMessage(ctx)
-        await ctx.send(
-            "<:thinking1:710563810582200350><:thinking2:710563810804498452>\n"
-            + "<:thinking3:710563823819554816><:thinking4:710563824079732756>"
-        )
 
 
 def setup(bot: commands.Bot):
