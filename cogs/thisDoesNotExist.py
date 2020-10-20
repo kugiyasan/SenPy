@@ -17,12 +17,6 @@ class AIGeneratedImg(commands.Cog):
         url = "https://thiswaifudoesnotexist.net/v2/example-{}.jpg"
         await self.sendAIImg(ctx, url, seed, 0, 199999)
 
-    @commands.command(aliases=["yiff", "fursona"])
-    async def furry(self, ctx, seed=None):
-        """Send AI generated image from thisfursonadoesnotexist.com"""
-        url = "https://thisfursonadoesnotexist.com/v2/jpgs-2x/seed{}.jpg"
-        await self.sendAIImg(ctx, url, seed, 10000, 99999)
-
     async def sendAIImg(self, ctx: commands.Context, url, seed, seedmin, seedmax):
         if seed is None:
             seed = random.randint(seedmin, seedmax)

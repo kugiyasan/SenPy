@@ -46,9 +46,11 @@ class Settings(commands.Cog):
                 )
                 channel = cursor.fetchone()[0]
 
+                mention = self.bot.get_channel(channel).mention
                 await ctx.send(
-                    f"Welcome messages are sent in the {self.bot.get_channel(channel).mention} channel (id: {channel})\n"
-                    + "to change the channel, type 'xd welcome #welcome' and put the actual channel name"
+                    f"Welcome messages are sent in {mention} (id: {channel})\n"
+                    'to change the channel, type "xd welcome #welcome"'
+                    "and put the actual channel name"
                 )
 
                 return
@@ -61,7 +63,8 @@ class Settings(commands.Cog):
 
         try:
             await channel.send(
-                "Welcoming will now be sent in this channel!\nThis message will be deleted automatically in 30 seconds",
+                "Welcoming will now be sent in this channel!\n"
+                "This message will be deleted automatically in 30 seconds",
                 delete_after=30.0,
             )
         except discord.errors.Forbidden:

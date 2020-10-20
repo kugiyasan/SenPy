@@ -16,7 +16,7 @@ class RussianRoulette(commands.Cog, name="Games"):
         await ctx.send("https://tenor.com/view/gun-pistol-revolver-gif-9832859")
         await ctx.send(
             "Russian Roulette game!! "
-            + "Take the gun, spin the barrel, shoot and hope to survive!"
+            "Take the gun, spin the barrel, shoot and hope to survive!"
         )
 
         players = list(adversaries)

@@ -64,32 +64,55 @@ class Memes(commands.Cog):
 
     @commands.command(aliases=["cat"])
     async def catyears(self, ctx, age):
-        """The following program does not endorse in any way, shape or form the slavery of sapient beings"""
+        """
+        The following program does not endorse in any way,
+        shape or form the slavery of sapient beings
+        """
         try:
             age = int(age)
             if age < 1:
                 raise ValueError
         except ValueError:
             await ctx.send(
-                "As far as I can tell, it is impossible to have a relationship with a being that does not exist (yet). However, a legend says some mythical man once succeded in this seemingly unachievable feat, through his infinite love for a certain heterochromatic nekomimi..."
+                "As far as I can tell, it is impossible to have a relationship "
+                "with a being that does not exist (yet). However, a legend says "
+                "some mythical man once succeded in this seemingly unachievable feat, "
+                "through his infinite love for a certain heterochromatic nekomimi..."
             )
             return
 
         if age == 1:
             await ctx.send(
-                'Hmm, while there have been no scientific consensus as of yet, your cat seems to be... 12.5 years old. To safely engage in intercourse, you would need to say "no beasto" and "no pedo" at the same time, which is sadly not physically possible. I advise you wait just a few months before indulging in your deep fantasies.'
+                "Hmm, while there have been no scientific consensus as of yet, "
+                "your cat seems to be... 12.5 years old. To safely engage in "
+                'intercourse, you would need to say "no beasto" and "no pedo" '
+                "at the same time, which is sadly not physically possible. I advise "
+                "you wait just a few months before indulging in your deep fantasies."
             )
         elif age == 2:
             await ctx.send(
-                'Hmm. Your cat has finished its initial growth stage, bringing them to the very mature age of 25 years old. Your patience has been justly rewarded. You may... proceed. Remember to say "no beasto", though.'
+                "Hmm. Your cat has finished its initial growth stage, "
+                "bringing them to the very mature age of 25 years old. "
+                "Your patience has been justly rewarded. You may... proceed. "
+                'Remember to say "no beasto", though.'
             )
         elif age > 20:
             await ctx.send(
-                f'What? Your cat is already {age}? That means... they are now {25+(age-2)*4}, in human years! Although... a doubt still plagues my mind. Are you sure that your cat is still alive and well? They should be deceased by now, according to statistical evidence. I\'d be cautious if I were you. Saying "no beasto" and "no necro" at the same time is sadly not physically possible.'
+                f"What? Your cat is already {age}? That means... "
+                f"they are now {25+(age-2)*4}, in human years! "
+                "Although... a doubt still plagues my mind. Are you sure that "
+                "your cat is still alive and well? They should be deceased by now, "
+                "according to statistical evidence. I'd be cautious if I were you. "
+                'Saying "no beasto" and "no necro" at the same time '
+                "is sadly not physically possible."
             )
         else:
             await ctx.send(
-                f"What? Your cat is already {age}? That means... they are now {25+(age-2)*4}, in human years! Make haste, before death does you part! I know these beings are... disposable, but that is not a good reason to leave them decay, untouched by your love."
+                f"What? Your cat is already {age}? That means... "
+                f"they are now {25+(age-2)*4}, in human years! "
+                "Make haste, before death does you part! I know these beings are... "
+                "disposable, but that is not a good reason to leave them decay, "
+                "untouched by your love."
             )
 
     def petpetFrames(self, petImg):

@@ -155,7 +155,7 @@ class DanbooruCog(BooruCog, name="Danbooru"):
 
             await self.booru(ctx, tags=" ".join(args))
         except commands.errors.NSFWChannelRequired as err:
-            #! should handle the errors with the default on_command_error
+            # ! should handle the errors with the default on_command_error
             await ctx.send(err)
             return
 
@@ -240,7 +240,8 @@ class GelbooruClient(object):
 
     def post_list(self, *, limit=200, page=None, tags="", random=False):
         res = requests.get(
-            f"https://{self.site_url}/index.php?page=dapi&s=post&q=index&limit={limit}&tags={tags}&json=1"
+            f"https://{self.site_url}/index.php?"
+            f"page=dapi&s=post&q=index&limit={limit}&tags={tags}&json=1"
         )
         return json.loads(res.content)
 

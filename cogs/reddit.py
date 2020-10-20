@@ -51,8 +51,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
     @commands.command(aliases=["mofu"])
     async def mofumofu(self, ctx: commands.Context):
         """Send blessing to the server!"""
-        subreddits = ("senko", "SewayakiKitsune",
-                      "ChurchOfSenko", "fluffthetail")
+        subreddits = ("senko", "SewayakiKitsune", "ChurchOfSenko", "fluffthetail")
         await self.sendRedditImage(ctx, random.choice(subreddits))
 
     @commands.command(aliases=["sub"])
@@ -65,36 +64,48 @@ class RedditAPI(commands.Cog, name="Reddit"):
         """Search a subreddit name"""
         if not len(searchkws):
             raise commands.errors.MissingRequiredArgument(
-                inspect.Parameter("searchkws", inspect.Parameter.POSITIONAL_ONLY))
+                inspect.Parameter("searchkws", inspect.Parameter.POSITIONAL_ONLY)
+            )
 
         print("requesting search to reddit")
-        requestURL = f"https://www.reddit.com/subreddits/search.json?q={'%20'.join(searchkws)}&include_over_18=on"
+        requestURL = (
+            "https://www.reddit.com/subreddits/search.json?"
+            f"q={'%20'.join(searchkws)}&include_over_18=on"
+        )
         NUMBER_OF_SUGGESTIONS = 5
 
         children = await self.requestReddit(requestURL)
-        suggestions = [child["data"]["url"][3:-1]
-                       for child in children[:NUMBER_OF_SUGGESTIONS]]
+        suggestions = [
+            child["data"]["url"][3:-1] for child in children[:NUMBER_OF_SUGGESTIONS]
+        ]
 
         NUMBER_OF_SUGGESTIONS = len(suggestions)
 
-        title = f"**Top {NUMBER_OF_SUGGESTIONS} subreddits based on your search keyword (Select with 1-{NUMBER_OF_SUGGESTIONS}):**"
+        title = (
+            f"**Top {NUMBER_OF_SUGGESTIONS} subreddits based on your search keyword "
+            f"(Select with 1-{NUMBER_OF_SUGGESTIONS}):**"
+        )
         await prettyList(ctx, title, suggestions, maxLength=NUMBER_OF_SUGGESTIONS)
 
         def checkresponse(m):
-            return (m.author == ctx.author
-                    and m.channel == ctx.channel
-                    and m.content.isdecimal()
-                    and int(m.content) > 0
-                    and int(m.content) <= NUMBER_OF_SUGGESTIONS)
+            return (
+                m.author == ctx.author
+                and m.channel == ctx.channel
+                and m.content.isdecimal()
+                and int(m.content) > 0
+                and int(m.content) <= NUMBER_OF_SUGGESTIONS
+            )
 
         try:
             m = await self.bot.wait_for("message", timeout=60.0, check=checkresponse)
         except Exception:
             return
 
-        await self.sendRedditImage(ctx, suggestions[int(m.content)-1])
+        await self.sendRedditImage(ctx, suggestions[int(m.content) - 1])
 
-    async def sendRedditImage(self, ctx: commands.Context, subreddit="all", dropnsfw=False):
+    async def sendRedditImage(
+        self, ctx: commands.Context, subreddit="all", dropnsfw=False
+    ):
         subreddit = subreddit.lower()
 
         try:
@@ -140,15 +151,14 @@ class RedditAPI(commands.Cog, name="Reddit"):
             color=discord.Colour.gold(),
             title=f"r/{subreddit}",
             description=f"[{post['title']}](https://reddit.com{post['permalink']})",
-            url=f"https://reddit.com/r/{subreddit}")
+            url=f"https://reddit.com/r/{subreddit}",
+        )
 
         embed.set_image(url=post["url"])
         embed.set_author(
-            name=post["author"],
-            url=f"https://reddit.com/u/{post['author']}"
+            name=post["author"], url=f"https://reddit.com/u/{post['author']}"
         )
-        embed.set_footer(
-            text=f'{post["score"]}⬆️ {post["num_comments"]}💬')
+        embed.set_footer(text=f'{post["score"]}⬆️ {post["num_comments"]}💬')
 
         return embed
 
@@ -170,8 +180,15 @@ class RedditAPI(commands.Cog, name="Reddit"):
         if not self.urls.get(subreddit):
             self.urls[subreddit] = []
 
-        fields = ("title", "score", "over_18", "author",
-                  "num_comments", "permalink", "url")
+        fields = (
+            "title",
+            "score",
+            "over_18",
+            "author",
+            "num_comments",
+            "permalink",
+            "url",
+        )
         for child in response:
             postInfo = {}
             if not re.search(r"(\.jpg|\.png|\.jpeg|\.gif)$", child["data"]["url"]):

@@ -38,10 +38,10 @@ class ChessCog(commands.Cog, name="Games"):
 
         await ctx.send(
             "CHESS!!\n"
-            + 'The invited person plays first, a valid move is in the form "e2e4" '
-            + "where e2 is the piece initial coordinate and e4 is the destination\n"
-            + "If you don't know how to play chess, "
-            + "go check out the wiki page <https://en.wikipedia.org/wiki/Chess>"
+            'The invited person plays first, a valid move is in the form "e2e4" '
+            "where e2 is the piece initial coordinate and e4 is the destination\n"
+            "If you don't know how to play chess, "
+            "go check out the wiki page <https://en.wikipedia.org/wiki/Chess>"
         )
 
         turn = 0
@@ -121,13 +121,13 @@ class ChessCog(commands.Cog, name="Games"):
         )
         header = (
             "⬛:regional_indicator_a:"
-            + ":regional_indicator_b:"
-            + ":regional_indicator_c:"
-            + ":regional_indicator_d:"
-            + ":regional_indicator_e:"
-            + ":regional_indicator_f:"
-            + ":regional_indicator_g:"
-            + ":regional_indicator_h:\n"
+            ":regional_indicator_b:"
+            ":regional_indicator_c:"
+            ":regional_indicator_d:"
+            ":regional_indicator_e:"
+            ":regional_indicator_f:"
+            ":regional_indicator_g:"
+            ":regional_indicator_h:\n"
         )
         return header + "\n".join(
             number[i] + "".join(row) for i, row in enumerate(builder)
