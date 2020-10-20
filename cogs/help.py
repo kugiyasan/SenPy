@@ -9,8 +9,7 @@ class MyHelpCommand(commands.HelpCommand):
         half = text.index("\n\n", len(text) // 2)
         return text[:half], text[half:]
 
-        # This function triggers when somone type `<prefix>help`
-
+    # This function triggers when somone type `<prefix>help`
     async def send_bot_help(self, mapping):
         ctx = self.context
         text = ""
@@ -48,15 +47,31 @@ class MyHelpCommand(commands.HelpCommand):
     # This function triggers when someone type `<prefix>help <cog>`
     async def send_cog_help(self, cog):
         ctx = self.context
+        print(cog.name)
 
-        filtered = await self.filter_commands(cog.get_commands(), sort=True)
+        def get_category(command):
+            cmdCog = command.cog
+            return cmdCog.qualified_name if cmdCog is not None else "No Category"
+
+        filtered = await self.filter_commands(
+            ctx.bot.commands, sort=True, key=get_category
+        )
+        to_iterate = itertools.groupby(filtered, key=get_category)
+
+        commandsObj = None
+        for category, commandsObj in to_iterate:
+            print(category, cog)
+            if category != cog:
+                continue
+
+            commandsObj = sorted(commandsObj, key=lambda c: c.name)
 
         embed = discord.Embed(title="Commands:", color=discord.Color(0xFF5BAE))
         embed.set_thumbnail(url=ctx.me.avatar_url)
 
-        for command in filtered:
+        for command in commandsObj:
             embed.add_field(
-                name=" / ".join([command.name, *command.aliases]),
+                name=" / ".join((command.name, *command.aliases)),
                 value=command.short_doc or "No description",
                 inline=False,
             )

@@ -16,11 +16,15 @@ class Info(commands.Cog):
     @commands.command(aliases=["credit", "credits", "invite"])
     async def about(self, ctx):
         """gives various informations about the bot"""
-        inviteLink = f"https://discord.com/oauth2/authorize?client_id={self.bot.user.id}&scope=bot&permissions=268827712"
+        inviteLink = (
+            f"https://discord.com/oauth2/authorize?client_id={self.bot.user.id}"
+            "&scope=bot&permissions=268827712"
+        )
 
         e = discord.Embed(
             title="Click here to invite me on your server!",
-            description=f"SenPy is written in Python with discord.py\n{sys.version}\n{sys.platform}",
+            description="SenPy is written in Python with discord.py\n"
+            f"{sys.version}\n{sys.platform}",
             url=inviteLink,
         )
 
@@ -46,7 +50,8 @@ class Info(commands.Cog):
         )
         e.add_field(
             name=f"Serving {sum(g.member_count for g in self.bot.guilds)} users",
-            value=f"Technically it's {realUsersCount} if you don't count bots and duplicated users but who cares",
+            value=f"Technically it's {realUsersCount} "
+            "if you don't count bots and duplicated users but who cares",
         )
         e.add_field(
             name="Github repository", value="https://github.com/kugiyasan/SenPy"
@@ -100,7 +105,8 @@ class Info(commands.Cog):
 
         if text == "":
             await ctx.send(
-                "Write your feedback directly with the command e.g. xd feedback blah blah blah"
+                "Write your feedback directly with the command "
+                "e.g. xd feedback blah blah blah"
             )
             return
 

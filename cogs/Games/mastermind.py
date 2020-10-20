@@ -67,8 +67,8 @@ class Mastermind(commands.Cog, name="Games"):
 
         text = (
             "1 :🔴\t2 : 🟠\t3 : 🟡\t4 : 🟢\t5 : 🔵\t6 : 🟣\n"
-            + f"Make your first guess! ({guessLength} digits) "
-            + '(Type "stop" to stop the game)'
+            f"Make your first guess! ({guessLength} digits) "
+            '(Type "stop" to stop the game)'
         )
         await ctx.send(text)
 
@@ -88,7 +88,7 @@ class Mastermind(commands.Cog, name="Games"):
             except asyncio.TimeoutError:
                 await ctx.send(
                     "Stopping mastermind, timeout expired\n"
-                    + f"The answer was {self.toEmoji(answer)}"
+                    f"The answer was {self.toEmoji(answer)}"
                 )
                 self.playingUsers.discard(ctx.author)
                 return
@@ -96,7 +96,7 @@ class Mastermind(commands.Cog, name="Games"):
             msg = m.content.replace(" ", "")
             if "stop" in msg.lower():
                 await ctx.send(
-                    "Stopping the game..." + f"The answer was {self.toEmoji(answer)}"
+                    "Stopping the game..." f"The answer was {self.toEmoji(answer)}"
                 )
                 self.playingUsers.discard(ctx.author)
                 return
