@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import random
+from pathlib import Path
 
 from cogs.mofupoints import incrementEmbedCounter
 from cogs.utils.sendEmbed import sendEmbed
@@ -46,7 +47,7 @@ class AIGeneratedImg(commands.Cog):
             return
 
         number = str(seed).zfill(4)
-        imgPath = f"media/2019-05-06-stylegan-malefaces-1ksamples/{number}.jpg"
+        imgPath = Path(f"media/2019-05-06-stylegan-malefaces-1ksamples/{number}.jpg")
 
         file = discord.File(imgPath, filename="image.png")
         await sendEmbed(

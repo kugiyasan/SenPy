@@ -5,12 +5,13 @@ import psycopg2
 # https://stackoverflow.com/questions/42385391/auto-reconnect-postgresq-database
 
 try:
-    DATABASE_URL = os.environ['DATABASE_URL']
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-except:
+    DATABASE_URL = os.environ["DATABASE_URL"]
+    conn = psycopg2.connect(DATABASE_URL, sslmode="require")
+except Exception:
     from dotenv import load_dotenv
+
     load_dotenv()
-    DATABASE_URL = os.environ['DATABASE_URL']
+    DATABASE_URL = os.environ["DATABASE_URL"]
     conn = psycopg2.connect(DATABASE_URL)
 
 cursor = conn.cursor()
