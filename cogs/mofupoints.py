@@ -33,7 +33,7 @@ class MofuPoints(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    async def getUsersLeaderboard(self, ctx, category):
+    def getUsersLeaderboard(self, ctx, category):
         if category == "mofupoints":
             cursor.execute(
                 """SELECT id, mofupoints FROM users
@@ -70,7 +70,7 @@ class MofuPoints(commands.Cog):
     @commands.command(aliases=["top"])
     async def leaderboard(self, ctx):
         """Show the leaderboard for the top fluffer"""
-        users = await self.getUsersLeaderboard(ctx, "mofupoints")
+        users = self.getUsersLeaderboard(ctx, "mofupoints")
 
         title = "***MOFUPOINTS LEADERBOARD***"
         await prettyList(ctx, title, users, "points")
@@ -78,7 +78,7 @@ class MofuPoints(commands.Cog):
     @commands.command(aliases=["requesttop"])
     async def nolife(self, ctx):
         """leaderboard shows the people who requested the most pictures"""
-        users = await self.getUsersLeaderboard(ctx, "numberOfEmbedRequests")
+        users = self.getUsersLeaderboard(ctx, "numberOfEmbedRequests")
 
         title = "***NO LIFE LEADERBOARD (people who requested the most images)***"
         await prettyList(ctx, title, users, "requests")
