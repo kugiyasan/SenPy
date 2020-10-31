@@ -131,10 +131,9 @@ class RedditAPI(commands.Cog, name="Reddit"):
                     return
 
         if post["over_18"]:
-            try:
+            nsfwChannel = True
+            if ctx.guild:
                 nsfwChannel = ctx.channel.is_nsfw()
-            except Exception:
-                nsfwChannel = ctx.is_nsfw()
 
             if not nsfwChannel:
                 await ctx.send("Retry in a nsfw channel with this subreddit!")
