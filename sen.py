@@ -32,10 +32,12 @@ async def prefixes(bot: commands.Bot, message: discord.Message):
 
 
 prefix = os.environ["DEFAULT_COMMAND_PREFIX"]
-intents = discord.Intents(members=True)
+intents = discord.Intents.default()
+intents.members = True
 bot = commands.Bot(
     command_prefix=prefixes,
     activity=discord.Game(name=f"{prefix} help | {prefix} about"),
+    intents=intents
 )
 
 
