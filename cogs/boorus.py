@@ -111,6 +111,8 @@ class DanbooruCog(BooruCog, name="Danbooru"):
             "chika": "fujiwara_chika",
             "emilia": "emilia_(re:zero)",
             "hanamaru": "kunikida_hanamaru",
+            "k": "kisaragi_(azur_lane) rating:s",
+            "kisaragi": "kisaragi_(azur_lane) rating:s",
             "korone": "inugami_korone",
             "loliwaifu": "unicorn_(azur_lane)",
             "long_island": "long_island_(azur_lane)",
@@ -239,11 +241,18 @@ class GelbooruClient(object):
         self.site_url = site_url
 
     def post_list(self, *, limit=200, page=None, tags="", random=False):
+        tags = (
+            (tags + " ")
+            .replace("rating:s ", "rating:safe ")
+            .replace("rating:q ", "rating:questionnable ")
+            .replace("rating:e ", "rating:explicit ")
+        )
+        print(tags)
         res = requests.get(
             f"https://{self.site_url}/index.php?"
             f"page=dapi&s=post&q=index&limit={limit}&tags={tags}&json=1"
         )
-        return json.loads(res.content)
+        return json.loads(res.content) if res.content else []
 
 
 class Gelbooru(BooruCog, name="Booru"):
