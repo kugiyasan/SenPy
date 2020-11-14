@@ -37,7 +37,7 @@ intents.members = True
 bot = commands.Bot(
     command_prefix=prefixes,
     activity=discord.Game(name=f"{prefix} help | {prefix} about"),
-    intents=intents
+    intents=intents,
 )
 
 
