@@ -96,7 +96,7 @@ class Mastermind(commands.Cog, name="Games"):
             msg = m.content.replace(" ", "")
             if "stop" in msg.lower():
                 await ctx.send(
-                    "Stopping the game..." f"The answer was {self.toEmoji(answer)}"
+                    f"Stopping the game... The answer was {self.toEmoji(answer)}"
                 )
                 self.playingUsers.discard(ctx.author)
                 return

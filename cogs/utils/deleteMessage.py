@@ -2,14 +2,11 @@ import discord
 
 
 async def deleteMessage(ctx):
-    if isinstance(
-        ctx, discord.Message
-    ):  # so ctx is a bad name for the variable, I know
-        try:
-            await ctx.delete()
-        except discord.Forbidden:
-            pass
+    # so ctx is a bad name for the variable, I know
+    if not isinstance(ctx, discord.Message):
+        ctx = ctx.message
+
     try:
-        await ctx.message.delete()
+        await ctx.delete()
     except discord.Forbidden:
         pass

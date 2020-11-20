@@ -123,6 +123,7 @@ class Info(commands.Cog):
             else None
         )
         await deleteMessage(ctx)
+        words = words.replace("@everyone", "everyone")
         await ctx.send(words, file=attachment)
 
     @commands.command(aliases=["SaY"])
