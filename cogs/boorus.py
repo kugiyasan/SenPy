@@ -1,9 +1,8 @@
 import discord
 from discord.ext import commands
 
-from pybooru import Danbooru, Moebooru
+from pybooru import Danbooru, Moebooru, PybooruHTTPError
 import json
-import random
 import requests
 
 from cogs.mofupoints import incrementEmbedCounter
@@ -21,7 +20,7 @@ class BooruCog(commands.Cog, name="Booru"):
         """Wow searching on booru site that's so original"""
         if not len(self.urlsTags.get(tags, {})):
             async with ctx.channel.typing():
-                await self.requestBooru(tags)
+                self.requestBooru(tags)
 
             if not len(self.urlsTags.get(tags, {})):
                 await ctx.send("I couldn't find any image with that tag!")
@@ -35,13 +34,17 @@ class BooruCog(commands.Cog, name="Booru"):
         ):
             raise commands.errors.NSFWChannelRequired(ctx.channel)
 
-        await ctx.send(embed=self.booruEmbed(post))
+        await self.sendBooruEmbed(ctx, post)
         incrementEmbedCounter(ctx.author)
 
-    async def requestBooru(self, tags):
+    def requestBooru(self, tags):
         print("requesting " + self.site_name)
 
-        posts = self.client.post_list(tags=tags, limit=100, random=True)
+        try:
+            posts = self.client.post_list(tags=tags, limit=100, random=True)
+        except PybooruHTTPError as error:
+            print(error)
+            return
         # print(posts[0])
 
         if len(posts) < 1:
@@ -53,7 +56,6 @@ class BooruCog(commands.Cog, name="Booru"):
 
         self.fillUrlsDict(tags, posts)
 
-        random.shuffle(self.urlsTags[tags])
         print(f"{len(self.urlsTags[tags])} urls for {tags}")
 
     def fillUrlsDict(self, tags, posts):
@@ -61,11 +63,10 @@ class BooruCog(commands.Cog, name="Booru"):
         for post in posts:
             try:
                 miniPost = {k: post.get(k, None) for k in keys}
-                if miniPost["file_url"] is None:
-                    miniPost["file_url"] = (
-                        f"https://furry.booru.org//images/{post['directory']}/"
-                        + post["image"]
-                    )
+                if not miniPost["file_url"]:
+                    return
+                if miniPost["file_url"].endswith(".zip"):
+                    miniPost["file_url"] = post["large_file_url"]
                 miniPost["file_url"] = miniPost["file_url"].replace(" ", "%20")
 
                 if isinstance(self.client, Danbooru):
@@ -76,23 +77,26 @@ class BooruCog(commands.Cog, name="Booru"):
                     miniPost["author"] = post["author"]
 
                 if post.get("file_size", 0) > 8000000:
-                    miniPost["file_url"] = post["preview_url"]
+                    miniPost["file_url"] = post.get("preview_url", miniPost["file_url"])
 
                 self.urlsTags[tags].append(miniPost)
             except Exception as err:
                 print(err)
 
-    def booruEmbed(self, post):
+    async def sendBooruEmbed(self, ctx, post):
         post_url = self.post_url + str(post["id"])
         print(post_url)
         print(post["file_url"])
         embed = discord.Embed(color=discord.Colour.gold(), title="sauce", url=post_url)
 
-        embed.set_image(url=post["file_url"])
         embed.set_author(name=post["author"])
         embed.set_footer(text=f'{post["score"]}⬆️ created at: {post["created_at"]}')
+        embed.set_image(url=post["file_url"])
 
-        return embed
+        if post["file_url"].endswith(".mp4") or post["file_url"].endswith(".webm"):
+            await ctx.send(post["file_url"])
+
+        await ctx.send(embed=embed)
 
 
 class DanbooruCog(BooruCog, name="Danbooru"):
@@ -263,14 +267,6 @@ class Gelbooru(BooruCog, name="Booru"):
         await self.booru(ctx, tags=tags)
 
 
-class Furrybooru(BooruCog, name="Booru"):
-    @commands.is_nsfw()
-    @commands.command(aliases=["fur"])
-    async def furrybooru(self, ctx, *, tags="puro_(changed)"):
-        """Wow searching on furrybooru that's so original"""
-        await self.booru(ctx, tags=tags)
-
-
 def setup(bot: commands.Bot):
     bot.add_cog(
         DanbooruCog(bot, Danbooru, "danbooru", "https://danbooru.donmai.us/posts/")
@@ -287,14 +283,5 @@ def setup(bot: commands.Bot):
             "gelbooru",
             "https://gelbooru.com/index.php?page=post&s=view&id=",
             "gelbooru.com",
-        )
-    )
-    bot.add_cog(
-        Furrybooru(
-            bot,
-            GelbooruClient,
-            "furrybooru",
-            "https://furry.booru.org/index.php?page=post&s=view&id=",
-            "furry.booru.org",
         )
     )

@@ -176,6 +176,7 @@ class Memes(commands.Cog):
 
         if speed_ms is None:
             speed_ms = random.choice((20, 30, 60))
+        speed_ms = max(20, speed_ms)
 
         with io.BytesIO() as image_binary:
             images[0].save(
