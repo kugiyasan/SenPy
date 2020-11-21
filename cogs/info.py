@@ -75,6 +75,14 @@ class Info(commands.Cog):
         if count < 1:
             return
 
+        try:
+            msg = await ctx.fetch_message(count)
+            if msg.author.id in (self.bot.user.id, ctx.author.id):
+                await msg.delete()
+            return
+        except discord.NotFound:
+            pass
+
         async for message in ctx.history(limit=100):
             if message.author == self.bot.user:
                 msgs.append(message)

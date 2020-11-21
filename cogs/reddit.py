@@ -143,9 +143,9 @@ class RedditAPI(commands.Cog, name="Reddit"):
         if hasattr(ctx, "author"):
             incrementEmbedCounter(ctx.author)
 
-        await ctx.send(embed=self.redditEmbed(subreddit, post))
+        await self.redditEmbed(ctx, subreddit, post)
 
-    def redditEmbed(self, subreddit, post):
+    async def redditEmbed(self, ctx, subreddit, post):
         embed = discord.Embed(
             color=discord.Colour.gold(),
             title=f"r/{subreddit}",
@@ -159,7 +159,10 @@ class RedditAPI(commands.Cog, name="Reddit"):
         )
         embed.set_footer(text=f'{post["score"]}⬆️ {post["num_comments"]}💬')
 
-        return embed
+        if not re.search(r"(\.jpg|\.png|\.jpeg|\.gif)$", post["url"]):
+            await ctx.send(post["url"])
+
+        await ctx.send(embed=embed)
 
     async def requestReddit(self, url):
         print("requesting reddit")
@@ -187,18 +190,14 @@ class RedditAPI(commands.Cog, name="Reddit"):
             "num_comments",
             "permalink",
             "url",
+            "is_video",
         )
         for child in response:
             postInfo = {}
-            if not re.search(r"(\.jpg|\.png|\.jpeg|\.gif)$", child["data"]["url"]):
-                print(child["data"]["url"])
-                continue
-
             for field in fields:
                 postInfo[field] = child["data"][field]
 
             self.urls[subreddit].append(postInfo)
-
         print(f"{len(self.urls[subreddit])} urls for r/{subreddit}")
 
 

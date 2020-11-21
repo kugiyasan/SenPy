@@ -51,7 +51,7 @@ class BooruCog(commands.Cog, name="Booru"):
             print(f"No post with {tags}")
             return
 
-        if self.urlsTags.get(tags, None) is None:
+        if self.urlsTags.get(tags) is None:
             self.urlsTags[tags] = []
 
         self.fillUrlsDict(tags, posts)
@@ -62,7 +62,7 @@ class BooruCog(commands.Cog, name="Booru"):
         keys = ("id", "created_at", "score", "rating", "file_url")
         for post in posts:
             try:
-                miniPost = {k: post.get(k, None) for k in keys}
+                miniPost = {k: post.get(k) for k in keys}
                 if not miniPost["file_url"]:
                     return
                 if miniPost["file_url"].endswith(".zip"):
@@ -188,7 +188,7 @@ class DanbooruCog(BooruCog, name="Danbooru"):
     @commands.command()
     async def addshortcut(self, ctx, key, danbooruTags):
         """add a shortcut for your waifu. 1 hour cooldown after 5 calls"""
-        if self.shortcuts.get(key, None):
+        if self.shortcuts.get(key):
             await ctx.send("There is already a shortcut with that key!")
         elif self.bot.get_command(key):
             await ctx.send("You can't name a shortcut with the name of a command!")
@@ -201,7 +201,7 @@ class DanbooruCog(BooruCog, name="Danbooru"):
     @commands.is_owner()
     @commands.command(hidden=True)
     async def delshortcut(self, ctx, key):
-        if not self.shortcuts.get(key, None):
+        if not self.shortcuts.get(key):
             await ctx.send("The shortcut doesn't exist!")
             return
 
