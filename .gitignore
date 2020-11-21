@@ -2,5 +2,4 @@ __pycache__
 .env
 .vscode
 media/2019-05-06-stylegan-malefaces-1ksamples
-runtime.txt
 tests
