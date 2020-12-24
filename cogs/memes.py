@@ -14,12 +14,8 @@ import typing
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.hand_frames = [
-            Image.open(
-                Path(__file__).parent.parent / "media" / "hand" / f"frame{i+1}.png"
-            )
-            for i in range(6)
-        ]
+        path = Path(__file__).parent.parent / "media" / "hand"
+        self.hand_frames = [Image.open(path / f"frame{i+1}.png") for i in range(6)]
 
     @commands.command()
     async def insult(self, ctx, *, member: discord.Member = None):
@@ -125,25 +121,27 @@ class Memes(commands.Cog):
         shake_x_amp = 4
         shake_y_amp = 4
 
-        CYCLE = 6
+        CYCLE = len(self.hand_frames)
         frames = []
 
         for i in range(CYCLE):
-            frame = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
+            frame = Image.new("RGBA", (256, 256), (255, 0, 0, 0))
+            phase = 2 * pi / CYCLE * i
 
-            squish_y = int(squish_y_amp * cos(2 * pi / CYCLE * i))
+            squish_y = int(squish_y_amp * cos(phase))
             squish_x = width * height // (squish_y + height) - width
 
-            shake_x = int(shake_x_amp * sin(2 * pi / CYCLE * i))
-            shake_y = int(shake_y_amp * -cos(2 * pi / CYCLE * i))
+            shake_x = int(shake_x_amp * sin(phase))
+            shake_y = int(shake_y_amp * -cos(phase))
 
             petCoords = (x - squish_x // 2 + shake_x, y - squish_y + shake_y)
 
             frame.paste(
                 petImg.resize((squish_x + width, squish_y + height)),
                 petCoords,
+                petImg.resize((squish_x + width, squish_y + height)),
             )
-            hand = self.hand_frames[6 * i // CYCLE]
+            hand = self.hand_frames[i]
             frame.paste(hand, (shake_x, shake_y), hand)
             frames.append(frame)
 

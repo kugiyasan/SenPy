@@ -28,7 +28,7 @@ class Events(commands.Cog):
             authors = set(m.author for m in msgs if not m.author.bot)
 
             if len(msgSet) == 1 and len(authors) == 3:
-                await ctx.send(msgSet.pop())
+                await ctx.send(msgs[0].content)
         except discord.Forbidden:
             pass
 
