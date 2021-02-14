@@ -87,11 +87,10 @@ class MofuPoints(commands.Cog):
     @commands.command()
     async def daily(self, ctx):
         """Get your daily portion of mofupoints"""
-        amount = random.randint(2, 50)
+        amount = random.randint(10, 50)
         giveMofuPoints(ctx.author, amount)
-        await ctx.send(
-            f"You received {amount} points! They've been added to your balance!"
-        )
+        msg = f"You received {amount} points! They've been added to your balance!"
+        await ctx.send(msg)
 
 
 def setup(bot: commands.Bot):

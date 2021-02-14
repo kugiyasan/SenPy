@@ -31,19 +31,11 @@ class Roles(commands.Cog):
         """Remove roles from yourself"""
         await self.roleEmbed(ctx, RoleActions.DEL)
 
+    @commands.bot_has_guild_permissions(manage_roles=True)
     @commands.has_permissions(administrator=True)
     @commands.command()
     async def manageaddrole(self, ctx: commands.Context):
         """Admin command. Let you choose which roles can be given by the bot"""
-        ch = ctx.channel
-        permissions = ch.permissions_for(ctx.author)
-
-        if not permissions.manage_roles:
-            await ctx.send(
-                "Give me the manage_roles permissions if you want me to give roles!"
-            )
-            return
-
         await self.roleEmbed(ctx, RoleActions.MANAGEADD)
 
     @commands.has_permissions(administrator=True)
@@ -52,66 +44,83 @@ class Roles(commands.Cog):
         """Admin command. Let you choose which roles can be given by the bot"""
         await self.roleEmbed(ctx, RoleActions.MANAGEDEL)
 
-    async def renderEmbed(self, ctx, roles, page):
+    def renderEmbed(self, ctx, roles, page):
         title = (
             "React to the number associated with the role you want to interact with!"
         )
 
         description = []
-        for n in range(1, 10):
-            role = None
-            if 9 * page + n - 1 < len(roles):
-                role = roles[9 * page + n - 1]
+        for n in range(9):
+            try:
+                role = roles[9 * page + n]
+            except IndexError:
+                break
 
-            description.append(f"{n}\ufe0f\u20e3: {role}")
-
-        description = "\n".join(description)
+            description.append(f"{n+1}\ufe0f\u20e3: {role}")
 
         embed = discord.Embed(
-            title=title, description=description, colour=discord.Colour.gold()
+            title=title,
+            description="\n".join(description),
+            colour=discord.Colour.gold(),
         )
         embed.set_footer(text=f"Page {page+1}")
 
         return embed
 
-    async def initEmbed(self, ctx, roleAction, page):
+    def getUserAvailableRoles(self, authorRoles, guild, roleAction):
         with conn:
-            cursor.execute(
-                "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,)
-            )
+            command = "SELECT rolesToGive FROM guilds WHERE id=%s"
+            cursor.execute(command, (guild.id,))
             try:
-                roles = cursor.fetchone()[0]
-            except Exception:
+                roles = cursor.fetchone()[0] or []
+            except IndexError:
                 roles = []
 
         if roleAction == RoleActions.ADD:
-            roles = set(roles).difference(role.id for role in ctx.author.roles)
+            roles = set(roles).difference(role.id for role in authorRoles)
         elif roleAction == RoleActions.DEL:
-            roles = set(roles).intersection(role.id for role in ctx.author.roles)
+            roles = set(roles).intersection(role.id for role in authorRoles)
         elif roleAction == RoleActions.MANAGEADD:
             roles = set(
                 role.id
-                for role in ctx.guild.roles
+                for role in guild.roles
                 if not role.managed and not role.is_default()
             ).difference(roles)
 
-        roles = [ctx.guild.get_role(role) for role in roles]
+        # TODO should clean the database here if there is some dangling roles
+        roles = (guild.get_role(role) for role in roles)
+        roles = (role for role in roles if role is not None)
+        return sorted(roles, key=lambda e: e.name)
+
+    async def initEmbed(self, ctx, roleAction, page):
+        roles = self.getUserAvailableRoles(ctx.author.roles, ctx.guild, roleAction)
 
         if not len(roles):
-            await ctx.send("There isn't an available role! Exiting...")
-            return
+            return None, None
 
-        message = await ctx.send(embed=await self.renderEmbed(ctx, roles, page))
-        await message.add_reaction("◀")
-        await message.add_reaction("▶")
-        for n in range(1, 10):
-            await message.add_reaction(f"{n}\ufe0f\u20e3")
+        e = self.renderEmbed(ctx, roles, page)
+        message = await ctx.send(embed=e)
+
+        if len(roles) <= 9:
+            for n in range(9):
+                # Add number emoji
+                await message.add_reaction(f"{n+1}\ufe0f\u20e3")
+        else:
+            await message.add_reaction("◀")
+            await message.add_reaction("▶")
+            for n in range(9):
+                # Add number emoji from 1 to 9 inclusive
+                await message.add_reaction(f"{n+1}\ufe0f\u20e3")
 
         return roles, message
 
     async def roleEmbed(self, ctx: commands.Context, roleAction):
         page = 0
         roles, message = await self.initEmbed(ctx, roleAction, page)
+
+        if roles is None or message is None:
+            await ctx.send("There's no available role! Exiting...")
+            return
 
         emoji = ""
 
@@ -126,13 +135,13 @@ class Roles(commands.Cog):
             elif emoji.endswith("\ufe0f\u20e3"):
                 # if a emoji with a number is pressed
                 if emoji[0] != "0":
-                    await self.numberEmojiSelected(
-                        ctx, message, emoji, page, roles, roleAction
-                    )
+                    await message.clear_reactions()
+                    roleNumber = 9 * page - 1 + int(emoji[0])
+                    await self.numberEmojiSelected(ctx, roleNumber, roles, roleAction)
                     return
 
             page %= (len(roles) - 1) // 9 + 1
-            await message.edit(embed=await self.renderEmbed(ctx, roles, page))
+            await message.edit(embed=self.renderEmbed(ctx, roles, page))
 
             try:
                 res = await self.bot.wait_for("reaction_add", check=check, timeout=30)
@@ -143,11 +152,10 @@ class Roles(commands.Cog):
             emoji = str(res[0].emoji)
             await message.remove_reaction(res[0].emoji, res[1])
 
-    async def numberEmojiSelected(self, ctx, message, emoji, page, roles, roleAction):
-        roleNumber = 9 * page - 1 + int(emoji[0])
+    async def numberEmojiSelected(self, ctx, roleNumber, roles, roleAction):
+        # TODO The user shouldn't see None anymore
         if roleNumber >= len(roles):
             await ctx.send("You chose None! Exiting...")
-            await message.clear_reactions()
             return
 
         role = roles[roleNumber]
@@ -168,29 +176,15 @@ class Roles(commands.Cog):
                     (ctx.guild.id, role.id, role.id),
                 )
 
-            await ctx.send(f"{role.name} is now available for the users!")
+            await ctx.send(f"{role.name} is now available for the members!")
         elif roleAction == RoleActions.MANAGEDEL:
             with conn:
                 cursor.execute(
-                    "SELECT rolesToGive FROM guilds WHERE id=%s", (ctx.guild.id,)
+                    "UPDATE guilds SET rolesToGive=array_remove(rolesToGive, %s)",
+                    (role.id,),
                 )
-                newRoles = cursor.fetchone()[0]
-                newRoles.remove(role.id)
 
-                if not len(newRoles):
-                    cursor.execute(
-                        "UPDATE guilds SET rolesToGive=ARRAY[]::BIGINT[] WHERE id=%s",
-                        (ctx.guild.id,),
-                    )
-                else:
-                    cursor.execute(
-                        "UPDATE guilds SET rolesToGive=%s WHERE id=%s",
-                        (newRoles, ctx.guild.id),
-                    )
-
-            await ctx.send(f"{role.name} is now unavailable for the users!")
-
-        await message.clear_reactions()
+            await ctx.send(f"{role.name} is now unavailable for the members!")
 
 
 def setup(bot: commands.Bot):

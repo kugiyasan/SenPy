@@ -61,7 +61,7 @@ class Info(commands.Cog):
         e.add_field(name="Uptime", value=str(uptime)[:-7])
         e.add_field(name="Latency", value=f"{int(self.bot.latency*1000)} ms")
         e.add_field(name="Contributors", value=contributors)
-        e.add_field(name="Support server", value="https://discord.gg/axTWGsc")
+        e.add_field(name="Support server", value="https://discord.gg/9B6vY3kSrZ")
         e.add_field(name="You have some feedback?", value="Use xd report")
         await ctx.send(embed=e)
 

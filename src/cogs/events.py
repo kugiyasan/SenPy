@@ -66,6 +66,7 @@ class Events(commands.Cog):
         errors = (
             commands.errors.NSFWChannelRequired,
             commands.errors.MissingPermissions,
+            commands.errors.BotMissingPermissions,
             commands.errors.NoPrivateMessage,
             commands.errors.CommandOnCooldown,
         )

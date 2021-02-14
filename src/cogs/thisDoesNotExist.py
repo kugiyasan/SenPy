@@ -46,10 +46,13 @@ class AIGeneratedImg(commands.Cog):
             await ctx.send("Give me a seed between 0 and 1003 inclusively!")
             return
 
-        number = str(seed).zfill(4)
-        imgPath = Path(f"media/2019-05-06-stylegan-malefaces-1ksamples/{number}.jpg")
+        img_path = (
+            Path(__file__).parent.parent.parent
+            / "media/2019-05-06-stylegan-malefaces-1ksamples"
+        )
 
-        file = discord.File(imgPath, filename="image.png")
+        number = str(seed).zfill(4)
+        file = discord.File(img_path / f"{number}.jpg", filename="image.png")
         await sendEmbed(
             ctx,
             "attachment://image.png",

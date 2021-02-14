@@ -14,7 +14,7 @@ import typing
 class Memes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        path = Path(__file__).parent.parent / "media" / "hand"
+        path = Path(__file__).parent.parent.parent / "media/hand"
         self.hand_frames = [Image.open(path / f"frame{i+1}.png") for i in range(6)]
 
     @commands.command()

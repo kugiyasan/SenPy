@@ -13,13 +13,17 @@ import re
 class Japanese(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        with open(Path(__file__).parent / "gyaru_dict.json") as jsonFile:
-            gyaruDict = json.load(jsonFile)
+        media = Path(__file__).parent.parent.parent / "media"
+        with open(media / "gyaru_dict.json") as jsonFile:
+            gyaru_dict = json.load(jsonFile)
 
-        self.multipleCharacterDict = gyaruDict["multiple_characters"]
-        self.singleCharacterDict = gyaruDict["single_character"]
+        self.multiple_character_dict = gyaru_dict["multiple_characters"]
+        self.single_character_dict = gyaru_dict["single_character"]
 
-    @commands.command(aliases=["あんき"])
+        self.font_size = 20
+        self.font = ImageFont.truetype(str(media / "japanese_font.ttf"), self.font_size)
+
+    @commands.command(aliases=["あんき", "暗記"])
     async def anki(self, ctx, *members: discord.Member):
         """Remind your friends to do their Anki!"""
         for member in members:
@@ -28,47 +32,47 @@ class Japanese(commands.Cog):
     @commands.command(aliases=["ぎゃる", "ギャル"])
     async def gyaru(self, ctx, *, text="_ _"):
         """まじ卍"""
-        # replace with multipleCharacterDict and note the changes in a bool list
+        # replace with multiple_character_dict and note the changes in a bool list
         changes = [False] * len(text)
-        for k, v in self.multipleCharacterDict.items():
+        for k, v in self.multiple_character_dict.items():
             for m in re.finditer(k, text):
-                changes[m.start():m.end()] = [True] * len(k)
+                changes[m.start() : m.end()] = [True] * len(k)
             text = text.replace(k, random.choice(v))
 
-        # replace with singleCharacterDict
-        # if it isn't already changed by multipleCharacterDict
+        # replace with single_character_dict
+        # if it isn't already changed by multiple_character_dict
         output = ""
         for i, c in enumerate(text.upper()):
             if changes[i]:
                 output += c
             else:
-                output += random.choice(self.singleCharacterDict.get(c, c))
+                output += random.choice(self.single_character_dict.get(c, c))
 
         await ctx.send(output)
 
     @commands.command(aliases=["はいく", "俳句"])
     async def haiku(self, ctx, *, text):
         """Send your 5-7-5 and boom a clean display of your haiku"""
-        font = ImageFont.truetype("media/EPMGOBLD.TTF", 20)
-
+        # Turn the text top to bottom right to left
         text = ["　" * i * 2 + string for i, string in enumerate(text.split("\n"))][::-1]
         text = itertools.zip_longest(*text, fillvalue="　")
         text = "\n".join(("　".join(line) for line in text))
 
-        size = ImageDraw.Draw(Image.new("RGB", (1, 1))).textsize(text, font)
-        image = Image.new("RGB", (size[0] + 20, size[1] + 20))
+        # Write the text on a image
+        size = ImageDraw.Draw(Image.new("RGB", (1, 1))).textsize(text, self.font)
+        image = Image.new("RGB", (size[0] + self.font_size, size[1] + self.font_size))
         draw = ImageDraw.Draw(image)
+        draw.text((5, 5), text, font=self.font, align="left")
 
-        draw.text((5, 5), text, font=font, align="left")
-
+        # Save the image in the ram
         with BytesIO() as image_binary:
             image.save(image_binary, "PNG")
             image_binary.seek(0)
-            file = discord.File(fp=image_binary, filename="haiku.png")
+            image_file = discord.File(fp=image_binary, filename="haiku.png")
 
         embed = discord.Embed(color=discord.Color.gold())
         embed.set_image(url="attachment://haiku.png")
-        await ctx.send(file=file, embed=embed)
+        await ctx.send(file=image_file, embed=embed)
 
 
 def setup(bot: commands.Bot):
