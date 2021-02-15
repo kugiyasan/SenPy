@@ -3,6 +3,7 @@ from discord.ext import commands
 
 from cogs.utils.prettyList import prettyList
 from cogs.utils.dbms import conn, cursor
+from cogs.utils.get_extensions import get_extensions
 
 
 class Owner(commands.Cog):
@@ -64,9 +65,26 @@ class Owner(commands.Cog):
     @commands.command(hidden=True)
     async def servers(self, ctx):
         title = f"Running on {len(self.bot.guilds)} servers"
-        guilds = [f"{g.name} member_count: {g.member_count}" for g in self.bot.guilds]
+        guilds = [f"{g.name}: {g.member_count} members" for g in self.bot.guilds]
 
         await prettyList(ctx, title, guilds, maxLength=0)
+
+    @commands.is_owner()
+    @commands.command(hidden=True, aliases=["rl"])
+    async def reload(self, ctx: commands.Context):
+        """Reloads the bot extensions without rebooting the entire program"""
+        try:
+            for ext in get_extensions():
+                try:
+                    self.bot.reload_extension(ext)
+                except commands.errors.ExtensionNotLoaded:
+                    self.bot.load_extension(ext)
+        except commands.ExtensionFailed:
+            await ctx.send("Reloading failed")
+            raise
+
+        await ctx.message.add_reaction("✅")
+        print("\033[94mReloading successfully finished!\033[0m\n")
 
 
 def setup(bot: commands.Bot):

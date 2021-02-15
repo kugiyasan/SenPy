@@ -15,6 +15,10 @@ class Events(commands.Cog):
         self.diff = set()
 
     @commands.Cog.listener()
+    async def on_ready(self):
+        print(f"Logged in as {self.bot.user.name} on {len(self.bot.guilds)} servers")
+
+    @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author == self.bot.user or message.author.bot:
             return

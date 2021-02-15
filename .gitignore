@@ -1,5 +1,7 @@
 __pycache__/
-.env
+.pytest_cache/
 .vscode/
+.env
+
 2019-05-06-stylegan-malefaces-1ksamples/
 junk/

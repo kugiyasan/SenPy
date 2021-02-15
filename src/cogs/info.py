@@ -100,7 +100,7 @@ class Info(commands.Cog):
     @commands.command()
     async def ping(self, ctx):
         """haha ping pong"""
-        await ctx.send(f"Pong! The latency is about {int(self.bot.latency*1000)} ms")
+        await ctx.send(f"Pong! The latency is about {self.bot.latency*1000:.0f} ms")
 
     @commands.command(hidden=True)
     async def pong(self, ctx):
