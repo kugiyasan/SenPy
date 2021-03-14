@@ -8,6 +8,7 @@ import json
 from pathlib import Path
 import random
 import re
+from typing import Union
 
 
 class Japanese(commands.Cog):
@@ -24,10 +25,13 @@ class Japanese(commands.Cog):
         self.font = ImageFont.truetype(str(media / "japanese_font.ttf"), self.font_size)
 
     @commands.command(aliases=["あんき", "暗記"])
-    async def anki(self, ctx, *members: discord.Member):
+    async def anki(self, ctx, *members: Union[discord.Member, str]):
         """Remind your friends to do their Anki!"""
         for member in members:
-            await ctx.send(f"{member.mention}, did you do your anki yet?")
+            if isinstance(member, discord.Member):
+                member = member.mention
+
+            await ctx.send(f"{member}, did you do your anki yet?")
 
     @commands.command(aliases=["ぎゃる", "ギャル"])
     async def gyaru(self, ctx, *, text="_ _"):

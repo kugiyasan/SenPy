@@ -10,13 +10,16 @@ import inspect
 import random
 import re
 import requests
+from typing import Dict, List, Union
+
+Post = Dict[str, Union[str, int, bool]]
 
 
 class RedditAPI(commands.Cog, name="Reddit"):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.ua = UserAgent(verify_ssl=False)
-        self.urls = {}
+        self.urls: Dict[str, List[Post]] = {}
         self.waifuByTheHour.start()
 
     def cog_unload(self):

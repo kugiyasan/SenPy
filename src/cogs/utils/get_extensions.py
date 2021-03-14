@@ -1,7 +1,8 @@
 from pathlib import Path
+from typing import Iterator
 
 
-def get_extensions():
+def get_extensions() -> Iterator[str]:
     here = Path(__file__).parent.parent.parent
     for path in ("cogs", "cogs/Games"):
         for f in (here / path).iterdir():

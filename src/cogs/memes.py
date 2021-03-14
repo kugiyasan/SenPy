@@ -8,7 +8,7 @@ import io
 from pathlib import Path
 import random
 import requests
-import typing
+from typing import Union
 
 
 class Memes(commands.Cog):
@@ -151,7 +151,7 @@ class Memes(commands.Cog):
     async def petpet(
         self,
         ctx,
-        userOrLink: typing.Union[discord.Member, discord.User, str] = None,
+        userOrLink: Union[discord.Member, discord.User, str] = None,
         speed_ms: int = None,
     ):
         """Headpat people or images that need to be protected! """

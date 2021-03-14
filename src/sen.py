@@ -2,15 +2,14 @@ import discord
 from discord.ext import commands
 
 import os
-from dotenv import load_dotenv
+import dotenv
 
 from cogs.utils.get_extensions import get_extensions
 from cogs.utils.get_prefixes import get_prefixes
 
-load_dotenv()
-
 
 def create_bot() -> commands.Bot:
+    dotenv.load_dotenv()
     prefix = os.environ["DEFAULT_COMMAND_PREFIX"]
     intents = discord.Intents.default()
     intents.members = True

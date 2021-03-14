@@ -2,8 +2,9 @@ import discord
 from discord.ext import commands
 import asyncio
 from enum import Enum
+from typing import List
 
-from cogs.utils.dbms import conn, cursor
+from .utils.dbms import conn, cursor
 
 
 class RoleActions(Enum):
@@ -14,7 +15,7 @@ class RoleActions(Enum):
 
 
 class Roles(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
 
     @commands.guild_only()
@@ -44,7 +45,8 @@ class Roles(commands.Cog):
         """Admin command. Let you choose which roles can be given by the bot"""
         await self.roleEmbed(ctx, RoleActions.MANAGEDEL)
 
-    def renderEmbed(self, ctx, roles, page):
+    @staticmethod
+    def renderEmbed(roles: List[discord.Role], page: int):
         title = (
             "React to the number associated with the role you want to interact with!"
         )
@@ -67,13 +69,18 @@ class Roles(commands.Cog):
 
         return embed
 
-    def getUserAvailableRoles(self, authorRoles, guild, roleAction):
+    def getUserAvailableRoles(
+        self,
+        authorRoles: List[discord.Role],
+        guild: discord.Guild,
+        roleAction: RoleActions,
+    ):
         with conn:
             command = "SELECT rolesToGive FROM guilds WHERE id=%s"
             cursor.execute(command, (guild.id,))
             try:
                 roles = cursor.fetchone()[0] or []
-            except IndexError:
+            except TypeError:
                 roles = []
 
         if roleAction == RoleActions.ADD:
@@ -92,14 +99,15 @@ class Roles(commands.Cog):
         roles = (role for role in roles if role is not None)
         return sorted(roles, key=lambda e: e.name)
 
-    async def initEmbed(self, ctx, roleAction, page):
+    async def initEmbed(
+        self, ctx: commands.Context, roleAction: RoleActions, page: int
+    ):
         roles = self.getUserAvailableRoles(ctx.author.roles, ctx.guild, roleAction)
 
         if not len(roles):
             return None, None
 
-        e = self.renderEmbed(ctx, roles, page)
-        message = await ctx.send(embed=e)
+        message = await ctx.send(embed=self.renderEmbed(roles, page))
 
         if len(roles) <= 9:
             for n in range(9):
@@ -114,7 +122,7 @@ class Roles(commands.Cog):
 
         return roles, message
 
-    async def roleEmbed(self, ctx: commands.Context, roleAction):
+    async def roleEmbed(self, ctx: commands.Context, roleAction: RoleActions):
         page = 0
         roles, message = await self.initEmbed(ctx, roleAction, page)
 
@@ -141,7 +149,7 @@ class Roles(commands.Cog):
                     return
 
             page %= (len(roles) - 1) // 9 + 1
-            await message.edit(embed=self.renderEmbed(ctx, roles, page))
+            await message.edit(embed=self.renderEmbed(roles, page))
 
             try:
                 res = await self.bot.wait_for("reaction_add", check=check, timeout=30)
@@ -152,7 +160,13 @@ class Roles(commands.Cog):
             emoji = str(res[0].emoji)
             await message.remove_reaction(res[0].emoji, res[1])
 
-    async def numberEmojiSelected(self, ctx, roleNumber, roles, roleAction):
+    async def numberEmojiSelected(
+        self,
+        ctx: commands.Context,
+        roleNumber: int,
+        roles: List[discord.Role],
+        roleAction: RoleActions,
+    ):
         # TODO The user shouldn't see None anymore
         if roleNumber >= len(roles):
             await ctx.send("You chose None! Exiting...")

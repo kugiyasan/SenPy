@@ -119,7 +119,7 @@ def setup(bot: commands.Bot):
     bot.add_cog(Help(bot))
 
 
-# Usefull variables for help command
+# Useful variables for help command
 # =============================
 
 # self.clean_prefix  # Current prefix
