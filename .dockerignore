@@ -1,0 +1,20 @@
+# Ignoring all files from .gitignore
+
+.mypy_cache/
+__pycache__/
+.pytest_cache/
+.vscode/
+
+2019-05-06-stylegan-malefaces-1ksamples/
+junk/
+
+.env
+nohup.out
+
+# Ignoring files that are useless at runtime
+
+.qovery.yml
+LICENSE
+Procfile
+README.md
+runtime.txt
