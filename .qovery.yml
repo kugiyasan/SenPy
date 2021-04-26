@@ -1,0 +1,11 @@
+---
+application:
+  name: "senpy"
+  project: "discord-bot"
+  organization: "QoveryCommunity"
+routers:
+- name: "main-senpy"
+  routes:
+  - application_name: "senpy"
+    paths:
+    - "/*"
