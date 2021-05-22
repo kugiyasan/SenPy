@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 
-from cogs.utils.prettyList import prettyList
-from cogs.utils.dbms import conn, cursor
+from cogs.utils.dbms import db
 from cogs.utils.get_extensions import get_extensions
 
 
@@ -46,28 +45,22 @@ class Owner(commands.Cog):
 
     @commands.is_owner()
     @commands.command(hidden=True)
-    async def sql(self, ctx, code, *values):
+    async def sql(self, ctx: commands.Context, code: str, *values):
         code = code.strip("`").lower()
-        with conn:
-            cursor.execute(code, values)
 
-            if code.startswith("select"):
-                await ctx.send(cursor.fetchall())
+        if code.startswith("select"):
+            data = db.get_data(code, values)
+            await ctx.send(data)
+        else:
+            db.set_data(code, values)
+            await ctx.message.add_reaction("✅")
 
     @commands.is_owner()
     @commands.command(hidden=True)
-    async def activity(self, ctx, *, string):
+    async def activity(self, ctx: commands.Context, *, string: str):
         occupation = discord.Game(name=string)
         await self.bot.change_presence(activity=occupation)
         await ctx.message.add_reaction("✅")
-
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def servers(self, ctx):
-        title = f"Running on {len(self.bot.guilds)} servers"
-        guilds = [f"{g.name}: {g.member_count} members" for g in self.bot.guilds]
-
-        await prettyList(ctx, title, guilds, maxLength=0)
 
     @commands.is_owner()
     @commands.command(hidden=True, aliases=["rl"])

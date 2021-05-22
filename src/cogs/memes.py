@@ -111,6 +111,20 @@ class Memes(commands.Cog):
                 "untouched by your love."
             )
 
+    async def get_image(self, attachments, userOrLink):
+        if not userOrLink:
+            if not attachments:
+                raise FileNotFoundError("Please attach an image or tag a person!")
+
+            image = await attachments[0].read()
+        elif isinstance(userOrLink, (discord.Member, discord.User)):
+            image = await userOrLink.avatar_url_as(format="png", size=256).read()
+        else:  # isinstance(userOrLink, str):
+            # This may fail, and should be handled by the outer function
+            image = requests.get(userOrLink).content
+
+        return image
+
     def petpetFrames(self, petImg):
         x = 50
         y = 75
@@ -155,20 +169,14 @@ class Memes(commands.Cog):
         speed_ms: int = None,
     ):
         """Headpat people or images that need to be protected! """
-        if not userOrLink:
-            if not ctx.message.attachments:
-                await ctx.send("Please attach an image or tag a person!")
-                return
-
-            image = await ctx.message.attachments[0].read()
-        elif isinstance(userOrLink, (discord.Member, discord.User)):
-            image = await userOrLink.avatar_url_as(format="png", size=256).read()
-        else:  # isinstance(userOrLink, str):
-            try:
-                image = requests.get(userOrLink).content
-            except requests.exceptions.MissingSchema as err:
-                await ctx.send(err)
-                return
+        try:
+            image = await self.get_image(ctx.message.attachments, userOrLink)
+        except requests.exceptions.MissingSchema as err:
+            await ctx.send(err)
+            return
+        except FileNotFoundError as err:
+            await ctx.send(err)
+            return
 
         images = self.petpetFrames(Image.open(io.BytesIO(image)))
 
@@ -194,6 +202,16 @@ class Memes(commands.Cog):
 
         embed.set_image(url="attachment://petpet.gif")
         await ctx.send(file=gifFile, embed=embed)
+
+    @commands.command(name="random", hidden=True)
+    async def rnd(self, ctx, m: discord.Member = None):
+        """This command only works on the Chika-Two server"""
+        if ctx.guild.id != 722359478799958057:
+            return
+
+        m = m or random.choice(ctx.guild.members)
+        text = f"{m.mention}!!! You've been summoned to make the server active!!"
+        await ctx.send(text)
 
 
 def setup(bot: commands.Bot):

@@ -7,7 +7,7 @@ import re
 import traceback
 from typing import List, Set
 
-from cogs.utils.dbms import conn, cursor
+from cogs.utils.dbms import db
 
 
 class Events(commands.Cog):
@@ -151,9 +151,8 @@ class Events(commands.Cog):
         await channel.send(newemojis)
 
     async def getGeneralchannel(self, guildID: int):
-        with conn:
-            cursor.execute("SELECT welcomebye FROM guilds WHERE id=%s", (guildID,))
-            return self.bot.get_channel(cursor.fetchone()[0])
+        channel = db.get_data("SELECT welcomebye FROM guilds WHERE id=%s", (guildID,))
+        return self.bot.get_channel(channel[0][0])
 
 
 def setup(bot: commands.Bot):

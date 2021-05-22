@@ -1,1 +1,1 @@
-worker: python sen.py
+worker: python src/sen.py

@@ -2,31 +2,29 @@ from discord.ext import commands
 
 import random
 
-from cogs.utils.dbms import conn, cursor
+from cogs.utils.dbms import db
 from cogs.utils.prettyList import prettyList
 
 
 def giveMofuPoints(user, points):
-    with conn:
-        cursor.execute(
-            """INSERT INTO users (id, mofupoints)
-                VALUES(%s, %s)
-                ON CONFLICT(id)
-                DO UPDATE SET mofupoints = users.mofupoints + %s""",
-            (user.id, points, points),
-        )
+    db.set_data(
+        """INSERT INTO users (id, mofupoints)
+            VALUES(%s, %s)
+            ON CONFLICT(id)
+            DO UPDATE SET mofupoints = users.mofupoints + %s""",
+        (user.id, points, points),
+    )
 
 
 def incrementEmbedCounter(user):
-    with conn:
-        cursor.execute(
-            """INSERT INTO users (id, numberOfEmbedRequests)
-                VALUES(%s, 1)
-                ON CONFLICT(id)
-                DO UPDATE SET
-                numberOfEmbedRequests = users.numberOfEmbedRequests + 1""",
-            (user.id,),
-        )
+    db.set_data(
+        """INSERT INTO users (id, numberOfEmbedRequests)
+            VALUES(%s, 1)
+            ON CONFLICT(id)
+            DO UPDATE SET
+            numberOfEmbedRequests = users.numberOfEmbedRequests + 1""",
+        (user.id,),
+    )
 
 
 class MofuPoints(commands.Cog):
@@ -35,17 +33,15 @@ class MofuPoints(commands.Cog):
 
     def getUsersLeaderboard(self, ctx, category):
         if category == "mofupoints":
-            cursor.execute(
+            rows = db.get_data(
                 """SELECT id, mofupoints FROM users
                     ORDER BY mofupoints DESC"""
             )
-            rows = cursor.fetchall()
         elif category == "numberOfEmbedRequests":
-            cursor.execute(
+            rows = db.get_data(
                 """SELECT id, numberOfEmbedRequests FROM users
                     ORDER BY numberOfEmbedRequests DESC"""
             )
-            rows = cursor.fetchall()
         else:
             raise ValueError(
                 "Unknown category. Available args: mofupoints, numberOfEmbedRequests"

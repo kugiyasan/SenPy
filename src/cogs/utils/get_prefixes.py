@@ -3,21 +3,18 @@ from discord.ext import commands
 
 from functools import lru_cache
 import os
+from typing import Optional
 
-from cogs.utils.dbms import conn, cursor
+from cogs.utils.dbms import db
 
 PREFIX = os.environ["DEFAULT_COMMAND_PREFIX"]
 
 
 @lru_cache
-def get_guild_prefix(guildID: int):
-    try:
-        with conn:
-            query = "SELECT command_prefix FROM guilds WHERE id = %s"
-            cursor.execute(query, (guildID,))
-            return cursor.fetchone()[0]
-    except TypeError:
-        return None
+def get_guild_prefix(guildID: int) -> Optional[str]:
+    query = "SELECT command_prefix FROM guilds WHERE id = %s"
+    result = db.get_data(query, (guildID,))
+    return result[0][0]
 
 
 def get_prefixes(bot: commands.Bot, message: discord.Message):

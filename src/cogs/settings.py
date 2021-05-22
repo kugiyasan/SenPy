@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 
-from cogs.utils.dbms import conn, cursor
+from cogs.utils.dbms import db
 
 
 class Settings(commands.Cog):
@@ -20,14 +20,13 @@ class Settings(commands.Cog):
         if newPrefix == "xd":
             newPrefix = None
 
-        with conn:
-            cursor.execute(
-                """INSERT INTO guilds (id, command_prefix)
-                            VALUES(%s, %s)
-                            ON CONFLICT(id)
-                            DO UPDATE SET command_prefix = %s""",
-                (ctx.guild.id, newPrefix, newPrefix),
-            )
+        db.set_data(
+            """INSERT INTO guilds (id, command_prefix)
+                VALUES(%s, %s)
+                ON CONFLICT(id)
+                DO UPDATE SET command_prefix = %s""",
+            (ctx.guild.id, newPrefix, newPrefix),
+        )
 
         if not newPrefix:
             await ctx.send("The command prefix has been reset to xd!")
@@ -40,20 +39,19 @@ class Settings(commands.Cog):
     async def welcomeChannel(self, ctx, channel: commands.TextChannelConverter = None):
         """View the current welcoming channel and change it to your preference"""
         if not channel:
-            with conn:
-                cursor.execute(
-                    "SELECT welcomebye FROM guilds WHERE id=%s", (ctx.guild.id,)
-                )
-                channel = cursor.fetchone()[0]
+            result = db.get_data(
+                "SELECT welcomebye FROM guilds WHERE id=%s", (ctx.guild.id,)
+            )
+            channel = result[0][0]
 
-                mention = self.bot.get_channel(channel).mention
-                await ctx.send(
-                    f"Welcome messages are sent in {mention} (id: {channel})\n"
-                    'to change the channel, type "xd welcome #welcome"'
-                    "and put the actual channel name"
-                )
+            mention = self.bot.get_channel(channel).mention
+            await ctx.send(
+                f"Welcome messages are sent in {mention} (id: {channel})\n"
+                'to change the channel, type "xd welcome #welcome"'
+                "and put the actual channel name"
+            )
 
-                return
+            return
 
         if channel.guild.id != ctx.guild.id:
             await ctx.send(
@@ -73,14 +71,13 @@ class Settings(commands.Cog):
 
         await ctx.send(f"A test have been sent into the {channel.mention} channel!")
 
-        with conn:
-            cursor.execute(
-                """INSERT INTO guilds (id, welcomebye)
-                            VALUES(%s, %s)
-                            ON CONFLICT(id)
-                            DO UPDATE SET welcomebye = %s""",
-                (ctx.guild.id, channel.id, channel.id),
-            )
+        db.set_data(
+            """INSERT INTO guilds (id, welcomebye)
+                VALUES(%s, %s)
+                ON CONFLICT(id)
+                DO UPDATE SET welcomebye = %s""",
+            (ctx.guild.id, channel.id, channel.id),
+        )
 
         await ctx.send("Setting saved!")
 

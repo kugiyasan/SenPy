@@ -4,7 +4,7 @@ import asyncio
 from enum import Enum
 from typing import List
 
-from .utils.dbms import conn, cursor
+from .utils.dbms import db
 
 
 class RoleActions(Enum):
@@ -75,13 +75,11 @@ class Roles(commands.Cog):
         guild: discord.Guild,
         roleAction: RoleActions,
     ):
-        with conn:
-            command = "SELECT rolesToGive FROM guilds WHERE id=%s"
-            cursor.execute(command, (guild.id,))
-            try:
-                roles = cursor.fetchone()[0] or []
-            except TypeError:
-                roles = []
+        command = "SELECT rolesToGive FROM guilds WHERE id=%s"
+        try:
+            roles = db.get_data(command, (guild.id,))[0][0] or []
+        except TypeError:
+            roles = []
 
         if roleAction == RoleActions.ADD:
             roles = set(roles).difference(role.id for role in authorRoles)
@@ -181,22 +179,20 @@ class Roles(commands.Cog):
             await ctx.author.remove_roles(role, reason="xd delrole")
             await ctx.send(f"You chose : {role.name}! The role is removed!")
         elif roleAction == RoleActions.MANAGEADD:
-            with conn:
-                cursor.execute(
-                    """INSERT INTO guilds (id, rolesToGive)
-                        VALUES (%s, Array [%s])
-                        ON CONFLICT(id)
-                        DO UPDATE SET rolesToGive=guilds.rolesToGive||%s""",
-                    (ctx.guild.id, role.id, role.id),
-                )
+            db.set_data(
+                """INSERT INTO guilds (id, rolesToGive)
+                    VALUES (%s, Array [%s])
+                    ON CONFLICT(id)
+                    DO UPDATE SET rolesToGive=guilds.rolesToGive||%s""",
+                (ctx.guild.id, role.id, role.id),
+            )
 
             await ctx.send(f"{role.name} is now available for the members!")
         elif roleAction == RoleActions.MANAGEDEL:
-            with conn:
-                cursor.execute(
-                    "UPDATE guilds SET rolesToGive=array_remove(rolesToGive, %s)",
-                    (role.id,),
-                )
+            db.set_data(
+                "UPDATE guilds SET rolesToGive=array_remove(rolesToGive, %s)",
+                (role.id,),
+            )
 
             await ctx.send(f"{role.name} is now unavailable for the members!")
 
