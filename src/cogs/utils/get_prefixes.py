@@ -14,7 +14,9 @@ PREFIX = os.environ["DEFAULT_COMMAND_PREFIX"]
 def get_guild_prefix(guildID: int) -> Optional[str]:
     query = "SELECT command_prefix FROM guilds WHERE id = %s"
     result = db.get_data(query, (guildID,))
-    return result[0][0]
+    if len(result) and len(result[0]):
+        return result[0][0]
+    return None
 
 
 def get_prefixes(bot: commands.Bot, message: discord.Message):
