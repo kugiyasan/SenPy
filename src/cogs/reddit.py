@@ -1,10 +1,9 @@
 import discord
-from discord.ext import commands, tasks
+from discord.ext import commands
 
-from cogs.utils.prettyList import prettyList
-from cogs.mofupoints import incrementEmbedCounter
+from .utils.prettyList import prettyList
+from .mofupoints import incrementEmbedCounter
 
-import asyncio
 from fake_useragent import UserAgent
 import inspect
 import random
@@ -20,30 +19,6 @@ class RedditAPI(commands.Cog, name="Reddit"):
         self.bot = bot
         self.ua = UserAgent(verify_ssl=False)
         self.urls: Dict[str, List[Post]] = {}
-        self.waifuByTheHour.start()
-
-    def cog_unload(self):
-        self.waifuByTheHour.cancel()
-
-    @tasks.loop(hours=1.0)
-    async def waifuByTheHour(self):
-        channelID = 722374291148111884
-        subreddits = ("chikafujiwara", "zerotwo")
-        await self.hourlyRedditImage(channelID, subreddits)
-
-    @waifuByTheHour.before_loop
-    async def before_waifuByTheHour(self):
-        await self.bot.wait_until_ready()
-        await asyncio.sleep(1)
-
-    async def hourlyRedditImage(self, channelID, subreddits):
-        channel = self.bot.get_channel(channelID)
-
-        if not channel:
-            return
-
-        subreddit = random.choice(subreddits)
-        await self.sendRedditImage(channel, subreddit, dropnsfw=True)
 
     @commands.command(aliases=["ara"])
     async def araara(self, ctx: commands.Context):
@@ -135,7 +110,7 @@ class RedditAPI(commands.Cog, name="Reddit"):
 
         if post["over_18"]:
             nsfwChannel = True
-            if ctx.guild:
+            if isinstance(ctx.channel, discord.TextChannel):
                 nsfwChannel = ctx.channel.is_nsfw()
 
             if not nsfwChannel:

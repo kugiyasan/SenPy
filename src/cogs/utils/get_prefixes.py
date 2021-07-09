@@ -5,7 +5,7 @@ from functools import lru_cache
 import os
 from typing import Optional
 
-from cogs.utils.dbms import db
+from .dbms import db
 
 PREFIX = os.environ["DEFAULT_COMMAND_PREFIX"]
 
@@ -14,8 +14,9 @@ PREFIX = os.environ["DEFAULT_COMMAND_PREFIX"]
 def get_guild_prefix(guildID: int) -> Optional[str]:
     query = "SELECT command_prefix FROM guilds WHERE id = %s"
     result = db.get_data(query, (guildID,))
+    # ? len(result) seems like an unnecessary check
     if len(result) and len(result[0]):
-        return result[0][0]
+        return str(result[0][0])
     return None
 
 

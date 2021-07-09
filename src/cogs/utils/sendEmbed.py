@@ -1,6 +1,6 @@
 import discord
 
-from cogs.mofupoints import incrementEmbedCounter
+from ..mofupoints import incrementEmbedCounter
 
 
 async def sendEmbed(ctx, url, localImageFile=None, **kwargs):

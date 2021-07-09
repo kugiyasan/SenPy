@@ -1,0 +1,4 @@
+-r requirements.txt
+discord.py-stubs
+git+https://github.com/bravosierra99/dpytest.git
+lxml-stubs

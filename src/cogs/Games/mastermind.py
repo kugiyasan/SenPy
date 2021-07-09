@@ -1,8 +1,8 @@
 import discord
 from discord.ext import commands
 
-from cogs.mofupoints import giveMofuPoints
-from cogs.utils.deleteMessage import deleteMessage
+from ..mofupoints import giveMofuPoints
+from ..utils.deleteMessage import deleteMessage
 
 import asyncio
 import random
@@ -69,7 +69,9 @@ class Mastermind(commands.Cog, name="Games"):
         self.playingUsers.discard(ctx.author)
         giveMofuPoints(ctx.author, guessLength ** 2)
 
-    async def getUserInput(self, ctx, answer) -> Tuple[discord.Message, Optional[str]]:
+    async def getUserInput(
+        self, ctx: commands.Context, answer: List[int]
+    ) -> Optional[Tuple[discord.Message, str]]:
         def checkresponse(m):
             return m.author == ctx.author and m.channel == ctx.channel
 
@@ -137,9 +139,10 @@ class Mastermind(commands.Cog, name="Games"):
         # MAIN LOOP
         tryCount = 0
         while tryCount < NUMBER_OF_TRIES:
-            m, msg = await self.getUserInput(ctx, answer)
-            if not msg:
+            userInput = await self.getUserInput(ctx, answer)
+            if not userInput:
                 return
+            m, msg = userInput
 
             if await self.isInvalidMessage(ctx, msg, boardMessage, guessLength):
                 continue

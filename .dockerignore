@@ -5,16 +5,23 @@ __pycache__/
 .pytest_cache/
 .vscode/
 
-2019-05-06-stylegan-malefaces-1ksamples/
 junk/
 
-.env
+# .env
 nohup.out
 
 # Ignoring files that are useless at runtime
 
+.git/
+tests/
+.dockerignore
+.env.example
+.gitignore
 .qovery.yml
+Dockerfile
 LICENSE
+mypy.ini
 Procfile
 README.md
+requirements-dev.txt
 runtime.txt

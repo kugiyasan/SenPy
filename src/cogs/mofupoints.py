@@ -2,8 +2,8 @@ from discord.ext import commands
 
 import random
 
-from cogs.utils.dbms import db
-from cogs.utils.prettyList import prettyList
+from .utils.dbms import db
+from .utils.prettyList import prettyList
 
 
 def giveMofuPoints(user, points):

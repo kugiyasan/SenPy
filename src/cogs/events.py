@@ -2,12 +2,12 @@ import discord
 from discord.ext import commands
 
 import asyncio
-from datetime import datetime
+import datetime as dt
 import re
 import traceback
 from typing import List, Set
 
-from cogs.utils.dbms import db
+from .utils.dbms import db
 
 
 class Events(commands.Cog):
@@ -32,7 +32,7 @@ class Events(commands.Cog):
             msgSet = set(m.content.lower() for m in msgs)
             authors = set(m.author for m in msgs if not m.author.bot)
 
-            if len(msgSet) == 1 and len(authors) == 3:
+            if len(msgSet) == 1 and len(authors) == 3 and msgs[0].content != "":
                 await ctx.send(msgs[0].content)
         except discord.Forbidden:
             pass
@@ -56,30 +56,30 @@ class Events(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self, ctx: commands.Context, exception: Exception):
-        errors = (
+        errors1 = (
             asyncio.TimeoutError,
             commands.errors.NotOwner,
         )
-        if ctx.command is None or isinstance(exception, errors):
+        if ctx.command is None or isinstance(exception, errors1):
             return
 
-        errors = (
+        errors2 = (
             commands.errors.MissingRequiredArgument,
             commands.errors.BadArgument,
         )
-        if isinstance(exception, errors):
+        if isinstance(exception, errors2):
             await ctx.send(exception)
             await ctx.send_help(ctx.command)
             return
 
-        errors = (
+        errors3 = (
             commands.errors.NSFWChannelRequired,
             commands.errors.MissingPermissions,
             commands.errors.BotMissingPermissions,
             commands.errors.NoPrivateMessage,
             commands.errors.CommandOnCooldown,
         )
-        if isinstance(exception, errors):
+        if isinstance(exception, errors3):
             await ctx.send(exception)
             return
 
@@ -115,7 +115,7 @@ class Events(commands.Cog):
     async def on_member_remove(self, member: discord.Member):
         channel = await self.getGeneralchannel(member.guild.id)
         if channel:
-            timeInTheGuild = datetime.utcnow() - member.joined_at
+            timeInTheGuild = dt.datetime.utcnow() - (member.joined_at or dt.timedelta())
             text = (
                 f"See you later alligator {member.mention}.\n"
                 + f"You stayed in this server for {str(timeInTheGuild)[:-3]}!"
@@ -151,8 +151,11 @@ class Events(commands.Cog):
         await channel.send(newemojis)
 
     async def getGeneralchannel(self, guildID: int):
-        channel = db.get_data("SELECT welcomebye FROM guilds WHERE id=%s", (guildID,))
-        return self.bot.get_channel(channel[0][0])
+        query = "SELECT welcomebye FROM guilds WHERE id=%s"
+        channel = db.get_data(query, (guildID,))[0]
+        if len(channel) < 1:
+            return None
+        return self.bot.get_channel(channel[0])
 
 
 def setup(bot: commands.Bot):

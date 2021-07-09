@@ -5,7 +5,7 @@ from datetime import datetime
 import random
 import sys
 
-from cogs.utils.deleteMessage import deleteMessage
+from .utils.deleteMessage import deleteMessage
 
 
 class Info(commands.Cog):
@@ -92,8 +92,10 @@ class Info(commands.Cog):
                     break
 
         try:
+            if not isinstance(ctx.channel, discord.TextChannel):
+                raise TypeError
             await ctx.channel.delete_messages(msgs)
-        except (discord.errors.Forbidden, AttributeError):
+        except (discord.errors.Forbidden, AttributeError, TypeError):
             for msg in msgs:
                 await msg.delete()
 

@@ -74,7 +74,7 @@ class Roles(commands.Cog):
         authorRoles: List[discord.Role],
         guild: discord.Guild,
         roleAction: RoleActions,
-    ):
+    ) -> List[discord.Role]:
         command = "SELECT rolesToGive FROM guilds WHERE id=%s"
         try:
             roles = db.get_data(command, (guild.id,))[0][0] or []
@@ -100,6 +100,8 @@ class Roles(commands.Cog):
     async def initEmbed(
         self, ctx: commands.Context, roleAction: RoleActions, page: int
     ):
+        if isinstance(ctx.author, discord.User) or not ctx.guild:
+            return
         roles = self.getUserAvailableRoles(ctx.author.roles, ctx.guild, roleAction)
 
         if not len(roles):
@@ -171,12 +173,15 @@ class Roles(commands.Cog):
             return
 
         role = roles[roleNumber]
+        if isinstance(ctx.author, discord.User) or not ctx.guild:
+            return
+        author = ctx.author
 
         if roleAction == RoleActions.ADD:
-            await ctx.author.add_roles(role, reason="xd addrole")
+            await author.add_roles(role, reason="senpy addrole")
             await ctx.send(f"You chose : {role.name}! The role is added!")
         elif roleAction == RoleActions.DEL:
-            await ctx.author.remove_roles(role, reason="xd delrole")
+            await author.remove_roles(role, reason="senpy delrole")
             await ctx.send(f"You chose : {role.name}! The role is removed!")
         elif roleAction == RoleActions.MANAGEADD:
             db.set_data(

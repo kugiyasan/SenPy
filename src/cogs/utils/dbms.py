@@ -1,7 +1,7 @@
 import os
 import psycopg2
 from tenacity import retry, wait_exponential, stop_after_attempt
-from typing import Callable
+from typing import Any, Callable, List, Optional, Tuple
 
 
 # https://stackoverflow.com/questions/42385391/auto-reconnect-postgresq-database
@@ -21,11 +21,11 @@ def reconnect(f: Callable):
 
 class DbStorage:
     def __init__(self, conn: str):
-        self._conn: str = conn
-        self._connection = None
+        self._conn = conn
+        self._connection: Optional[Any] = None
 
     def connected(self) -> bool:
-        return self._connection and self._connection.closed == 0
+        return bool(self._connection) and self._connection.closed == 0
 
     def connect(self):
         self.close()
@@ -33,7 +33,6 @@ class DbStorage:
 
     def close(self):
         if self.connected():
-            # noinspection PyBroadException
             try:
                 self._connection.close()
             except Exception:
@@ -43,12 +42,17 @@ class DbStorage:
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential())
     @reconnect
-    def get_data(self, query: str, args):
+    def get_data(self, query: str, args) -> List[Tuple[Any]]:
         """
         Execute the query and let psycopg2 protect from SQL injection
         """
         cur = self._connection.cursor()
         cur.execute(query, args)
+
+        conn = psycopg2.connect()
+        c = conn.cursor()
+        c.execute("SELECT * FROM guilds")
+        c.fetchall()
         return cur.fetchall()
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential())

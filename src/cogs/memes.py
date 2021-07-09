@@ -8,17 +8,17 @@ import io
 from pathlib import Path
 import random
 import requests
-from typing import Union
+from typing import Optional, Union
 
 
 class Memes(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         path = Path(__file__).parent.parent.parent / "media/hand"
-        self.hand_frames = [Image.open(path / f"frame{i+1}.png") for i in range(6)]
+        self.hand_frames = [Image.open(path / f"frame{i}.png") for i in range(1, 7)]
 
     @commands.command()
-    async def insult(self, ctx, *, member: discord.Member = None):
+    async def insult(self, ctx: commands.Context, *, member: discord.Member = None):
         """get an free insult from robietherobot.com/insult-generator.htm"""
         url = "http://www.robietherobot.com/insult-generator.htm"
         webpage = requests.get(url)
@@ -164,11 +164,11 @@ class Memes(commands.Cog):
     @commands.command(aliases=["pet", "headpat", "pat"])
     async def petpet(
         self,
-        ctx,
+        ctx: commands.Context,
         userOrLink: Union[discord.Member, discord.User, str] = None,
-        speed_ms: int = None,
+        speed_ms: Optional[int] = None,
     ):
-        """Headpat people or images that need to be protected! """
+        """Headpat people or images that need to be protected!"""
         try:
             image = await self.get_image(ctx.message.attachments, userOrLink)
         except requests.exceptions.MissingSchema as err:
@@ -204,9 +204,9 @@ class Memes(commands.Cog):
         await ctx.send(file=gifFile, embed=embed)
 
     @commands.command(name="random", hidden=True)
-    async def rnd(self, ctx, m: discord.Member = None):
-        """This command only works on the Chika-Two server"""
-        if ctx.guild.id != 722359478799958057:
+    async def rnd(self, ctx: commands.Context, m: discord.Member = None):
+        """Chika-Two server exclusive command, ping a random user"""
+        if not ctx.guild or ctx.guild.id != 722359478799958057:
             return
 
         m = m or random.choice(ctx.guild.members)

@@ -5,7 +5,7 @@ from pybooru import Danbooru, Moebooru, PybooruHTTPError
 import json
 import requests
 
-from cogs.mofupoints import incrementEmbedCounter
+from .mofupoints import incrementEmbedCounter
 
 
 class BooruCog(commands.Cog, name="Booru"):
@@ -29,7 +29,7 @@ class BooruCog(commands.Cog, name="Booru"):
         post = self.urlsTags[tags].pop()
         if not (
             post["rating"] in ("s", "safe")
-            or isinstance(ctx.channel, discord.DMChannel)
+            or not isinstance(ctx.channel, discord.TextChannel)
             or ctx.channel.is_nsfw()
         ):
             raise commands.errors.NSFWChannelRequired(ctx.channel)

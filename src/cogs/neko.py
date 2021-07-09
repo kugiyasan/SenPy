@@ -4,8 +4,8 @@ import nekos
 import random
 import re
 
-from cogs.utils.sendEmbed import sendEmbed
-from cogs.utils.deleteMessage import deleteMessage
+from .utils.sendEmbed import sendEmbed
+from .utils.deleteMessage import deleteMessage
 
 
 def get_owo(text: str) -> str:

@@ -1,5 +1,4 @@
 discord.py
-git+https://github.com/bravosierra99/dpytest.git
 python-dotenv
 fake_useragent
 lxml
