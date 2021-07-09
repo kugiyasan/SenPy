@@ -48,11 +48,6 @@ class DbStorage:
         """
         cur = self._connection.cursor()
         cur.execute(query, args)
-
-        conn = psycopg2.connect()
-        c = conn.cursor()
-        c.execute("SELECT * FROM guilds")
-        c.fetchall()
         return cur.fetchall()
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential())

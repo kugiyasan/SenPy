@@ -23,13 +23,13 @@ class MyHelpCommand(commands.HelpCommand):
         )
         to_iterate = itertools.groupby(filtered, key=get_category)
 
-        for category, commandsObj in to_iterate:
+        for category, commands_obj in to_iterate:
             if category == "Help":
                 continue
 
-            commandsObj = sorted(commandsObj, key=lambda c: c.name)
-            commandsName = "\n".join(str(command) for command in commandsObj)
-            text += f"\n\n**{category}:**\n" + commandsName
+            commands_obj = sorted(commands_obj, key=lambda c: c.name)
+            commands_name = "\n".join(str(command) for command in commands_obj)
+            text += f"\n\n**{category}:**\n" + commands_name
 
         column1, column2 = self.divideInTwoColumns(text)
 
@@ -45,9 +45,9 @@ class MyHelpCommand(commands.HelpCommand):
         await ctx.send(embed=embed)
 
     # This function triggers when someone type `<prefix>help <cog>`
-    async def send_cog_help(self, cog):
+    async def send_cog_help(self, cog: commands.Cog):
         ctx = self.context
-        print(cog.name)
+        print(cog.qualified_name)
 
         def get_category(command):
             cmdCog = command.cog
@@ -58,18 +58,18 @@ class MyHelpCommand(commands.HelpCommand):
         )
         to_iterate = itertools.groupby(filtered, key=get_category)
 
-        commandsObj = None
-        for category, commandsObj in to_iterate:
+        commands_obj = None
+        for category, commands_obj in to_iterate:
             print(category, cog)
             if category != cog:
                 continue
 
-            commandsObj = sorted(commandsObj, key=lambda c: c.name)
+            commands_obj = sorted(commands_obj, key=lambda c: c.name)
 
         embed = discord.Embed(title="Commands:", color=discord.Color(0xFF5BAE))
         embed.set_thumbnail(url=ctx.me.avatar_url)
 
-        for command in commandsObj:
+        for command in commands_obj:
             embed.add_field(
                 name=" / ".join((command.name, *command.aliases)),
                 value=command.short_doc or "No description",

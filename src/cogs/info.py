@@ -75,13 +75,15 @@ class Info(commands.Cog):
         if count < 1:
             return
 
-        try:
-            msg = await ctx.fetch_message(count)
-            if msg.author.id in (self.bot.user.id, ctx.author.id):
-                await msg.delete()
+        # Big count means that the int is probably a message id
+        if count > 100:
+            try:
+                msg = await ctx.fetch_message(count)
+                if msg.author.id in (self.bot.user.id, ctx.author.id):
+                    await msg.delete()
+            except discord.NotFound:
+                pass
             return
-        except discord.NotFound:
-            pass
 
         async for message in ctx.history(limit=100):
             if message.author == self.bot.user:
@@ -100,17 +102,17 @@ class Info(commands.Cog):
                 await msg.delete()
 
     @commands.command()
-    async def ping(self, ctx):
+    async def ping(self, ctx: commands.Context):
         """haha ping pong"""
         await ctx.send(f"Pong! The latency is about {self.bot.latency*1000:.0f} ms")
 
     @commands.command(hidden=True)
-    async def pong(self, ctx):
+    async def pong(self, ctx: commands.Context):
         """haha ping pong"""
         await ctx.send("Ping... You ugly btw")
 
     @commands.command(aliases=["suggest", "comment", "feedback"])
-    async def report(self, ctx, *, text=""):
+    async def report(self, ctx: commands.Context, *, text: str = ""):
         """Send your thoughts about this bot to the bot dev"""
 
         if text == "":
@@ -125,7 +127,7 @@ class Info(commands.Cog):
         await ctx.send("Your feedback was sent successfully!")
 
     @commands.command()
-    async def say(self, ctx: commands.Context, *, words="_ _"):
+    async def say(self, ctx: commands.Context, *, words: str = "_ _"):
         """Make this little innocent bot speak for you, you pervert"""
         attachment = (
             await ctx.message.attachments[0].to_file()
@@ -137,7 +139,7 @@ class Info(commands.Cog):
         await ctx.send(words, file=attachment)
 
     @commands.command(aliases=["SaY"])
-    async def sAy(self, ctx: commands.Context, *, words="_ _"):
+    async def sAy(self, ctx: commands.Context, *, words: str = "_ _"):
         """MaKe tHiS LiTtLe iNnOcEnT BoT SpEaK FoR YoU, yOu pErVeRt"""
         alternateCase = ""
         for c in words.lower():
@@ -149,7 +151,7 @@ class Info(commands.Cog):
         await self.say(ctx, words=alternateCase)
 
     @commands.command()
-    async def poll(self, ctx: commands.Context, *, question):
+    async def poll(self, ctx: commands.Context, *, question: str):
         """Make a yes/no poll"""
         message = await ctx.send(f"**{question}**")
         await message.add_reaction("👍")
