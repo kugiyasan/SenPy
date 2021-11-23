@@ -22,7 +22,7 @@ def get_guild_prefix(guildID: int) -> Optional[str]:
 
 def get_prefixes(bot: commands.Bot, message: discord.Message):
     prefix = PREFIX
-    if message.guild is not None:
-        prefix = get_guild_prefix(message.guild.id) or prefix
+    # if message.guild is not None:
+    #     prefix = get_guild_prefix(message.guild.id) or prefix
 
     return commands.when_mentioned_or(prefix + " ", prefix)(bot, message)
