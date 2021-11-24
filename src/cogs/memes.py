@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.message import Attachment
 
 from lxml import html
 from PIL import Image
@@ -8,17 +9,21 @@ import io
 from pathlib import Path
 import random
 import requests
-from typing import Optional, Union
+from typing import List, Optional, Union
+
+UserOrLink = Union[discord.Member, discord.User, str, None]
 
 
 class Memes(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         path = Path(__file__).parent.parent.parent / "media/hand"
         self.hand_frames = [Image.open(path / f"frame{i}.png") for i in range(1, 7)]
 
     @commands.command()
-    async def insult(self, ctx: commands.Context, *, member: discord.Member = None):
+    async def insult(
+        self, ctx: commands.Context, *, member: Optional[discord.Member] = None
+    ) -> None:
         """get an free insult from robietherobot.com/insult-generator.htm"""
         url = "http://www.robietherobot.com/insult-generator.htm"
         webpage = requests.get(url)
@@ -35,10 +40,10 @@ class Memes(commands.Cog):
             raise ConnectionError
 
     @commands.command(aliases=["legal"])
-    async def legalize(self, ctx, age):
+    async def legalize(self, ctx: commands.Context, age_str: str) -> None:
         """All lolis can be legal, if you let me handle it!"""
         try:
-            age = int(age)
+            age = int(age_str)
             if age < 1:
                 raise ValueError
         except ValueError:
@@ -59,13 +64,13 @@ class Memes(commands.Cog):
             await ctx.send(f"{age}? That's {20+age%2}, in base {age//2}!")
 
     @commands.command(aliases=["cat"])
-    async def catyears(self, ctx, age):
+    async def catyears(self, ctx: commands.Context, age_str: str) -> None:
         """
         The following program does not endorse in any way,
         shape or form the slavery of sapient beings
         """
         try:
-            age = int(age)
+            age = int(age_str)
             if age < 1:
                 raise ValueError
         except ValueError:
@@ -111,7 +116,9 @@ class Memes(commands.Cog):
                 "untouched by your love."
             )
 
-    async def get_image(self, attachments, userOrLink):
+    async def get_image(
+        self, attachments: List[Attachment], userOrLink: UserOrLink
+    ) -> bytes:
         if not userOrLink:
             if not attachments:
                 raise FileNotFoundError("Please attach an image or tag a person!")
@@ -125,7 +132,7 @@ class Memes(commands.Cog):
 
         return image
 
-    def petpetFrames(self, petImg):
+    def petpetFrames(self, petImg: Image.Image) -> List[Image.Image]:
         x = 50
         y = 75
         width = 200
@@ -139,7 +146,7 @@ class Memes(commands.Cog):
         frames = []
 
         for i in range(CYCLE):
-            frame = Image.new("RGBA", (256, 256), (255, 0, 0, 0))
+            frame = Image.new("RGBA", (256, 256), (0, 0, 0, 0))
             phase = 2 * pi / CYCLE * i
 
             squish_y = int(squish_y_amp * cos(phase))
@@ -149,11 +156,14 @@ class Memes(commands.Cog):
             shake_y = int(shake_y_amp * -cos(phase))
 
             petCoords = (x - squish_x // 2 + shake_x, y - squish_y + shake_y)
+            resized_img = petImg.resize((squish_x + width, squish_y + height)).convert(
+                "RGBA"
+            )
 
             frame.paste(
-                petImg.resize((squish_x + width, squish_y + height)),
-                petCoords,
-                petImg.resize((squish_x + width, squish_y + height)),
+                im=resized_img,
+                box=petCoords,
+                mask=resized_img,
             )
             hand = self.hand_frames[i]
             frame.paste(hand, (shake_x, shake_y), hand)
@@ -165,9 +175,9 @@ class Memes(commands.Cog):
     async def petpet(
         self,
         ctx: commands.Context,
-        userOrLink: Union[discord.Member, discord.User, str] = None,
+        userOrLink: UserOrLink = None,
         speed_ms: Optional[int] = None,
-    ):
+    ) -> None:
         """Headpat people or images that need to be protected!"""
         try:
             image = await self.get_image(ctx.message.attachments, userOrLink)
@@ -178,7 +188,7 @@ class Memes(commands.Cog):
             await ctx.send(err)
             return
 
-        images = self.petpetFrames(Image.open(io.BytesIO(image)))
+        images = self.petpetFrames(Image.open(io.BytesIO(image)).convert("RGBA"))
 
         if speed_ms is None:
             speed_ms = random.choice((20, 30, 60))
@@ -192,6 +202,7 @@ class Memes(commands.Cog):
                 append_images=images[1:],
                 duration=speed_ms,
                 transparency=0,
+                # disposal=2,
                 loop=0,
                 optimize=True,
             )
@@ -204,7 +215,9 @@ class Memes(commands.Cog):
         await ctx.send(file=gifFile, embed=embed)
 
     @commands.command(name="random", hidden=True)
-    async def rnd(self, ctx: commands.Context, m: discord.Member = None):
+    async def rnd(
+        self, ctx: commands.Context, m: Optional[discord.Member] = None
+    ) -> None:
         """Chika-Two server exclusive command, ping a random user"""
         if not ctx.guild or ctx.guild.id != 722359478799958057:
             return
@@ -214,5 +227,5 @@ class Memes(commands.Cog):
         await ctx.send(text)
 
 
-def setup(bot: commands.Bot):
+def setup(bot: commands.Bot) -> None:
     bot.add_cog(Memes(bot))
