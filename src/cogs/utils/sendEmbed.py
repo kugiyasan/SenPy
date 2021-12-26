@@ -1,9 +1,13 @@
+from typing import Any
 import discord
+from discord.ext import commands
 
 from ..mofupoints import incrementEmbedCounter
 
 
-async def sendEmbed(ctx, url, localImageFile=None, **kwargs):
+async def sendEmbed(
+    ctx: commands.Context, url: str, localImageFile: discord.File = None, **kwargs: Any
+) -> None:
     print(url)
 
     if hasattr(ctx, "author"):

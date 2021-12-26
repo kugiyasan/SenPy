@@ -23,12 +23,12 @@ def get_owo(text: str) -> str:
 
 
 class Neko(commands.Cog):
-    def __init__(self, bot: commands.Bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
 
     @commands.is_nsfw()
     @commands.command()
-    async def neko(self, ctx: commands.Context, style: str = "neko"):
+    async def neko(self, ctx: commands.Context, style: str = "neko") -> None:
         """Send some cute nekos on your server!"""
         try:
             await sendEmbed(ctx, nekos.img(style))
@@ -36,18 +36,18 @@ class Neko(commands.Cog):
             await ctx.send(err)
 
     @commands.command()
-    async def fact(self, ctx: commands.Context):
+    async def fact(self, ctx: commands.Context) -> None:
         """Get yo facts right!"""
         await deleteMessage(ctx)
         await ctx.send(nekos.fact())
 
     @commands.command()
-    async def owo(self, ctx: commands.Context, *, text: str):
+    async def owo(self, ctx: commands.Context, *, text: str) -> None:
         """yay cute wwitinyg >w<"""
         text = text or "give me a text to owoify!"
         await deleteMessage(ctx)
         await ctx.send(get_owo(text))
 
 
-def setup(bot: commands.Bot):
+def setup(bot: commands.Bot) -> None:
     bot.add_cog(Neko(bot))

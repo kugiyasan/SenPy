@@ -9,14 +9,14 @@ from .mofupoints import incrementEmbedCounter
 
 
 class BooruCog(commands.Cog, name="Booru"):
-    def __init__(self, bot, Client, site_name, post_url, site_url=""):
+    def __init__(self, bot: commands.Bot, Client: "BooruCog", site_name: str, post_url: str, site_url: str="") -> None:
         self.bot = bot
         self.site_name = site_name
         self.urlsTags = {}
         self.client = Client(site_name=site_name, site_url=site_url)
         self.post_url = post_url
 
-    async def booru(self, ctx: commands.Context, *, tags="rating:s"):
+    async def booru(self, ctx: commands.Context, *, tags: str="rating:s") -> None:
         """Wow searching on booru site that's so original"""
         if not len(self.urlsTags.get(tags, {})):
             async with ctx.channel.typing():
@@ -37,7 +37,7 @@ class BooruCog(commands.Cog, name="Booru"):
         await self.sendBooruEmbed(ctx, post)
         incrementEmbedCounter(ctx.author)
 
-    def requestBooru(self, tags):
+    def requestBooru(self, tags: str) -> None:
         print("requesting " + self.site_name)
 
         try:

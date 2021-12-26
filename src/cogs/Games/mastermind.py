@@ -7,16 +7,16 @@ from ..utils.deleteMessage import deleteMessage
 import asyncio
 import random
 import re
-from typing import Optional, List, Tuple
+from typing import Optional, List, Set, Tuple, Union
 
 
 class Mastermind(commands.Cog, name="Games"):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.playingUsers = set()
+        self.playingUsers: Set[discord.Member] = set()
 
     @commands.command()
-    async def stopmm(self, ctx: commands.Context):
+    async def stopmm(self, ctx: commands.Context) -> None:
         """
         Debug command, call this if mastermind has crashed
         and it thinks that you still have a on going game
@@ -24,7 +24,9 @@ class Mastermind(commands.Cog, name="Games"):
         self.playingUsers.discard(ctx.author)
         await ctx.send("You should now be able to start a new game!")
 
-    def generateAnswer(self, guessLength, repeatedColor) -> Optional[List[int]]:
+    def generateAnswer(
+        self, guessLength: int, repeatedColor: bool
+    ) -> Optional[List[int]]:
         if repeatedColor:
             answer = [random.randint(1, 6) for _ in range(guessLength)]
         else:
@@ -37,8 +39,8 @@ class Mastermind(commands.Cog, name="Games"):
 
         return answer
 
-    def judgement(self, guess, answer) -> str:
-        guess = [int(i) for i in guess]
+    def judgement(self, guess_str: str, answer: List[int]) -> str:
+        guess = [int(i) for i in guess_str]
         white, brown = 0, 0
 
         for i in range(1, 7):
@@ -50,8 +52,8 @@ class Mastermind(commands.Cog, name="Games"):
 
         return "⚪" * white + "🟤" * (brown - white)
 
-    def toEmoji(self, string):
-        if type(string) == list:
+    def toEmoji(self, string: Union[str, List[int]]) -> str:
+        if isinstance(string, list):
             string = "".join(str(i) for i in string)
 
         return (
@@ -165,5 +167,5 @@ class Mastermind(commands.Cog, name="Games"):
         self.playingUsers.discard(ctx.author)
 
 
-def setup(bot: commands.Bot):
+def setup(bot: commands.Bot) -> None:
     bot.add_cog(Mastermind(bot))

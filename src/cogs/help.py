@@ -2,15 +2,16 @@ import discord
 from discord.ext import commands
 
 import itertools
+from typing import Tuple
 
 
 class MyHelpCommand(commands.HelpCommand):
-    def divideInTwoColumns(self, text):
+    def divideInTwoColumns(self, text: str) -> Tuple[str, str]:
         half = text.index("\n\n", len(text) // 2)
         return text[:half], text[half:]
 
     # This function triggers when somone type `<prefix>help`
-    async def send_bot_help(self, mapping):
+    async def send_bot_help(self, mapping) -> None:
         ctx = self.context
         text = ""
 

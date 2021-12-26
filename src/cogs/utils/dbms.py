@@ -1,12 +1,14 @@
 import os
 import psycopg2
 from tenacity import retry, wait_exponential, stop_after_attempt
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
+
+T = TypeVar("T")
 
 # https://stackoverflow.com/questions/42385391/auto-reconnect-postgresq-database
-def reconnect(f: Callable):
-    def wrapper(storage, *args, **kwargs):
+def reconnect(f: Callable[..., T]) -> Callable[..., T]:
+    def wrapper(storage: "DbStorage", *args: Any, **kwargs: Any) -> T:
         if not storage.connected():
             storage.connect()
 
@@ -25,13 +27,13 @@ class DbStorage:
         self._connection: Optional[Any] = None
 
     def connected(self) -> bool:
-        return bool(self._connection) and self._connection.closed == 0
+        return self._connection is not None and self._connection.closed == 0
 
-    def connect(self):
+    def connect(self) -> None:
         self.close()
         self._connection = psycopg2.connect(self._conn)
 
-    def close(self):
+    def close(self) -> None:
         if self.connected():
             try:
                 self._connection.close()
@@ -42,7 +44,7 @@ class DbStorage:
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential())
     @reconnect
-    def get_data(self, query: str, args) -> List[Tuple[Any]]:
+    def get_data(self, query: str, args: Tuple[Any, ...]=tuple()) -> List[Tuple[Any, ...]]:
         """
         Execute the query and let psycopg2 protect from SQL injection
         """
@@ -52,7 +54,7 @@ class DbStorage:
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential())
     @reconnect
-    def set_data(self, query: str, args):
+    def set_data(self, query: str, args: Tuple[Any, ...]) -> None:
         """
         Execute the query and let psycopg2 protect from SQL injection
         """

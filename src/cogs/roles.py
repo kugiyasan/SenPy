@@ -122,7 +122,7 @@ class Roles(commands.Cog):
 
         return roles, message
 
-    async def roleEmbed(self, ctx: commands.Context, roleAction: RoleActions):
+    async def roleEmbed(self, ctx: commands.Context, roleAction: RoleActions) -> None:
         page = 0
         roles, message = await self.initEmbed(ctx, roleAction, page)
 
