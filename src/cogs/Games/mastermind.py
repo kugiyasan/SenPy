@@ -10,7 +10,7 @@ import re
 from typing import Optional, List, Set, Tuple, Union
 
 
-class Mastermind(commands.Cog, name="Games"):
+class Mastermind(commands.Cog, name="Mastermind"):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.playingUsers: Set[discord.Member] = set()
@@ -167,5 +167,5 @@ class Mastermind(commands.Cog, name="Games"):
         self.playingUsers.discard(ctx.author)
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(Mastermind(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Mastermind(bot))

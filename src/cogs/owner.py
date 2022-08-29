@@ -4,7 +4,7 @@ from discord.ext import commands
 import os
 from typing import Tuple
 
-from .utils.dbms import db
+# from .utils.dbms import db
 from .utils.get_extensions import get_extensions
 
 
@@ -55,18 +55,18 @@ class Owner(commands.Cog):
         output = stream.read()
         await ctx.send(f"```{output}```")
 
-    @commands.is_owner()
-    @commands.command(hidden=True)
-    async def sql(self, ctx: commands.Context, code: str, *values: Tuple[str]):
-        """Send a query to the database"""
-        code = code.strip("`").lower()
+    # @commands.is_owner()
+    # @commands.command(hidden=True)
+    # async def sql(self, ctx: commands.Context, code: str, *values: Tuple[str]):
+    #     """Send a query to the database"""
+    #     code = code.strip("`").lower()
 
-        if code.startswith("select"):
-            data = db.get_data(code, values)
-            await ctx.send(data)
-        else:
-            db.set_data(code, values)
-            await ctx.message.add_reaction("✅")
+    #     if code.startswith("select"):
+    #         data = db.get_data(code, values)
+    #         await ctx.send(data)
+    #     else:
+    #         db.set_data(code, values)
+    #         await ctx.message.add_reaction("✅")
 
     @commands.is_owner()
     @commands.command(hidden=True)
@@ -83,9 +83,9 @@ class Owner(commands.Cog):
         try:
             for ext in get_extensions():
                 try:
-                    self.bot.reload_extension(ext)
+                    await self.bot.reload_extension(ext)
                 except commands.errors.ExtensionNotLoaded:
-                    self.bot.load_extension(ext)
+                    await self.bot.load_extension(ext)
         except commands.ExtensionFailed:
             await ctx.send("Reloading failed")
             raise
@@ -94,5 +94,5 @@ class Owner(commands.Cog):
         print("\033[94mReloading successfully finished!\033[0m\n")
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Owner(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Owner(bot))

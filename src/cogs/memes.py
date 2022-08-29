@@ -227,5 +227,5 @@ class Memes(commands.Cog):
         await ctx.send(text)
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(Memes(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Memes(bot))

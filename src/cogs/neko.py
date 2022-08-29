@@ -49,5 +49,5 @@ class Neko(commands.Cog):
         await ctx.send(get_owo(text))
 
 
-def setup(bot: commands.Bot) -> None:
-    bot.add_cog(Neko(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Neko(bot))

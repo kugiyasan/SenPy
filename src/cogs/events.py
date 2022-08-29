@@ -158,5 +158,5 @@ class Events(commands.Cog):
         return self.bot.get_channel(channel[0])
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Events(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Events(bot))

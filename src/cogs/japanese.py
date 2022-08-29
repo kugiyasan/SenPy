@@ -79,5 +79,5 @@ class Japanese(commands.Cog):
         await ctx.send(file=image_file, embed=embed)
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Japanese(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Japanese(bot))

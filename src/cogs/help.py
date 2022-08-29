@@ -38,7 +38,7 @@ class MyHelpCommand(commands.HelpCommand):
             title=f"Here are all the available command for {ctx.bot.user.name}!",
             color=discord.Color(0xFF5BAE),
         )
-        embed.set_thumbnail(url=ctx.me.avatar_url)
+        embed.set_thumbnail(url=ctx.me.avatar.url)
 
         embed.add_field(name="_ _", value=column1)
         embed.add_field(name="_ _", value=column2)
@@ -116,8 +116,8 @@ class Help(commands.Cog):
         self.bot.help_command = self.bot._original_help_command
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Help(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Help(bot))
 
 
 # Useful variables for help command

@@ -95,5 +95,5 @@ class Settings(commands.Cog):
         await ctx.send("Setting saved!")
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Settings(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Settings(bot))

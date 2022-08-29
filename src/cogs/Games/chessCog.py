@@ -5,7 +5,7 @@ import asyncio
 import chess
 
 
-class ChessCog(commands.Cog, name="Games"):
+class ChessCog(commands.Cog, name="Chess"):
     def __init__(self, bot):
         self.bot = bot
         self.playingUsers = set()
@@ -134,5 +134,5 @@ class ChessCog(commands.Cog, name="Games"):
         )
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(ChessCog(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(ChessCog(bot))

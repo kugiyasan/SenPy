@@ -202,5 +202,5 @@ class Roles(commands.Cog):
             await ctx.send(f"{role.name} is now unavailable for the members!")
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Roles(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Roles(bot))

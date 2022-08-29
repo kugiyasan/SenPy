@@ -158,5 +158,5 @@ class Info(commands.Cog):
         await message.add_reaction("👎")
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(Info(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(Info(bot))

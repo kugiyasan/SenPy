@@ -267,21 +267,21 @@ class Gelbooru(BooruCog, name="Booru"):
         await self.booru(ctx, tags=tags)
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(
         DanbooruCog(bot, Danbooru, "danbooru", "https://danbooru.donmai.us/posts/")
     )
-    bot.add_cog(Yandere(bot, Moebooru, "yandere", "https://yande.re/post/show/"))
-    bot.add_cog(Konachan(bot, Moebooru, "konachan", "https://konachan.com/post/show/"))
-    bot.add_cog(
-        Safebooru(bot, Danbooru, "safebooru", "https://safebooru.donmai.us/posts/")
-    )
-    bot.add_cog(
-        Gelbooru(
-            bot,
-            GelbooruClient,
-            "gelbooru",
-            "https://gelbooru.com/index.php?page=post&s=view&id=",
-            "gelbooru.com",
-        )
-    )
+    # await bot.add_cog(Yandere(bot, Moebooru, "yandere", "https://yande.re/post/show/"))
+    # await bot.add_cog(Konachan(bot, Moebooru, "konachan", "https://konachan.com/post/show/"))
+    # await bot.add_cog(
+    #     Safebooru(bot, Danbooru, "safebooru", "https://safebooru.donmai.us/posts/")
+    # )
+    # await bot.add_cog(
+    #     Gelbooru(
+    #         bot,
+    #         GelbooruClient,
+    #         "gelbooru",
+    #         "https://gelbooru.com/index.php?page=post&s=view&id=",
+    #         "gelbooru.com",
+    #     )
+    # )

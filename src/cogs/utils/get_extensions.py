@@ -3,6 +3,7 @@ from typing import Iterator
 
 
 def get_extensions() -> Iterator[str]:
+    # return ["cogs.info", "cogs.owner"]
     here = Path(__file__).parent.parent.parent
     for path in ("cogs", "cogs/Games"):
         for f in (here / path).iterdir():

@@ -89,5 +89,5 @@ class MofuPoints(commands.Cog):
         await ctx.send(msg)
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(MofuPoints(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(MofuPoints(bot))

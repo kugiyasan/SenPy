@@ -6,6 +6,7 @@ from typing import Any, Callable, List, Optional, Tuple, TypeVar
 
 T = TypeVar("T")
 
+
 # https://stackoverflow.com/questions/42385391/auto-reconnect-postgresq-database
 def reconnect(f: Callable[..., T]) -> Callable[..., T]:
     def wrapper(storage: "DbStorage", *args: Any, **kwargs: Any) -> T:
@@ -44,7 +45,9 @@ class DbStorage:
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential())
     @reconnect
-    def get_data(self, query: str, args: Tuple[Any, ...]=tuple()) -> List[Tuple[Any, ...]]:
+    def get_data(
+        self, query: str, args: Tuple[Any, ...] = tuple()
+    ) -> List[Tuple[Any, ...]]:
         """
         Execute the query and let psycopg2 protect from SQL injection
         """

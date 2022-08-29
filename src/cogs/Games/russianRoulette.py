@@ -5,7 +5,7 @@ import asyncio
 import random
 
 
-class RussianRoulette(commands.Cog, name="Games"):
+class RussianRoulette(commands.Cog, name="Russian Roulette"):
     def __init__(self, bot):
         self.bot = bot
 
@@ -67,5 +67,5 @@ class RussianRoulette(commands.Cog, name="Games"):
                 return
 
 
-def setup(bot: commands.Bot):
-    bot.add_cog(RussianRoulette(bot))
+async def setup(bot: commands.Bot):
+    await bot.add_cog(RussianRoulette(bot))
